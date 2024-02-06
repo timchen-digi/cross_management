@@ -1,6 +1,7 @@
-# Quasar App (quasar-project)
+# 管理後台
 
-A Quasar Project
+登入頁面
+http://localhost:9000/#/Login/Index
 
 ## Install the dependencies
 ```bash
