@@ -54,75 +54,14 @@
 </template>
 <script>
 import { defineComponent } from "vue";
-const columns = [
-  { name: "name", required: true, label: "日期", field: "date" },
-  { name: "calories", label: "類型", field: "type" },
-  { name: "fat", label: "用戶名稱", field: "name" },
-  { name: "carbs", label: "狀態", field: "state" },
-  {
-    name: "protein",
-    label: "手續費",
-    field: "fee",
-    format: (val) => `$${val} NTD`,
-  },
-  {
-    name: "sodium",
-    label: "淨額",
-    field: "amt",
-    format: (val) => `$${val} NTD`,
-  },
-];
-
-const rows = [
-  {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已付款",
-    fee: 15,
-    amt: 5678,
-  },
-  {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已提領",
-    fee: 1,
-    amt: 89,
-  },
-  {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已退款",
-    fee: 5,
-    amt: 100,
-  },
-  {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已完成",
-    fee: 1,
-    amt: 10,
-  },
-  {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已完成",
-    fee: 0,
-    amt: 200,
-  },
-];
-
+import DataTable from "components/DataTable.vue";
 export default defineComponent({
   name: "MerchantPage",
+  components: {
+    DataTable,
+  },
   setup() {
-    return {
-      columns,
-      rows,
-    };
+    return {};
   },
 });
 </script>
