@@ -127,7 +127,8 @@
               <q-table class="recentlyTable col-12" flat :rows="rows" :columns="columns" hide-bottom />
             </div>
             <div class="row justify-center q-my-md">
-              <q-btn color="warning" size="18px" class="q-px-xl text-black" label="查看交易明細" unelevated rounded />
+              <q-btn color="warning" size="18px" class="q-px-xl text-black" label="查看交易明細" to="/History" unelevated
+                rounded />
             </div>
           </q-card-section>
         </q-card>
@@ -139,6 +140,7 @@
 <script>
 
 import { toThousands } from 'src/utils/index.js'
+import { ref } from 'vue'
 
 const columns = [
   { name: "name", required: true, label: "日期", field: "date", align: 'left' },
@@ -209,6 +211,7 @@ export default {
   name: "HomePage",
   data() {
     return {
+      link: ref(''),
       DigiAccound: {
         img: '/src/assets/logos/DigiFlow_logoOnly.svg',
         type: 'digiflow',

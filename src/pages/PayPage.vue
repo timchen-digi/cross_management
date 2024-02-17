@@ -5,7 +5,7 @@
       <div class="col-md-7 col-12">
         <div class="BlockContent q-pr-lg">
           <h5 class="mainTitle">支付</h5>
-          <q-input rounded outlined v-model="text" label="姓名、用戶名、電子郵件、手機">
+          <q-input rounded outlined v-model="searchUserByPay" label="姓名、用戶名、電子郵件、手機">
             <template v-slot:prepend><q-icon name="search" /></template>
           </q-input>
           <div class="row justify-start q-my-md">
@@ -16,7 +16,7 @@
       <div class="col-md-5 col-12">
         <div class="BlockContent q-pr-lg">
           <h5 class="mainTitle">聯絡人</h5>
-          <q-input rounded outlined v-model="text" label="搜尋">
+          <q-input rounded outlined v-model="searchUser" label="搜尋">
             <template v-slot:prepend>
               <q-icon name="search" />
             </template>
@@ -63,10 +63,15 @@
 </template>
 
 <script>
+
+import { ref } from 'vue'
+
 export default {
   name: "WalletPage",
   data() {
     return {
+      searchUser: ref(''),
+      searchUserByPay: ref(''),
       contactUser: [
         {
           avatar: "/src/assets/User/UserAvatar_01.png",
