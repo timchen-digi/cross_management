@@ -2,7 +2,7 @@
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
       <q-toolbar class="bg-primary text-white">
-        <img src="~assets/digiflow-logo.svg" />
+        <img src="~assets/logos/DigiFlow_logo_White.svg" class="mainLOGO" />
         <q-space />
         <q-btn
           color="amber"
