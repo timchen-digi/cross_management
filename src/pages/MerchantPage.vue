@@ -6,6 +6,7 @@
         <div class="col-4 q-pa-xs">
           <q-card class="my-card q-mb-md" bordered>
             <q-card-section>
+
               <div class="BlockContent">
                 <h5 class="mainTitle q-px-md">商戶基本資料</h5>
                 <q-list separator>
@@ -23,6 +24,7 @@
           </q-card>
           <q-card class="my-card q-mb-md" bordered>
             <q-card-section>
+
               <div class="BlockContent">
                 <h5 class="Title">已綁定的卡片/帳戶</h5>
                 <q-btn v-for="(BindCard, index) in  BindCard" :key="index" class="AccountList btn-fixed-width"
@@ -43,6 +45,7 @@
                   <q-btn color="warning" size="18px" class="q-px-xl text-black" label="管理" unelevated rounded />
                 </div>
               </div>
+
             </q-card-section>
           </q-card>
         </div>
@@ -52,6 +55,12 @@
               <div class="text-h5 q-mb-xs">近期活動</div>
               <div class="q-my-md row">
                 <q-table class="recentlyTable col-12" flat :rows="rows" :columns="columns" hide-bottom />
+                <DataTable
+                  title="近期活動"
+                  label="查看交易明細"
+                  link="/History"
+                  :showBottom="false"
+                />
               </div>
               <div class="row justify-center q-my-md">
                 <q-btn color="warning" size="18px" class="q-px-xl text-black" label="查看交易明細" to="/History" unelevated
@@ -59,6 +68,7 @@
               </div>
             </q-card-section>
           </q-card>
+          
         </div>
       </div>
     </div>
@@ -66,8 +76,10 @@
 </template>
 <script>
 
-import { toThousands } from 'src/utils/index.js'
 import { ref } from 'vue'
+import { useUserStore } from "../stores";
+import DataTable from "components/DataTable.vue";
+import { toThousands } from 'src/utils/index.js'
 
 const columns = [
   { name: "name", required: true, label: "日期", field: "date", align: 'left' },
@@ -165,10 +177,13 @@ export default {
     }
   },
   setup() {
+    const user = useUserStore();
+    const username = user.username;
     return {
       toThousands,
       rows,
-      columns
+      columns,
+      username
     }
   },
 };
