@@ -1,6 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-
+  <q-layout view="hHh Lpr lFf">
     <HeaderComp />
 
     <q-page-container>
@@ -10,7 +9,6 @@
     </q-page-container>
 
     <FooterComp />
-
   </q-layout>
 </template>
 
