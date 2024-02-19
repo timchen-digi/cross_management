@@ -40,7 +40,7 @@ export default route(function (/* { store, ssrContext } */) {
     console.log("next", next);
     if (!to.path.startsWith("/Login") && !user.username) {
       alert("請先登入");
-      next("/Login/Index");
+      next("/Login");
     } else {
       next();
     }
