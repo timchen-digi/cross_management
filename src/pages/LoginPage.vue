@@ -6,23 +6,27 @@
       <q-form @submit="login">
         <div class="text-h6">電子郵件 或 手機號碼</div>
         <div class="q-gutter-md">
-          <q-input filled v-model="account" label="" stack-label />
+          <q-input filled v-model="account" stack-label />
           <div class="text-h6">密碼</div>
-          <q-input v-model="password" label="" type="password" />
-          <!-- <q-input v-model="password" filled :type="isPwd ? 'password' : 'text'">
-          <template v-slot:append>
-            <q-icon
-              :name="isPwd ? 'visibility_off' : 'visibility'"
-              class="cursor-pointer"
-              @click="isPwd = !isPwd"
-            />
-          </template>
-        </q-input> -->
-          <!-- <q-input label="驗證碼" v-model="verify" stack-label>
+          <!-- <q-input v-model="password" type="password" /> -->
+          <q-input
+            v-model="password"
+            filled
+            :type="isPwd ? 'password' : 'text'"
+          >
+            <template v-slot:append>
+              <q-icon
+                :name="isPwd ? 'visibility_off' : 'visibility'"
+                class="cursor-pointer"
+                @click="isPwd = !isPwd"
+              />
+            </template>
+          </q-input>
+          <q-input label="驗證碼" v-model="verify" stack-label>
             <template v-slot:control>
               <div class="self-center full-width no-outline" tabindex="0"></div>
             </template>
-          </q-input> -->
+          </q-input>
           <q-btn
             style="width: 100%"
             color="amber"
@@ -47,7 +51,7 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import { useUserStore } from "../stores";
 export default defineComponent({
   name: "LoginPage",
@@ -66,13 +70,15 @@ export default defineComponent({
       const authStore = useUserStore();
       authStore.setUser(username);
       // 假設登入成功後導航至其他頁面
-      this.$router.push("/Merchant");
+      this.$router.push("/");
     },
   },
   data() {
     return {
       account: "",
       password: "",
+      isPwd: ref(true),
+      verify: "",
     };
   },
 });

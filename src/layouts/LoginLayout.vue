@@ -14,22 +14,19 @@
         />
       </q-toolbar>
     </q-header>
-    <q-footer elevated>
-      <q-toolbar class="bg-secondary text-black">
-        Digiflow tech. 2024
-      </q-toolbar>
-    </q-footer>
     <q-page-container>
       <router-view />
     </q-page-container>
+    <FooterComp />
   </q-layout>
 </template>
 
 <script>
 import { defineComponent, ref } from "vue";
+import FooterComp from "/src/components/Footer.vue";
 export default defineComponent({
   name: "LoginLayout",
-  components: {},
+  components: { FooterComp },
 
   setup() {
     const leftDrawerOpen = ref(false);

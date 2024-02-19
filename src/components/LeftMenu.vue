@@ -16,12 +16,25 @@ export default {
     return {
       menuList: [
         {
-          label: "帳號管理",
-          path: "/",
+          label: "我的帳號",
+          children: [
+            {
+              label: "變更密碼",
+              path: "/",
+            },
+            {
+              label: "登出",
+              path: "/Logout",
+            },
+          ],
         },
         {
           label: "系統管理",
           children: [
+            {
+              label: "員工帳號管理",
+              path: "/",
+            },
             {
               label: "員工操作紀錄",
               path: "/",

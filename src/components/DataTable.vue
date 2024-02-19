@@ -1,10 +1,10 @@
 <template>
-  <q-card class="my-card" bordered>
-    <q-card-section>
+  <q-card class="my-card q-my-md">
+    <q-card-section class="q-pa-0">
       <div class="text-h5 q-mb-xs">{{ title }}</div>
-      <div>
+      <div class="q-my-md row">
         <q-table
-          class="my-sticky-header-table"
+          class="recentlyTable col-12"
           flat
           bordered
           :rows="rows"
@@ -12,21 +12,24 @@
           :hide-bottom="!showBottom"
         />
       </div>
-      <q-card-actions align="center">
+      <div class="row justify-center q-my-md">
         <q-btn
-          color="amber"
-          text-color="black"
-          rounded
+          color="warning"
+          size="18px"
+          class="q-px-xl text-black"
           :label="label"
           :to="link"
+          unelevated
+          rounded
         />
-      </q-card-actions>
+      </div>
     </q-card-section>
   </q-card>
 </template>
 
 <script>
 import { defineComponent } from "vue";
+import { toThousands } from "src/utils/index.js";
 export default defineComponent({
   name: "DataTable",
   props: {
@@ -54,21 +57,29 @@ export default defineComponent({
     },
     columns: {
       default: [
-        { name: "name", required: true, label: "日期", field: "date" },
-        { name: "calories", label: "類型", field: "type" },
-        { name: "fat", label: "用戶名稱", field: "name" },
-        { name: "carbs", label: "狀態", field: "state" },
+        {
+          name: "name",
+          required: true,
+          label: "日期",
+          field: "date",
+          align: "left",
+        },
+        { name: "calories", label: "類型", field: "type", align: "center" },
+        { name: "fat", label: "用戶名稱", field: "name", align: "center" },
+        { name: "carbs", label: "狀態", field: "state", align: "center" },
         {
           name: "protein",
           label: "手續費",
           field: "fee",
-          format: (val) => `$${val} NTD`,
+          format: (val) => `NTD$ ${toThousands(val)}`,
+          align: "center",
         },
         {
           name: "sodium",
           label: "淨額",
           field: "amt",
-          format: (val) => `$${val} NTD`,
+          format: (val) => `NTD$ ${toThousands(val)}`,
+          align: "right",
         },
       ],
     },

@@ -50,6 +50,10 @@
         </q-menu>
       </q-btn>
       <q-tabs shrink>
+        <q-item-section color="warning">{{ username }}</q-item-section>
+      </q-tabs>
+
+      <!-- <q-tabs shrink>
         <q-btn round>
           <q-avatar>
             <img src="/src/assets/User/UserAvatar_01.png" />
@@ -74,8 +78,7 @@
             </q-list>
           </q-menu>
         </q-btn>
-        <!--<q-route-tab name="logout" label="登出" to="/Login/Index" />-->
-      </q-tabs>
+      </q-tabs> -->
     </q-toolbar>
   </q-header>
   <q-drawer
