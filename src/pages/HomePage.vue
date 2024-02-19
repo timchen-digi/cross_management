@@ -12,17 +12,8 @@
               <p class="Remark">*以最新貨幣轉換匯率估算</p>
             </div>
             <div class="currency">
-              <q-list
-                class="rounded-borders"
-                style="max-width: 100%"
-                bordered
-                separator
-              >
-                <q-item
-                  class="q-py-md"
-                  v-for="(BindCurrency, index) in BindCurrency"
-                  :key="index"
-                >
+              <q-list class="rounded-borders" style="max-width: 100%" bordered separator>
+                <q-item class="q-py-md" v-for="(BindCurrency, index) in BindCurrency" :key="index">
                   <q-item-section center class="col-1">
                     <q-avatar size="md">
                       <img :src="BindCurrency.img" />
@@ -31,47 +22,25 @@
 
                   <q-item-section center>
                     <q-item-label lines="1" class="row justify-between">
-                      <span class="text-weight-medium"
-                        >{{ BindCurrency.name }}
-                        <q-chip
-                          v-if="BindCurrency.type == 'default'"
-                          color="warning"
-                          size="xs"
-                          label="預設"
-                          outline
-                        ></q-chip>
+                      <span class="text-weight-medium">{{ BindCurrency.name }}
+                        <q-chip v-if="BindCurrency.type == 'default'" color="warning" size="xs" label="預設"
+                          outline></q-chip>
                       </span>
-                      <span class="text-grey-8"
-                        >{{ BindCurrency.symbol }}
-                        {{ toThousands(BindCurrency.balance) }}</span
-                      >
+                      <span class="text-grey-8">{{ BindCurrency.symbol }}
+                        {{ toThousands(BindCurrency.balance) }}</span>
                     </q-item-label>
                   </q-item-section>
 
                   <q-item-section center side>
                     <div class="text-grey-8 q-gutter-xs">
-                      <q-btn
-                        size="12px"
-                        flat
-                        dense
-                        round
-                        icon="more_vert"
-                        v-if="BindCurrency.type != 'default'"
-                      >
+                      <q-btn size="12px" flat dense round icon="more_vert" v-if="BindCurrency.type != 'default'">
                         <q-menu auto-close square :offset="[0, 5]">
                           <q-list>
-                            <q-item
-                              clickable
-                              @click="setDefaultCurrency(index)"
-                            >
-                              <q-item-section class="text-subtitle1"
-                                >設為預設</q-item-section
-                              >
+                            <q-item clickable @click="setDefaultCurrency(index)">
+                              <q-item-section class="text-subtitle1">設為預設</q-item-section>
                             </q-item>
                             <q-item clickable>
-                              <q-item-section class="text-red"
-                                >刪除貨幣</q-item-section
-                              >
+                              <q-item-section class="text-red">刪除貨幣</q-item-section>
                             </q-item>
                           </q-list>
                         </q-menu>
@@ -82,14 +51,7 @@
               </q-list>
 
               <div class="row justify-center q-my-md">
-                <q-btn
-                  color="warning"
-                  size="18px"
-                  class="q-px-xl text-black"
-                  label="提領"
-                  unelevated
-                  rounded
-                />
+                <q-btn color="warning" size="18px" class="q-px-xl text-black" label="提領" unelevated rounded />
               </div>
             </div>
           </div>
@@ -98,15 +60,8 @@
         <q-card class="my-card q-pa-md q-mb-md" bordered>
           <div class="BlockContent">
             <h5 class="Title">已綁定的卡片/帳戶</h5>
-            <q-btn
-              v-for="(BindCard, index) in BindCard"
-              :key="index"
-              class="AccountList btn-fixed-width"
-              align="between"
-              :class="link === index ? 'AccountListActive' : ''"
-              @click="link = index"
-              unelevated
-            >
+            <q-btn v-for="(BindCard, index) in BindCard" :key="index" class="AccountList btn-fixed-width" align="between"
+              :class="link === index ? 'AccountListActive' : ''" @click="link = index" unelevated>
               <div class="CardInfo">
                 <div class="CardThumb">
                   <img :src="BindCard.img" alt="信用卡1" />
@@ -115,8 +70,8 @@
                   <h5>
                     {{
                       BindCard.type == "credit"
-                        ? "信用卡"
-                        : BindCard.type == "bank"
+                      ? "信用卡"
+                      : BindCard.type == "bank"
                         ? "銀行帳戶"
                         : "不明類型"
                     }}
@@ -128,14 +83,7 @@
             </q-btn>
 
             <div class="row justify-center q-my-md">
-              <q-btn
-                color="warning"
-                size="18px"
-                class="q-px-xl text-black"
-                label="管理"
-                unelevated
-                rounded
-              />
+              <q-btn color="warning" size="18px" class="q-px-xl text-black" label="管理" unelevated rounded />
             </div>
           </div>
         </q-card>
@@ -184,12 +132,7 @@
             <div class="text-h5 q-mb-xs">近期活動</div>
             <div class="q-my-md row">
               <q-table class="recentlyTable col-12" flat :rows="rows" :columns="columns" hide-bottom />
-              <DataTable
-                title="近期活動"
-                label="查看交易明細"
-                link="/History"
-                :showBottom="false"
-              />
+              <DataTable title="近期活動" label="查看交易明細" link="/History" :showBottom="false" />
             </div>
             <div class="row justify-center q-my-md">
               <q-btn color="warning" size="18px" class="q-px-xl text-black" label="查看交易明細" to="/History" unelevated
@@ -201,11 +144,12 @@
     </div>
   </q-page>
 </template>
+
 <script>
 
-
-import { toThousands } from 'src/utils/index.js'
 import { ref } from 'vue'
+import { toThousands } from 'src/utils/index.js'
+import DataTable from "components/DataTable.vue";
 
 const columns = [
   { name: "name", required: true, label: "日期", field: "date", align: 'left' },
@@ -270,10 +214,6 @@ const rows = [
     amt: 200,
   },
 ];
-
-import { toThousands } from "src/utils/index.js";
-import { ref } from "vue";
-import DataTable from "components/DataTable.vue";
 
 export default {
   name: "HomePage",

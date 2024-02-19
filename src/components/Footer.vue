@@ -7,8 +7,8 @@
         <q-tab name="contact" label="聯絡我們" to="/" />
         <q-tab name="qa" label="常見問題" to="/" />
         <q-tab name="privacy" label="隱私權聲明" to="/" />
-        <q-tab name="privacy" label="Cookie" to="/" />
-        <q-tab name="privacy" label="法律同意書" to="/" />
+        <q-tab name="cookie" label="Cookie" to="/" />
+        <q-tab name="legal" label="法律同意書" to="/" />
       </q-tabs>
     </q-toolbar>
     <div class="copyright">Digiflow tech. ©2024</div>
