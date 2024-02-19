@@ -1,37 +1,49 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar class="bg-primary text-white">
-        <img src="~assets/logos/DigiFlow_logo_White.svg" class="mainLOGO" />
-        <q-space />
-        <q-btn
-          color="amber"
-          text-color="black"
-          rounded
-          icon-right="send"
-          label="登入"
-          to="/Login/Index"
-        />
-      </q-toolbar>
-    </q-header>
+
+    <HeaderComp />
+
     <q-page-container>
-      <router-view />
+      <div class="mainContent">
+        <router-view />
+      </div>
     </q-page-container>
+
     <FooterComp />
+
   </q-layout>
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
+
+
 import FooterComp from "/src/components/Footer.vue";
-export default defineComponent({
+export default{
   name: "LoginLayout",
   components: { FooterComp },
 
+import { ref } from "vue";
+import HeaderComp from "/src/components/Header.vue"
+import FooterComp from "/src/components/Footer.vue"
+
+export default {
+  name: "LoginLayout",
+  components: {
+    HeaderComp,
+    FooterComp
+  },
   setup() {
     const leftDrawerOpen = ref(false);
 
     return {};
-  },
-});
+  }
+};
 </script>
+
+<style lang="sass" scoped>
+.mainContent
+  max-width: 1200px
+  margin: 0 auto
+  padding: 30px 0
+
+</style>
