@@ -16,6 +16,12 @@
 
 <script>
 
+
+import FooterComp from "/src/components/Footer.vue";
+export default{
+  name: "LoginLayout",
+  components: { FooterComp },
+
 import { ref } from "vue";
 import HeaderComp from "/src/components/Header.vue"
 import FooterComp from "/src/components/Footer.vue"

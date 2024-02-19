@@ -1,4 +1,5 @@
 <template>
+
   <q-page padding>
     <div class="LoginContent">
       <h5 class="MainTitle">登入</h5>
@@ -39,7 +40,6 @@
         <q-btn color="black" text-color="white" label="註冊" to="/Login/Register" size="lg" rounded />
 
       </div>
-
     </div>
   </q-page>
 </template>
@@ -48,6 +48,7 @@
 
 import { ref } from "vue";
 import Sidentify from "/src/utils/identify.vue"
+import { useUserStore } from "../stores";
 
 export default {
   name: "LoginPage",
@@ -58,18 +59,29 @@ export default {
     return {
       identifyCode: "", //密碼登入圖形驗證碼
       identifyCodes: "1234567890abcdefghizklmnopqrstuvwxyz", //生成圖形驗證碼依據
+      account: "",
+      password: "",
+      isPwd: ref(true),
+      verify: ""
     }
   },
-  setup() {
-    return {
-      password: ref(""),
-      isPwd: ref(true),
-      account: ref(""),
-      verify: ref(""),
-    };
-  },
   methods: {
-
+    login() {
+      // 假設這裡進行登入驗證，成功後將資料保存至 Pinia
+      var username = "";
+      if (this.account == "digiflow") {
+        username = "數位鎏測試商戶";
+      } else if (this.account == "admin") {
+        username = "後台系統管理員";
+      } else {
+        alert("使用者名稱或密碼錯誤");
+        return;
+      }
+      const authStore = useUserStore();
+      authStore.setUser(username);
+      // 假設登入成功後導航至其他頁面
+      this.$router.push("/");
+    },
     // 刷新验证码
     refreshIdentifyCode() {
       this.identifyCode = "";
@@ -85,7 +97,7 @@ export default {
     // 生成单个验证码
     randomNum(min, max) {
       return Math.floor(Math.random() * (max - min) + min);
-    },
+    }
   },
   mounted() {
     // 初始化验证码

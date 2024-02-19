@@ -1,6 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-
+  <q-layout view="hHh Lpr lFf">
     <HeaderComp />
 
     <q-page-container>
@@ -10,28 +9,27 @@
     </q-page-container>
 
     <FooterComp />
-
   </q-layout>
 </template>
 
 <script>
 import { ref } from "vue";
-import HeaderComp from "/src/components/Header.vue"
-import FooterComp from "/src/components/Footer.vue"
+import HeaderComp from "/src/components/Header.vue";
+import FooterComp from "/src/components/Footer.vue";
 
 export default {
   name: "MainLayout",
   components: {
     HeaderComp,
-    FooterComp
+    FooterComp,
   },
   setup() {
     const leftDrawerOpen = ref(false);
 
     return {
-      tab: ref('mails')
+      tab: ref("mails"),
     };
-  }
+  },
 };
 </script>
 

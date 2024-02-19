@@ -1,5 +1,5 @@
 const Management = { template: "<div>管理後臺</div>" };
-
+import { useUserStore } from "../stores";
 const routes = [
   {
     path: "/",
@@ -11,6 +11,7 @@ const routes = [
       { path: "Pay", component: () => import("pages/PayPage.vue") },
       { path: "Home", component: () => import("pages/HomePage.vue") },
       { path: "History", component: () => import("pages/HistoryPage.vue") },
+      { path: "Logout", component: () => import("pages/LogoutPage.vue") },
     ],
   },
   {
