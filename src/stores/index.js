@@ -21,7 +21,7 @@ export const useUserStore = defineStore({
       });
       window.localStorage.setItem("userName", "");
       //Router.push("Login");
-      window.location.href = "./#/Login/Index/";
+      window.location.href = "/Login";
     },
   },
 });
