@@ -127,17 +127,10 @@
           </div>
         </div>
 
+
         <q-card class="my-card q-my-md">
           <q-card-section class=" q-pa-0">
-            <div class="text-h5 q-mb-xs">近期活動</div>
-            <div class="q-my-md row">
-              <q-table class="recentlyTable col-12" flat :rows="rows" :columns="columns" hide-bottom />
-              <DataTable title="近期活動" label="查看交易明細" link="/History" :showBottom="false" />
-            </div>
-            <div class="row justify-center q-my-md">
-              <q-btn color="warning" size="18px" class="q-px-xl text-black" label="查看交易明細" to="/History" unelevated
-                rounded />
-            </div>
+            <dataTable title="近期活動" label="查看交易明細" link="/History" :rows="rows" :columns="columns" :showBottom="false" />
           </q-card-section>
         </q-card>
       </div>
@@ -149,7 +142,7 @@
 
 import { ref } from 'vue'
 import { toThousands } from 'src/utils/index.js'
-import DataTable from "components/DataTable.vue";
+import dataTable from "components/DataTable.vue";
 
 const columns = [
   { name: "name", required: true, label: "日期", field: "date", align: 'left' },
@@ -219,7 +212,7 @@ export default {
   name: "HomePage",
   methods: {},
   components: {
-    DataTable,
+    dataTable,
   },
   data() {
     return {
@@ -290,6 +283,8 @@ export default {
         });
         BindCurrency.value[idx].type = "default";
       },
+      columns,
+      rows,
     };
   },
 };

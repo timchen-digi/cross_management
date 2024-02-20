@@ -2,9 +2,7 @@
   <q-header elevated class="header">
     <q-toolbar class="Toolbar text-white">
       <q-btn flat @click="drawer = !drawer" icon="menu" />
-      <a href="/"
-        ><img src="~assets/logos/DigiFlow_logo_White.svg" class="mainLOGO"
-      /></a>
+      <a href="/"><img src="~assets/logos/DigiFlow_logo_White.svg" class="mainLOGO" /></a>
       <q-tabs v-model="tab" inline-label class="tabs" indicator-color="warning">
         <!-- <q-route-tab name="home" label="首頁" to="/Home" /> -->
         <q-route-tab name="merchant" label="商戶管理" to="/Merchant" />
@@ -20,26 +18,13 @@
             <q-toolbar-title>通知({{ notify.length }})</q-toolbar-title>
           </q-toolbar>
           <q-list separator>
-            <q-item
-              clickable
-              v-for="(notify, index) in notify"
-              :key="index"
-              class="q-py-md"
-            >
+            <q-item clickable v-for="(notify, index) in notify" :key="index" class="q-py-md">
               <q-item-section>
                 <q-item-label>{{ notify.Title }}</q-item-label>
                 <q-item-label class="notifyContent" caption>
                   {{ notify.detail }}
                   <br />
-                  <q-btn
-                    v-if="notify.link"
-                    color="warning"
-                    size="md"
-                    class="q-mt-md"
-                    outline
-                    rounded
-                    >查看詳情</q-btn
-                  >
+                  <q-btn v-if="notify.link" color="warning" size="md" class="q-mt-md" outline rounded>查看詳情</q-btn>
                 </q-item-label>
               </q-item-section>
               <q-item-section side top>
@@ -81,14 +66,8 @@
       </q-tabs> -->
     </q-toolbar>
   </q-header>
-  <q-drawer
-    v-model="drawer"
-    show-if-above
-    :width="350"
-    :breakpoint="500"
-    bordered
-    :class="$q.dark.isActive ? 'bg-grey-9' : 'bg-grey-3'"
-  >
+  <q-drawer v-model="drawer" show-if-above :width="300" :breakpoint="500" bordered
+    :class="$q.dark.isActive ? 'bg-grey-9' : 'bg-grey-3'">
     <q-scroll-area class="fit">
       <my-q-menu />
     </q-scroll-area>
