@@ -3,7 +3,7 @@
     <!-- content -->
     <div class="row">
       <div id="parent" class="fit row justify-between" style="overflow: hidden">
-        <div class="col-4 q-pa-xs">
+        <div class="col-4 q-px-xs">
           <q-card class="my-card q-mb-md" bordered>
             <q-card-section>
 
@@ -49,26 +49,13 @@
             </q-card-section>
           </q-card>
         </div>
-        <div class="col-8 q-pa-xs">
-          <q-card class="my-card" bordered>
-            <q-card-section>
-              <div class="text-h5 q-mb-xs">近期活動</div>
-              <div class="q-my-md row">
-                <q-table class="recentlyTable col-12" flat :rows="rows" :columns="columns" hide-bottom />
-                <DataTable
-                  title="近期活動"
-                  label="查看交易明細"
-                  link="/History"
-                  :showBottom="false"
-                />
-              </div>
-              <div class="row justify-center q-my-md">
-                <q-btn color="warning" size="18px" class="q-px-xl text-black" label="查看交易明細" to="/History" unelevated
-                  rounded />
-              </div>
+        <div class="col-8 q-px-xs">
+          <q-card class="my-card">
+            <q-card-section class=" q-pa-0">
+              <dataTable title="近期活動" label="查看交易明細" link="/History" :rows="rows" :columns="columns" :filter="filter"
+                :showBottom="false" />
             </q-card-section>
           </q-card>
-          
         </div>
       </div>
     </div>
@@ -78,7 +65,7 @@
 
 import { ref } from 'vue'
 import { useUserStore } from "../stores";
-import DataTable from "components/DataTable.vue";
+import dataTable from "src/components/DataTable.vue";
 import { toThousands } from 'src/utils/index.js'
 
 const columns = [
@@ -102,51 +89,13 @@ const columns = [
   },
 ];
 
-const rows = [
-  {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已付款",
-    fee: 15,
-    amt: 5678,
-  },
-  {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已提領",
-    fee: 1,
-    amt: 89,
-  },
-  {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已退款",
-    fee: 5,
-    amt: 100,
-  },
-  {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已完成",
-    fee: 1,
-    amt: 10,
-  },
-  {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已完成",
-    fee: 0,
-    amt: 200,
-  },
-];
+const rows = [];
 
 export default {
   name: "MerchantPage",
+  components: {
+    dataTable
+  },
   data() {
     return {
       link: ref(''),
@@ -180,6 +129,7 @@ export default {
     const user = useUserStore();
     const username = user.username;
     return {
+      filter: ref('filter'),
       toThousands,
       rows,
       columns,

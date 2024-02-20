@@ -64,24 +64,7 @@
 
           </div>
           <div class="OrderTableBlock q-my-lg">
-            <q-table class="OrderTable" flat :rows="rows" :columns="columns" row-key="name"
-              v-model:pagination="pagination" hide-bottom>
-
-              <template v-slot:no-data="{ icon, message, filter }">
-                <div class="full-width row flex-center text-accent q-gutter-sm">
-                  <q-icon size="2em" name="sentiment_dissatisfied" />
-                  <span>
-                    Well this is sad... {{ message }} {{ filter }}
-                  </span>
-                  <q-icon size="2em" :name="filter ? 'filter_b_and_w' : icon" />
-                </div>
-              </template>
-
-            </q-table>
-            <div class="row justify-center q-mt-md">
-              <q-pagination v-model="pagination.page" :max="pagesNumber" size="sm" direction-links flat color="grey"
-                active-color="warning" gutter="md" />
-            </div>
+            <dataTable title="" label="" link="/History" :rows="rows" :columns="columns" :showBottom="false" />
           </div>
         </div>
       </div>
@@ -91,8 +74,9 @@
 
 <script>
 
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { toThousands } from 'src/utils/index.js'
+import dataTable from 'src/components/DataTable.vue';
 
 const columns = [
   { name: "name", required: true, label: "日期", field: "date", align: 'left' },
@@ -219,14 +203,10 @@ const rows = [
 
 export default {
   name: "HistoryPage",
+  components: {
+    dataTable
+  },
   setup() {
-
-    const pagination = ref({
-      sortBy: 'desc',
-      descending: true,
-      page: 1,
-      rowsPerPage: 10
-    })
 
     return {
       text: ref(''),
@@ -250,9 +230,7 @@ export default {
         { label: '去年', value: 'lastYear', color: 'warning' }
       ],
       columns,
-      rows,
-      pagination,
-      pagesNumber: computed(() => Math.ceil(rows.length / pagination.value.rowsPerPage))
+      rows
     }
   }
 };
@@ -292,20 +270,6 @@ export default {
   .DateInput
     width: calc(50% - 20px)
     max-width: 200px
-
-.OrderTable
-  .q-table__top,
-  thead tr:first-child th
-    color: #FFF
-    background-color: #738A94
-
-.q-pagination__middle > .q-btn
-  width: 30px
-  height: 30px
-  border-radius: 50%
-
-.q-btn:before
-  box-shadow: none
 
 
 </style>

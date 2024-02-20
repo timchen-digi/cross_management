@@ -24,7 +24,8 @@
         <div class="BlockContent">
           <h5 class="Title">Digiflow帳戶</h5>
           <q-btn class="AccountList btn-fixed-width" align="between"
-            :class="link === 'digiAccount' ? 'AccountListActive' : ''" @click="link = 'digiAccount'" unelevated>
+            :class="cardLink === 'digiAccount' ? 'AccountListActive' : ''"
+            @click="cardLink = 'digiAccount', tab = 'digiAccount'" unelevated>
             <div class="CardInfo">
               <div class="CardThumb">
                 <img :src="DigiAccound.img" alt="DIGIFlow" />
@@ -40,14 +41,15 @@
         <div class="BlockContent">
           <h5 class="Title">已綁定的卡片</h5>
           <q-btn v-for="(BindCard, index) in  BindCard" :key="index" class="AccountList btn-fixed-width" align="between"
-            :class="link === index ? 'AccountListActive' : ''" @click="link = index" unelevated>
+            :class="link === index ? 'AccountListActive' : ''" @click="cardLink = index, tab = BindCard.type + index"
+            unelevated>
             <div class="CardInfo">
               <div class="CardThumb">
                 <img :src="BindCard.img" alt="信用卡1" />
               </div>
               <div class="CardTxt">
                 <h5>{{ BindCard.type == 'credit' ? '信用卡' : BindCard.type == 'bank' ? '銀行帳戶' : '不明類型' }}</h5>
-                <p>{{ BindCard.cardNum }}</p>
+                <p>{{ BindCard.origin }}<span class="price">{{ BindCard.cardNum }}</span> </p>
               </div>
             </div>
             <q-icon right size="30px" name="chevron_right" color="lightGrey" />
@@ -56,58 +58,97 @@
       </div>
       <div class="col-md-5 col-12 q-px-md">
         <div class="BlockContent">
-          <h5 class="mainTitle"><img src="src/assets/logos/DigiFlow_logoOnly.svg" alt="DigiFlow" class="TitleLogo">帳戶餘額
-          </h5>
-          <div class="balanceBlock">
-            <h5>NT$ <span class="price">{{ toThousands(DigiAccound.balance) }}</span></h5>
-            <p class="Remark">*以最新貨幣轉換匯率估算</p>
-          </div>
-          <div class="row justify-end q-my-md">
-            <q-btn color="warning" size="18px" class="q-px-xl text-black" label="提現" unelevated rounded />
-          </div>
-          <div class="currency">
-            <q-list class="rounded-borders" style="max-width: 100%" bordered separator>
+          <q-tab-panels v-model="tab" animated swipeable vertical transition-prev="jump-up" transition-next="jump-up">
+            <q-tab-panel name="digiAccount">
+              <h5 class="mainTitle"><img src="src/assets/logos/DigiFlow_logoOnly.svg" alt="DigiFlow"
+                  class="TitleLogo">帳戶餘額
+              </h5>
+              <div class="balanceBlock">
+                <h5>NT$ <span class="price">{{ toThousands(DigiAccound.balance) }}</span></h5>
+                <p class="Remark">*以最新貨幣轉換匯率估算</p>
+              </div>
+              <div class="row justify-end q-my-md">
+                <q-btn color="warning" size="18px" class="q-px-xl text-black" label="提現" unelevated rounded />
+              </div>
+              <div class="currency">
+                <q-list class="rounded-borders" style="max-width: 100%" bordered separator>
 
-              <q-item class="q-py-md" v-for="(BindCurrency, index) in  BindCurrency" :key="index">
-                <q-item-section center class="col-1">
-                  <q-avatar size="md">
-                    <img :src="BindCurrency.img">
-                  </q-avatar>
-                </q-item-section>
+                  <q-item class="q-py-md" v-for="(BindCurrency, index) in  BindCurrency" :key="index">
+                    <q-item-section center class="col-1">
+                      <q-avatar size="md">
+                        <img :src="BindCurrency.img">
+                      </q-avatar>
+                    </q-item-section>
 
-                <q-item-section center>
-                  <q-item-label lines="1" class="row justify-between">
-                    <span class="text-weight-medium">{{ BindCurrency.name }}
-                      <q-chip v-if="BindCurrency.type == 'default'" color="warning" size="xs" label="預設" outline></q-chip>
-                    </span>
-                    <span class="text-grey-8">{{ BindCurrency.symbol }} {{ toThousands(BindCurrency.balance) }}</span>
-                  </q-item-label>
-                </q-item-section>
+                    <q-item-section center>
+                      <q-item-label lines="1" class="row justify-between">
+                        <span class="text-weight-medium">{{ BindCurrency.name }}
+                          <q-chip v-if="BindCurrency.type == 'default'" color="warning" size="xs" label="預設"
+                            outline></q-chip>
+                        </span>
+                        <span class="text-grey-8">{{ BindCurrency.symbol }} {{ toThousands(BindCurrency.balance) }}</span>
+                      </q-item-label>
+                    </q-item-section>
 
-                <q-item-section center side>
-                  <div class="text-grey-8 q-gutter-xs">
-                    <q-btn size="12px" flat dense round icon="more_vert" v-if="BindCurrency.type != 'default'">
-                      <q-menu auto-close square :offset="[0, 5]">
-                        <q-list>
-                          <q-item clickable>
-                            <q-item-section class="text-subtitle1">設為預設</q-item-section>
-                          </q-item>
-                          <q-item clickable>
-                            <q-item-section class="text-red">刪除貨幣</q-item-section>
-                          </q-item>
-                        </q-list>
-                      </q-menu>
-                    </q-btn>
+                    <q-item-section center side>
+                      <div class="text-grey-8 q-gutter-xs">
+                        <q-btn size="12px" flat dense round icon="more_vert" v-if="BindCurrency.type != 'default'">
+                          <q-menu auto-close square :offset="[0, 5]">
+                            <q-list>
+                              <q-item clickable>
+                                <q-item-section class="text-subtitle1">設為預設</q-item-section>
+                              </q-item>
+                              <q-item clickable>
+                                <q-item-section class="text-red">刪除貨幣</q-item-section>
+                              </q-item>
+                            </q-list>
+                          </q-menu>
+                        </q-btn>
+                      </div>
+                    </q-item-section>
+                  </q-item>
+
+                </q-list>
+
+                <div class="row justify-end q-my-md">
+                  <q-btn color="warning" size="18px" class="q-px-xl text-black" label="新增幣別" unelevated rounded />
+                </div>
+              </div>
+            </q-tab-panel>
+            <q-tab-panel v-for="(BindCard, index) in  BindCard" :key="index" :name="BindCard.type + index">
+
+              <div>
+                <h5 class="mainTitle">您已綁定的 {{ BindCard.type == 'credit' ? '信用卡' : BindCard.type == 'bank' ? '銀行帳戶' :
+                  '不明類型' }}</h5>
+                <div class="CardInfoDetail">
+                  <div class="CardImg">
+                    <img :src="BindCard.img" alt="信用卡1" />
                   </div>
-                </q-item-section>
-              </q-item>
+                  <div class="CardTxt">
+                    <p class="nickname">
+                      <q-input label="卡片暱稱" v-model="BindCard.nickName" />
+                    </p>
+                    <div class="origin row justify-between">
+                      <div class="cardState">
+                        <span class="Tag">
+                          {{ BindCard.type == 'credit' ? '信用卡' : BindCard.type == 'bank' ? '銀行帳戶' : '未知類型' }}
+                        </span>
+                        {{ BindCard.origin }}
+                      </div>
+                      <p class="price">{{ BindCard.cardNum }}</p>
+                    </div>
+                    <div class="billAdd"> <q-input label="帳單地址" v-model="BindCard.billAdd" /></div>
+                    <div class="row justify-end q-my-xl">
+                      <q-btn color="warning" size="18px" class="q-px-xl q-mr-sm" label="移除卡片" rounded outline />
+                      <q-btn color="warning" size="18px" class="q-px-xl text-black" label="編輯卡片" rounded />
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-            </q-list>
+            </q-tab-panel>
+          </q-tab-panels>
 
-            <div class="row justify-end q-my-md">
-              <q-btn color="warning" size="18px" class="q-px-xl text-black" label="新增幣別" unelevated rounded />
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -131,15 +172,27 @@ export default {
         {
           img: '/src/assets/CardImg/CardImg.png',
           type: 'credit',
-          cardNum: '****-3456'
+          cardNum: '****-3456',
+          nickName: '卡片暱稱卡片暱稱',
+          origin: 'VISA',
+          deadline: '03/2030',
+          billAdd: ''
         }, {
           img: '/src/assets/CardImg/CardImg_02.png',
           type: 'bank',
-          cardNum: '****-5678'
+          cardNum: '****-5678',
+          nickName: '卡片暱稱卡片暱稱',
+          origin: '(808) 玉山銀行',
+          deadline: '09/2035',
+          billAdd: ''
         }, {
-          img: '/src/assets/CardImg/CardImg_02.png',
-          type: 'order',
-          cardNum: '****-5678'
+          img: '/src/assets/CardImg/CardImg.png',
+          type: '信用卡',
+          cardNum: '****-1234',
+          nickName: '卡片暱稱卡片暱稱',
+          origin: 'mastercaed',
+          deadline: '-',
+          billAdd: ''
         }
       ],
       BindCurrency: [
@@ -180,9 +233,12 @@ export default {
       isActive.value = true
     }
 
+    //console.log(tab)
+
     return {
       simp,
-      link: ref('digiAccount')
+      cardLink: ref('digiAccount'),
+      tab: ref('digiAccount')
     }
 
   }
@@ -238,7 +294,7 @@ export default {
   margin: 0 0 8px 0
 
   .CardInfo
-    width: auto
+    width: calc(100% - 50px)
     display: flex
     align-items: center
     color: #333
@@ -259,7 +315,7 @@ export default {
         max-width: 100%
 
     .CardTxt
-      width: calc(100% - 100px)
+      width: 100%
       text-align: left
       margin-left: 10px
 
@@ -278,4 +334,33 @@ export default {
   border: 3px solid #FCB335
 
 
+.CardInfoDetail
+    width: 100%
+    display: flex
+    flex-wrap: wrap
+    align-items: center
+    color: #333
+
+    .CardImg
+      width: 100%
+      margin-bottom: 20px
+      img
+        max-width: 100%
+
+    .CardTxt
+      width: 100%
+      h5
+        margin: 0 0 1rem 0
+
+      .origin
+        width: 100%
+
+        .cardState
+
+          .Tag
+            color: #777777
+            padding: 2px 10px
+            border:1px solid $warning
+            border-radius: 20px
+            margin-right: 5px
 </style>
