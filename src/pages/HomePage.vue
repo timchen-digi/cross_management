@@ -60,8 +60,8 @@
         <q-card class="my-card q-pa-md q-mb-md" bordered>
           <div class="BlockContent">
             <h5 class="Title">已綁定的卡片/帳戶</h5>
-            <q-btn v-for="(BindCard, index) in BindCard" :key="index" class="AccountList btn-fixed-width" align="between"
-              :class="link === index ? 'AccountListActive' : ''" @click="link = index" unelevated>
+            <q-btn v-for="(BindCard, index) in BindCard" :key="index" class="AccountList btn-fixed-width"
+              align="between" :class="link === index ? 'AccountListActive' : ''" @click="link = index" unelevated>
               <div class="CardInfo">
                 <div class="CardThumb">
                   <img :src="BindCard.img" alt="信用卡1" />
@@ -69,12 +69,12 @@
                 <div class="CardTxt">
                   <h5>
                     {{
-                      BindCard.type == "credit"
-                      ? "信用卡"
-                      : BindCard.type == "bank"
-                        ? "銀行帳戶"
-                        : "不明類型"
-                    }}
+                  BindCard.type == "credit"
+                    ? "信用卡"
+                    : BindCard.type == "bank"
+                      ? "銀行帳戶"
+                      : "不明類型"
+                }}
                   </h5>
                   <p>{{ BindCard.cardNum }}</p>
                 </div>
@@ -130,7 +130,8 @@
 
         <q-card class="my-card q-my-md">
           <q-card-section class=" q-pa-0">
-            <dataTable title="近期活動" label="查看交易明細" link="/History" :rows="rows" :columns="columns" :showBottom="false" />
+            <dataTable title="近期活動" label="查看交易明細" link="/History" :rows="rows" :columns="columns"
+              :showBottom="false" />
           </q-card-section>
         </q-card>
       </div>
