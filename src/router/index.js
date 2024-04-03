@@ -33,17 +33,17 @@ export default route(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   });
   // 檢查登入狀態
-  const user = useUserStore();
-  Router.beforeEach((to, from, next) => {
-    console.log("to", to);
-    console.log("from", from);
-    console.log("next", next);
-    if (!to.path.startsWith("/Login") && !user.username) {
-      alert("請先登入");
-      next("/Login");
-    } else {
-      next();
-    }
-  });
+  //const user = useUserStore();
+  //Router.beforeEach((to, from, next) => {
+  //  console.log("to", to);
+  //  console.log("from", from);
+  //  console.log("next", next);
+  //  if (!to.path.startsWith("/Login") && !user.username) {
+  //    alert("請先登入");
+  //    next("/Login");
+  //  } else {
+  //    next();
+  //  }
+  //});
   return Router;
 });
