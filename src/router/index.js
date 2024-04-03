@@ -20,8 +20,8 @@ export default route(function (/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
     : process.env.VUE_ROUTER_MODE === "history"
-    ? createWebHistory
-    : createWebHashHistory;
+      ? createWebHistory
+      : createWebHashHistory;
 
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
@@ -38,6 +38,9 @@ export default route(function (/* { store, ssrContext } */) {
     console.log("to", to);
     console.log("from", from);
     console.log("next", next);
+    if (to.path.startsWith("/Pay")) {
+      next();
+    }
     if (!to.path.startsWith("/Login") && !user.username) {
       alert("請先登入");
       next("/Login");
