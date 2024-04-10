@@ -93,7 +93,7 @@
           </q-card>
         </div>
         <div class="col-8 q-px-xs">
-          <q-card class="my-card">
+          <q-card class="my-card" bordered>
             <q-card-section class=" q-pa-0">
               <dataTable title="近期活動" label="查看交易明細" link="/History" :rows="rows" :columns="columns" :filter="filter"
                 :showBottom="false" />
