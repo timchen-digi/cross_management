@@ -2,75 +2,83 @@
   <q-page padding>
     <div class="LoginContent">
       <h5 class="MainTitle">商戶申請</h5>
-      <div class="text-subtitle1">登記類別</div>
-       <div class="inputContent">
-      <q-btn-toggle
-        glossy
-        v-model="group"
-        toggle-color="primary"
-        :options="tax_option"
-      />
-    </div>
+      <div class="text-subtitle1">營業登記類別</div>
+      <!-- <div class="inputContent">
+        <q-btn-toggle glossy v-model="group" toggle-color="primary" :options="tax_option" />
+      </div> -->
+      <div class="inputGroup q-mb-lg">
+        <q-btn-toggle v-model="group" color="grey" toggle-color="warning" :options="tax_option" size="15px" no-caps
+          unelevated rounded />
+      </div>
       <div class="inputContent">
+        <div class="inputGroup" v-if="group == 'taxType1' || group == 'taxType2'">
+          <div class="text-subtitle1">{{ tax_option.find((e) => e.value === group).slot }}</div>
+          <q-input color="warning" v-model="UBN" rounded outlined :rules="[checkTaxInfo]" />
+        </div>
+        <div class="inputGroup" v-else>
+          <div class="text-subtitle1">{{ tax_option.find((e) => e.value === group).slot }}</div>
+          <q-input color="warning" v-model="UBN" rounded outlined :rules="[val => !!val || '此欄位必填']" />
+        </div>
+        <div class="inputGroup" v-if="group == 'taxType1' || group == 'taxType2'">
+          <div class="text-subtitle1">{{ tax_option.find((e) => e.value === group).ext_data }}</div>
+          <q-input color="warning" v-model="regName" rounded outlined disable bg-color="grey-3" />
+        </div>
+        <div class="inputGroup" v-else>
+          <div class="text-subtitle1">{{ tax_option.find((e) => e.value === group).ext_data }}</div>
+          <q-input color="warning" v-model="regName" rounded outlined :rules="[val => !!val || '此欄位必填']" />
+        </div>
+        <div class="inputGroup" v-if="group == 'taxType1' || group == 'taxType2'">
+          <div class="text-subtitle1">{{ tax_option.find((e) => e.value === group).ext_data2 }}</div>
+          <q-input v-model="address" rounded outlined disable bg-color="grey-3" hidden />
+        </div>
+        <div class="inputGroup" v-else>
+          <div class="text-subtitle1">{{ tax_option.find((e) => e.value === group).ext_data2 }}</div>
+          <q-input v-model="address" rounded outlined :rules="[val => !!val || '此欄位必填']" />
+        </div>
         <div class="inputGroup">
-          <div class="text-subtitle1">{{tax_option.find((e)=>e.value===group).slot}}</div>
-          <q-input color="warning" v-model="UBN" rounded outlined  placeholder="請輸入完整之統一編號，共八位數" />
-        </div>
-          <div class="inputGroup">
-          <div class="text-subtitle1">{{tax_option.find((e)=>e.value===group).ext_data}}</div>
-          <q-input color="warning" v-model="regName" rounded outlined placeholder="合約簽訂公司名" />
-        </div>
-          <div class="inputGroup">
           <div class="text-subtitle1">營業名稱</div>
-          <q-input color="warning" v-model="businessName" rounded outlined placeholder="顯示予付款用戶的商店名稱" />
+          <q-input color="warning" v-model="businessName" rounded outlined placeholder="顯示予付款用戶的商店名稱"
+            :rules="[val => !!val || '此欄位必填']" />
         </div>
-          <div class="inputGroup">
-          <div class="text-subtitle1">{{tax_option.find((e)=>e.value===group).ext_data2}}</div>
-          <q-input color="warning" v-model="address" rounded outlined/>
-        </div>
-          <div class="inputGroup">
+        <div class="inputGroup">
           <div class="text-subtitle1">聯絡人</div>
-          <q-input color="warning" v-model="name" rounded outlined/>
+          <q-input color="warning" v-model="name" rounded outlined placeholder="註冊後，將有專人與您聯絡"
+            :rules="[val => !!val || '此欄位必填']" />
         </div>
         <div class="inputGroup">
           <div class="text-subtitle1">電子郵件</div>
-          <q-input color="warning" v-model="account" rounded outlined  placeholder="登入驗證碼將發送至此信箱" />
+          <q-input color="warning" v-model="email" rounded outlined placeholder="登入驗證碼將發送至此信箱"
+            :rules="[val => !!val || '此欄位必填']" />
         </div>
         <div class="inputGroup">
           <div class="text-subtitle1">連絡電話</div>
-          <q-input color="warning" v-model="phoneNum" rounded outlined>
-            <template v-slot:before>
-              <q-select outlined v-model="phoneCode" :options="phoneCodeOptions">
-                <template v-slot:prepend>
-                  <q-avatar>
-                    <img v-bind:src="'src/assets/currency/' + phoneCode.url">
-                  </q-avatar>
-                </template>
-              </q-select>
-            </template>
-          </q-input>
+          <div class="q-gutter-md row items-start">
+            <q-select v-model="phonePrefix" :options="['+886', '+86', '+852', '+1']" outlined rounded />
+            <q-input v-model="phoneNum" label="請輸入手機號碼" type="tel" outlined rounded
+              :rules="[val => !!val || '此欄位必填']" />
+          </div>
         </div>
         <div class="q-pa-md">
           <div class="text-subtitle1">欲開通支付方式</div>
           <div class="q-gutter-sm">
-              <q-checkbox v-model="payment_select" val="P1" label="超商代收" />
-              <q-checkbox v-model="payment_select" val="P2" label="街口支付" />
-              <q-checkbox v-model="payment_select" val="P3" label="LINE Pay一卡通" />
-            </div>
-            <div class="q-gutter-sm">
-              <q-checkbox v-model="payment_select" val="P4" label="Apple Pay" />
-              <q-checkbox v-model="payment_select" val="P5" label="全支付電子支付" />
-              <q-checkbox v-model="payment_select" val="P8" label="全盈支付+" />
-            </div>
-            <div class="q-gutter-sm">
-              <q-checkbox v-model="payment_select" val="P7" label="微信支付平台(富邦)" />
-              <q-checkbox v-model="payment_select" val="P9" label="電信代收" />
-              <q-checkbox v-model="payment_select" val="P10" label="信用卡" />
+            <q-checkbox v-model="payment_select" val="P1" label="超商代收" />
+            <q-checkbox v-model="payment_select" val="P2" label="街口支付" />
+            <q-checkbox v-model="payment_select" val="P3" label="LINE Pay一卡通" />
           </div>
           <div class="q-gutter-sm">
-              <q-checkbox v-model="payment_select" val="P11" label="銀行虛擬帳戶" />
-            </div>
-            <div class="q-gutter-sm">
+            <q-checkbox v-model="payment_select" val="P4" label="Apple Pay" />
+            <q-checkbox v-model="payment_select" val="P5" label="全支付電子支付" />
+            <q-checkbox v-model="payment_select" val="P8" label="全盈支付+" />
+          </div>
+          <div class="q-gutter-sm">
+            <q-checkbox v-model="payment_select" val="P7" label="微信支付平台(富邦)" />
+            <q-checkbox v-model="payment_select" val="P9" label="電信代收" />
+            <q-checkbox v-model="payment_select" val="P10" label="信用卡" />
+          </div>
+          <div class="q-gutter-sm">
+            <q-checkbox v-model="payment_select" val="P11" label="銀行虛擬帳戶" />
+          </div>
+          <div class="q-gutter-sm">
 
           </div>
         </div>
@@ -80,8 +88,8 @@
             <template v-slot:append>
               <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" class="cursor-pointer" @click="isPwd = !isPwd" />
             </template>
-          </q-input>
-        </div> -->
+</q-input>
+</div> -->
         <!-- <div class="inputGroup">
           <div class="text-subtitle1">確認密碼</div>
           <q-input color="warning" v-model="confirmPassword" :type="isConfirmPwd ? 'password' : 'text'" rounded outlined>
@@ -118,12 +126,6 @@
       </div>
       <div class="BtnGroup">
         <q-btn color="warning" text-color="black" label="註冊" size="lg" rounded @click="regClick" />
-        <!-- <div class="SeparatorTxt">
-           <span class="line"></span>
-          <span class="text">or</span>
-          <span class="line"></span>
-        </div>
-        <q-btn color="black" text-color="white" label="登入" size="lg" rounded /> -->
       </div>
     </div>
 
@@ -133,7 +135,8 @@
 <script>
 import { ref } from "vue";
 import Sidentify from "/src/utils/identify.vue"
-
+import { api } from 'boot/axios'
+import { useQuasar } from 'quasar'
 export default {
   name: "RegisterPage",
   components: {
@@ -146,57 +149,101 @@ export default {
     }
   },
   setup() {
+    const companyInfo = ref(null);
+    const UBN = ref("");
+    const regName = ref("");
+    const address = ref("");
+    const email = ref("");
+    const phoneNum = ref("");
+    const businessName = ref("");
+    const name = ref("");
+    const payment_select = ref(['P10']);
+    function regClick(e, go) {
+      // 各欄位皆必填
 
-    const phoneFlag = ref('src/assets/currency/Flag_Tw.svg')
-    function regClick(e,go){
-        console.log(e);
-        console.log(go);
+      const sendObject = {
+        UBN: UBN.value,
+        Type: 1,
+        RegistName: regName.value,
+        BusinessName: businessName.value,
+        RegistAddress: address.value,
+        BusinessAddress: address.value,
+        ContactName: name.value,
+        ContactMobile: phoneNum.value,
+        ContactMail: email.value
+      };
+      console.log(sendObject);
+      //return;
+      //打往後端
+      api.post('/Merchant/Create', sendObject, {
+        headers: {}
+      })
+        .then((response) => {
+          console.log(response.data);
+          $q.notify({
+            message: "已送出註冊，請至信箱確認",
+            type: 'positive',
+            position: "center"
+          });
+        })
+        .catch(function (error) {
+          // handle error
+          $q.notify({
+            type: 'negative',
+            message: "連線失敗 " + error,
+            position: "center",
+          });
+        })
+    }
+    const $q = useQuasar()
+    function checkTaxInfo(val) {
+      if (val.length != 8) {
+        // 統編必須是8碼
+        return ('統編長度為8碼');
+      }
+      // 財政部API查詢公司登記
+      api.get('https://eip.fia.gov.tw/OAI/api/businessRegistration/' + val)
+        .then((response) => {
+          companyInfo.value = response.data;
+          console.log(response.data);
+          regName.value = companyInfo.value.businessNm;
+          address.value = companyInfo.value.businessAddress;
+          return true;
+        })
+        .catch(function (error) {
+          console.log(error.config);
+          $q.notify({
+            message: "查無此統編",
+            position: "center",
+            type: 'negative',
+          });
+        });
     }
     return {
       regClick,
-      account: ref(""),
-      //phoneCodeOptions: ['+886', '+86', '+1', '+81'],
-      //phoneCode: ref('+886'),
-      phoneCodeOptions: [
-        {
-          code: '+886',
-          url: 'Flag_Tw.svg'
-        }, {
-          code: '+86',
-          url: 'Flag_Cn.svg'
-        }, {
-          code: '+1',
-          url: 'Flag_US.svg'
-        }, {
-          code: '+81',
-          url: 'Flag_JP.svg'
-        }
-      ],
-      phoneCode: ref({
-        code: '+886',
-        url: 'Flag_Tw.svg'
-      }),
-      phoneNum: ref(""),
+      checkTaxInfo,
+      email,
+      phonePrefix: ref("+886"),
+      phoneNum,
       password: ref(""),
-      UBN: ref(""),
-      UBNtype: ref("公司統編"),
-      regName: ref(""),
-      businessName: ref(""),
-      address: ref(""),
-      name: ref(""),
+      UBN,
+      regName,
+      businessName,
+      address,
+      name,
       isPwd: ref(true),
       confirmPassword: ref(""),
       isConfirmPwd: ref(true),
       verify: ref(""),
-      phoneFlag,
       right: ref(false),
       group: ref('taxType1'),
       tax_option: ref([
-          {label: '有工商登記', value: 'taxType1', slot: '公司統編', ext_data:'合約簽訂公司名', ext_data2:'公司登記地址'},
-          {label: '僅稅籍編號', value: 'taxType2', slot: '稅籍編號', ext_data:'營業人名稱', ext_data2:'稅籍登記地址'},
-          {label: '皆無', value: 'taxType3', slot: '身分證字號', ext_data:'營業人名稱', ext_data2:'稅籍登記地址'}
-        ]),
-      payment_select: ref([ 'P1' ]),
+        { label: '工商登記', value: 'taxType1', slot: '公司統編', ext_data: '合約簽訂公司名', ext_data2: '公司登記地址' },
+        { label: '稅籍編號', value: 'taxType2', slot: '稅籍編號', ext_data: '營業人名稱', ext_data2: '稅籍登記地址' },
+        { label: '無登記', value: 'taxType3', slot: '身分證字號', ext_data: '營業人名稱', ext_data2: '營業地址' }
+      ]),
+      payment_select,
+      isSuccess: true,
     }
   },
   methods: {
@@ -221,8 +268,6 @@ export default {
     // 初始化验证码
     this.identifyCode = "";
     this.makeIdentifyCode(4);
-
-    this,t
   }
 };
 
