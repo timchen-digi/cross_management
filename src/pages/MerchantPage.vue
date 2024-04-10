@@ -10,16 +10,59 @@
               <div class="BlockContent">
                 <h5 class="mainTitle q-px-md">商戶基本資料</h5>
                 <q-list separator>
-                  <q-item v-for="(merchantList, index) in  merchantList" :key="index">
+                  <q-item>
                     <q-item-section>
-                      <q-item-label>{{ merchantList.Title }}</q-item-label>
+                      <q-item-label>商戶名稱</q-item-label>
                     </q-item-section>
                     <q-item-section side>
-                      <q-item-label>{{ merchantList.content }}</q-item-label>
+                      <q-item-label>{{ merchantData.businessName }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section>
+                      <q-item-label>商戶代碼</q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-item-label>{{ merchantData.merchantId }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section>
+                      <q-item-label>狀態</q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-item-label>開通</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section>
+                      <q-item-label>負責人</q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-item-label>{{ merchantData.bossName }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section>
+                      <q-item-label>銀行代碼</q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-item-label>{{ merchantData.bankBranch }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section>
+                      <q-item-label>帳戶</q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-item-label>{{ merchantData.bankAccount }}</q-item-label>
                     </q-item-section>
                   </q-item>
                 </q-list>
               </div>
+              <div class="row justify-center q-my-md">
+                  <q-btn color="warning" size="18px" class="q-px-xl text-black" label="商戶資料更新" @click="loadData" unelevated rounded />
+                </div>
             </q-card-section>
           </q-card>
           <q-card class="my-card q-mb-md" bordered>
@@ -67,6 +110,8 @@ import { ref } from 'vue'
 import { useUserStore } from "../stores";
 import dataTable from "src/components/DataTable.vue";
 import { toThousands } from 'src/utils/index.js'
+import { api } from 'boot/axios'
+import { useQuasar } from 'quasar'
 
 const columns = [
   { name: "name", required: true, label: "日期", field: "date", align: 'left' },
@@ -128,12 +173,40 @@ export default {
   setup() {
     const user = useUserStore();
     const username = user.username;
+    const merchantData = ref({});
+    const $q = useQuasar()
+    function loadData () {
+    api.get('/Merchant/Get',{
+      params: {
+        id: 183062446000001
+      }})
+      .then((response) => {
+        console.log(response.data);
+        merchantData.value = response.data
+      })
+      .catch(function (error) {
+        // handle error
+        //console.log(error);
+        $q.notify({
+          color: 'warning',
+          message:"連線失敗 "+error,
+          position: "center",
+          multiLine: true,
+          actions: [
+            { icon: 'close', color: 'white', round: true, handler: () => { /* ... */ } }
+          ]
+        });
+      })
+    }
+    loadData();
     return {
       filter: ref('filter'),
       toThousands,
       rows,
       columns,
-      username
+      username,
+      merchantData,
+      loadData
     }
   },
 };

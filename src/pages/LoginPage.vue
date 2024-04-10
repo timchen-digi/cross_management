@@ -31,7 +31,7 @@
       </div>
       <div class="BtnGroup">
 
-        <q-btn color="warning" text-color="black" label="登入" to="/Merchant" size="lg" rounded />
+        <q-btn color="warning" text-color="black" label="登入" @click="login" size="lg" rounded />
         <div class="SeparatorTxt">
           <span class="line"></span>
           <span class="text">or</span>
@@ -49,6 +49,7 @@
 import { ref } from "vue";
 import Sidentify from "/src/utils/identify.vue"
 import { useUserStore } from "../stores";
+import { api } from 'boot/axios'
 
 export default {
   name: "LoginPage",
@@ -68,6 +69,11 @@ export default {
   methods: {
     login() {
       // 假設這裡進行登入驗證，成功後將資料保存至 Pinia
+      // api.post('/auth/login', form)
+      // .then(response => {
+      //   api.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token
+      //   commit('login', {token: response.data.token, user: response.data.user})
+      // })
       var username = "";
       if (this.account == "digiflow") {
         username = "數位鎏測試商戶";
