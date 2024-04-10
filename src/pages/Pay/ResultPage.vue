@@ -1,8 +1,9 @@
 <template>
   <div class="PaymentResult">
-    <q-img src="~/assets/icons/PayFinish.svg" alt="銀聯卡" class="q-my-md" style="width: 50%; max-width: 150px;" />
+    <q-img v-if="OrderStatus" src="~/assets/icons/PayState_success.svg" alt="交易成功" class="q-my-md OrderStateImg" />
+    <q-img v-if="!OrderStatus" src="~/assets/icons/PayState_failed.svg" alt="交易失敗" class="q-my-md OrderStateImg" />
     <h4 class="text-gray">{{ Title }}</h4>
-    <p class="text-h5" :class="OrderStatus === '交易成功' ? 'text-green' : 'text-red'">交易結果: {{ OrderStatus }} </p>
+    <p class="text-h5" :class="OrderStatus ? 'text-green' : 'text-red'">交易結果: {{ OrderStatusText }} </p>
     <q-list separator class="orderList" bordered>
       <q-item v-for="(item, index) in Order" :key="index" clickabled>
         <q-item-section side>
@@ -14,7 +15,7 @@
       </q-item>
     </q-list>
     <div class="BTNGroup">
-      <q-btn color="warning" text-color="black" label="關閉視窗" size="lg" class="q-px-xl" rounded />
+      <q-btn color="warning" class="text-subtitle1 q-px-xl" text-color="black" label="關閉視窗" rounded />
     </div>
   </div>
 </template>
@@ -29,7 +30,8 @@ export default {
   setup() {
     return {
       Title: "%這裡放店家名稱%",
-      OrderStatus: "交易成功",
+      OrderStatus: true,
+      OrderStatusText: "交易失敗",
       Order: [
         {
           Title: '特店名稱：',
@@ -59,22 +61,21 @@ export default {
 };
 </script>
 <style lang="sass" scoped>
+
 .PaymentResult
   text-align: center
-.PaymentResult .orderList
-  max-width: 500px
-  font-size: 1rem
-  margin: 10px auto
-.ShopName
-  padding: 20px 0
-  text-align: center
-  font-size: 30px
-.ShopName i
-  color: #FFF
-  padding: 12px 10px
-  background: #dfa300
-  border-radius: 50%
+
+  .OrderStateImg
+    width: 50%
+    max-width: 150px
+
+  .orderList
+    max-width: 500px
+    font-size: 1rem
+    margin: 10px auto
+
 .BTNGroup
   padding: 20px 0
   text-align: center
+
 </style>

@@ -38,8 +38,7 @@
             @update:model-value="checkIssuer()" autocomplete="credit" outlined bottom-slots standout>
             <template v-slot:append>
               <q-icon :name="issuerIcon" color="warning" size="lg" />
-              <q-img v-if="issuer === '銀聯卡'" src="~/assets/CardImg/unionpay-pay.svg" alt="銀聯卡"
-                style="min-width: 50px;" />
+              <q-img v-if="issuer === '銀聯卡'" src="~/assets/icons/unionpay-pay.svg" alt="銀聯卡" style="min-width: 50px;" />
             </template>
             <template v-if="issuerState" v-slot:hint>
               發卡機構：{{ issuer }}
@@ -174,13 +173,11 @@ export default {
     return {
       monthArray: [],
       yearArray: [],
-      /*cardNumber: ref(null),*/
       phoneNumber: ref(""),
       phonePrefix: ref("+886"),
       emailAddress: ref(""),
       expM: ref('MM'),
       expY: ref('YY'),
-      /*cardNumber: ref(null),*/
       CVC: ref(null),
       agreeSubscribe: ref(false),
       emailRules: [
