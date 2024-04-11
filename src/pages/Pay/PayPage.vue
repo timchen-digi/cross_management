@@ -79,8 +79,8 @@
         <q-checkbox v-model="agreeSubscribe" label="同意每月自動扣款" color="orange" required />
 
         <div class="BtnGroup q-gutter-sm">
-          <q-btn class="text-subtitle1" color="warning" icon="paid" label="確認付款" rounded />
-          <q-btn class="text-subtitle1" icon="restart_alt" label="清除重填" rounded />
+          <q-btn class="text-subtitle1" color="warning" icon="paid" label="確認付款" rounded @click="CheckPay" />
+          <q-btn class="text-subtitle1" icon="restart_alt" label="清除重填" rounded @click="Clean" />
         </div>
 
       </q-tab-panel>
@@ -98,38 +98,38 @@
               <q-item v-ripple>
                 <q-item-section>
                   <q-item-label overline>繳款銀行</q-item-label>
-                  <q-item-label>{{ bankItem.labal }}</q-item-label>
+                  <q-item-label id="bankName">{{ bankItem.labal }}</q-item-label>
                 </q-item-section>
               </q-item>
               <q-item v-ripple>
                 <q-item-section>
                   <q-item-label overline>繳款銀行代碼</q-item-label>
-                  <q-item-label>{{ bankItem.code }}</q-item-label>
+                  <q-item-label id="bankCode">{{ bankItem.code }}</q-item-label>
                 </q-item-section>
               </q-item>
               <q-item v-ripple>
                 <q-item-section>
                   <q-item-label overline>繳款帳號</q-item-label>
-                  <q-item-label>{{ bankItem.account }}</q-item-label>
+                  <q-item-label id="bankAccount">{{ bankItem.account }}</q-item-label>
                 </q-item-section>
               </q-item>
               <q-item v-ripple>
                 <q-item-section>
                   <q-item-label overline>繳款金額</q-item-label>
-                  <q-item-label>新台幣 {{ bankItem.amount }} 元</q-item-label>
+                  <q-item-label id="amount">新台幣 {{ bankItem.amount }} 元</q-item-label>
                 </q-item-section>
               </q-item>
               <q-item v-ripple>
                 <q-item-section>
                   <q-item-label overline>繳款期限</q-item-label>
-                  <q-item-label>{{ bankItem.deadline }}</q-item-label>
+                  <q-item-label id="deadline">{{ bankItem.deadline }}</q-item-label>
                 </q-item-section>
               </q-item>
             </q-list>
             <p class="q-mt-md text-negative text-subtitle1">※以上繳費方式僅限本次交易使用，逾期無效</p>
             <div class="BtnGroup q-gutter-sm">
-              <q-btn class="text-subtitle1" color="warning" icon="content_copy" label="複製帳號" rounded />
-              <q-btn class="text-subtitle1" color="warning" icon="print" label="列印繳費資訊" rounded />
+              <q-btn class="text-subtitle1" color="warning" icon="content_copy" label="複製帳號" rounded @click="Copy" />
+              <q-btn class="text-subtitle1" color="warning" icon="print" label="列印繳費資訊" rounded @click="Print" />
             </div>
           </q-tab-panel>
         </q-tab-panels>
@@ -166,20 +166,13 @@
 
 <script>
 import { ref } from "vue";
-
+import { useQuasar } from 'quasar'
 export default {
   name: 'PayComponent',
   data() {
     return {
       monthArray: [],
       yearArray: [],
-      phoneNumber: ref(""),
-      phonePrefix: ref("+886"),
-      emailAddress: ref(""),
-      expM: ref('MM'),
-      expY: ref('YY'),
-      CVC: ref(null),
-      agreeSubscribe: ref(false),
       emailRules: [
         (value) => !!value || 'Email欄位必填',
         (value) => /.+@.+\..+/.test(value) || '請輸入正確的Email地址'
@@ -248,13 +241,72 @@ export default {
     this.checkIssuer();
   },
   setup() {
-
+    const phoneNumber = ref("");
+    const phonePrefix = ref("+886");
+    const emailAddress = ref("");
+    const expM = ref('MM');
+    const expY = ref('YY');
+    const CVC = ref(null);
+    const agreeSubscribe = ref(false);
     const cardNumber = ref('');
     const issuer = ref('');
     const issuerIcon = ref('');
     const issuerState = ref(false);
-
+    const $q = useQuasar()
+    function CheckPay(e, go) {
+      var message = cardNumber.value + "|" + issuer.value + "|" + expM.value + "/" + expY.value + "|" + emailAddress.value;
+      $q.notify({
+        type: 'positive',
+        message: "呼叫數位鎏付款API",
+        caption: message,
+        position: "center",
+      });
+      return;
+    }
+    function Clean() {
+      phoneNumber.value = "";
+      phonePrefix.value = "+886";
+      emailAddress.value = "";
+      expM.value = "MM";
+      expY.value = "YY";
+      CVC.value = null;
+      cardNumber.value = "";
+      issuer.value = "";
+      issuerIcon.value = "";
+      issuerState.value = false;
+    }
+    function Copy() {
+      var bankName = document.getElementById("bankName").innerText;
+      var bankCode = document.getElementById("bankCode").innerText;
+      var bankAccount = document.getElementById("bankAccount").innerText;
+      var amount = document.getElementById("amount").innerText;
+      var deadline = document.getElementById("deadline").innerText;
+      var text = "繳款銀行: " + bankName + "\n繳款銀行代碼: " + bankCode + "\n繳款帳號: " + bankAccount + "\n繳款金額: " + amount + "\n繳款期限: " + deadline;
+      navigator.clipboard.writeText(text).then(() => $q.notify({
+        type: 'positive',
+        message: "已複製",
+        position: "center",
+      }))
+    }
+    function Print() {
+      $q.notify({
+        type: 'positive',
+        message: "列印繳費單",
+        position: "center",
+      });
+    }
     return {
+      CheckPay,
+      Clean,
+      Copy,
+      Print,
+      phoneNumber,
+      phonePrefix,
+      emailAddress,
+      expM,
+      expY,
+      CVC,
+      agreeSubscribe,
       expanded: ref(true),
       getMonthArray() {
         const months = [];

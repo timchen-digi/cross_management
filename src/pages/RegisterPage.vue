@@ -3,36 +3,34 @@
     <div class="LoginContent">
       <h5 class="MainTitle">商戶申請</h5>
       <div class="text-subtitle1">營業登記類別</div>
-      <!-- <div class="inputContent">
-        <q-btn-toggle glossy v-model="group" toggle-color="primary" :options="tax_option" />
-      </div> -->
       <div class="inputGroup q-mb-lg">
-        <q-btn-toggle v-model="group" color="grey" toggle-color="warning" :options="tax_option" size="15px" no-caps
+        <q-btn-toggle v-model="taxType" color="grey" toggle-color="warning" :options="tax_option" size="15px" no-caps
           unelevated rounded />
       </div>
       <div class="inputContent">
-        <div class="inputGroup" v-if="group == 'taxType1' || group == 'taxType2'">
-          <div class="text-subtitle1">{{ tax_option.find((e) => e.value === group).slot }}</div>
-          <q-input color="warning" v-model="UBN" rounded outlined :rules="[checkTaxInfo]" />
+        <div class="inputGroup" v-if="taxType == 0 || taxType == 1">
+          <div class="text-subtitle1">{{ tax_option[taxType].slot }}</div>
+          <q-input color="warning" v-model="UBN" rounded outlined :rules="[checkTaxInfo]">
+          </q-input>
         </div>
         <div class="inputGroup" v-else>
-          <div class="text-subtitle1">{{ tax_option.find((e) => e.value === group).slot }}</div>
+          <div class="text-subtitle1">{{ tax_option[taxType].slot }}</div>
           <q-input color="warning" v-model="UBN" rounded outlined :rules="[val => !!val || '此欄位必填']" />
         </div>
-        <div class="inputGroup" v-if="group == 'taxType1' || group == 'taxType2'">
-          <div class="text-subtitle1">{{ tax_option.find((e) => e.value === group).ext_data }}</div>
+        <div class="inputGroup" v-if="taxType == 0 || taxType == 1">
+          <div class="text-subtitle1">{{ tax_option[taxType].ext_data }}</div>
           <q-input color="warning" v-model="regName" rounded outlined disable bg-color="grey-3" />
         </div>
         <div class="inputGroup" v-else>
-          <div class="text-subtitle1">{{ tax_option.find((e) => e.value === group).ext_data }}</div>
+          <div class="text-subtitle1">{{ tax_option[taxType].ext_data }}</div>
           <q-input color="warning" v-model="regName" rounded outlined :rules="[val => !!val || '此欄位必填']" />
         </div>
-        <div class="inputGroup" v-if="group == 'taxType1' || group == 'taxType2'">
-          <div class="text-subtitle1">{{ tax_option.find((e) => e.value === group).ext_data2 }}</div>
-          <q-input v-model="address" rounded outlined disable bg-color="grey-3" hidden />
+        <div class="inputGroup" v-if="taxType == 0 || taxType == 1">
+          <div class="text-subtitle1">{{ tax_option[taxType].ext_data2 }}</div>
+          <q-input v-model="address" rounded outlined disable bg-color="grey-3" />
         </div>
         <div class="inputGroup" v-else>
-          <div class="text-subtitle1">{{ tax_option.find((e) => e.value === group).ext_data2 }}</div>
+          <div class="text-subtitle1">{{ tax_option[taxType].ext_data2 }}</div>
           <q-input v-model="address" rounded outlined :rules="[val => !!val || '此欄位必填']" />
         </div>
         <div class="inputGroup">
@@ -47,7 +45,7 @@
         </div>
         <div class="inputGroup">
           <div class="text-subtitle1">電子郵件</div>
-          <q-input color="warning" v-model="email" rounded outlined placeholder="登入驗證碼將發送至此信箱"
+          <q-input color="warning" v-model="email" type="email" rounded outlined placeholder="登入驗證碼將發送至此信箱"
             :rules="[val => !!val || '此欄位必填']" />
         </div>
         <div class="inputGroup">
@@ -116,7 +114,7 @@
         <q-list>
           <q-item tag="label" manual-focus v-ripple="{ color: 'warning' }">
             <q-item-section avatar>
-              <q-checkbox color="warning" v-model="right" />
+              <q-checkbox color="warning" v-model="agreeRight" />
             </q-item-section>
             <q-item-section>
               <q-item-label>我已閱讀並且同意 數位鎏金融服務的 <a href="#">服務條款</a></q-item-label>
@@ -158,9 +156,45 @@ export default {
     const businessName = ref("");
     const name = ref("");
     const payment_select = ref(['P10']);
+    const agreeRight = ref(false);
+    const taxType = ref(0);
+    const tax_option = [
+      { label: '工商登記', value: 0, slot: '公司統編', ext_data: '合約簽訂公司名', ext_data2: '公司登記地址' },
+      { label: '稅籍編號', value: 1, slot: '稅籍編號', ext_data: '營業人名稱', ext_data2: '稅籍登記地址' },
+      { label: '無登記', value: 2, slot: '身分證字號', ext_data: '營業人名稱', ext_data2: '營業地址' }
+    ];
+    function CheckInput() {
+      var msg = "";
+      var type = taxType.value;
+      if (UBN.value == "") msg += tax_option[type].slot + ", ";
+      if (regName.value == "") msg += tax_option[type].ext_data + ", ";
+      if (regName.value == "") msg += tax_option[type].ext_data2 + ", ";
+      if (businessName.value == "") msg += "營業名稱, ";
+      if (name.value == "") msg += "聯絡人, ";
+      if (email.value == "") msg += "電子郵件, ";
+      if (phoneNum.value == "") msg += "連絡電話, ";
+      if (msg != "") msg = "請填寫" + msg.substring(0, msg.length - 2) + "欄位";
+      return msg;
+    }
     function regClick(e, go) {
       // 各欄位皆必填
-
+      var alertMessage = CheckInput();
+      if (alertMessage != "") {
+        $q.notify({
+          type: 'warning',
+          message: alertMessage,
+          position: "center",
+        });
+        return;
+      }
+      if (!agreeRight.value) {
+        $q.notify({
+          type: 'warning',
+          message: "請閱讀並同意服務條款",
+          position: "center",
+        });
+        return;
+      }
       const sendObject = {
         UBN: UBN.value,
         Type: 1,
@@ -170,7 +204,8 @@ export default {
         BusinessAddress: address.value,
         ContactName: name.value,
         ContactMobile: phoneNum.value,
-        ContactMail: email.value
+        ContactMail: email.value,
+        SelectPayment: payment_select.value
       };
       console.log(sendObject);
       //return;
@@ -216,6 +251,9 @@ export default {
             message: "查無此統編",
             position: "center",
             type: 'negative',
+            actions: [
+              { icon: 'close', color: 'white', round: true, handler: () => { /* ... */ } }
+            ]
           });
         });
     }
@@ -235,13 +273,9 @@ export default {
       confirmPassword: ref(""),
       isConfirmPwd: ref(true),
       verify: ref(""),
-      right: ref(false),
-      group: ref('taxType1'),
-      tax_option: ref([
-        { label: '工商登記', value: 'taxType1', slot: '公司統編', ext_data: '合約簽訂公司名', ext_data2: '公司登記地址' },
-        { label: '稅籍編號', value: 'taxType2', slot: '稅籍編號', ext_data: '營業人名稱', ext_data2: '稅籍登記地址' },
-        { label: '無登記', value: 'taxType3', slot: '身分證字號', ext_data: '營業人名稱', ext_data2: '營業地址' }
-      ]),
+      agreeRight,
+      taxType,
+      tax_option,
       payment_select,
       isSuccess: true,
     }

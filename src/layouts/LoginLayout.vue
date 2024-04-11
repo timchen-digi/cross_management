@@ -1,7 +1,5 @@
 <template>
   <q-layout view="hHh Lpr lFf">
-    <HeaderComp />
-
     <q-page-container>
       <div class="mainContent">
         <router-view />
@@ -21,7 +19,6 @@ import FooterComp from "/src/components/Footer.vue"
 export default {
   name: "LoginLayout",
   components: {
-    HeaderComp,
     FooterComp
   },
   setup() {
