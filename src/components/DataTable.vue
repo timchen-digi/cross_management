@@ -2,22 +2,41 @@
   <div v-if="title" class="text-h5 q-mb-xs">{{ title }}</div>
   <div class="q-my-md row">
     <q-table class="OrderTable" :rows="rows" :columns="columns" :row-key="rows.name" v-model:pagination="pagination"
-      :rows-per-page-options="[0]" no-data-label="I didn't find anything for you" :filter="filter" flat
-      :hide-bottom="rows.length <= 0 ? false : true">
-
+      :rows-per-page-options="[10, 25, 50]" no-data-label="I didn't find anything for you" :filter="filter" flat>
       <template v-slot:no-data="">
         <div class="noData">
           <h5>查無交易明細</h5>
           <p>請嘗試使用其他條件篩選</p>
         </div>
       </template>
-
+      <template v-slot:body="props">
+        <q-tr class="cursor-pointer" :props="props" @click="checkDetail(props.row)">
+          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+            {{ col.value }}
+          </q-td>
+        </q-tr>
+      </template>
     </q-table>
+    <q-dialog v-model="alert">
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">訂單詳細資料</div>
+        </q-card-section>
+        <q-card-section class="q-pt-none">
+          <div v-html="generateTable(selected_row)"></div>
+          <!-- {{ generateTable(selected_row) }} -->
+          <!-- 這邊顯示詳細資料 -->
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="OK" color="primary" @click="alert = false" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
-  <div v-if="rows.length >= 10" class="row justify-center q-mt-md">
-    <q-pagination v-model="pagination.page" :max="pagesNumber" size="sm" direction-links flat color="grey"
+  <!-- <div v-if="rows.length >= 10" class="row justify-center q-mt-md">
+    <q-pagination v-model="pagination.page" :max="pagesNumber" :max-pages="8" direction-links flat color="grey"
       active-color="warning" gutter="md" />
-  </div>
+  </div> -->
   <div v-if="label" class="row justify-center q-my-md">
     <q-btn color="warning" size="18px" class="q-px-xl text-black" :label="label" to="/History" unelevated rounded />
   </div>
@@ -61,16 +80,35 @@ export default {
     }
   },
   setup(props) {
+    //console.log(props.rows);
+    //console.log(props.columns);
     const pagination = ref({
       sortBy: 'desc',
       descending: true,
       page: 1,
       rowsPerPage: 10
     })
-
+    function checkDetail(row) {
+      this.selected_row = row;
+      this.alert = true;
+    }
+    function generateTable(obj) {
+      var htmlcode = "<table><tr>";
+      Object.keys(obj).forEach(function (k) {
+        //console.log(k + ' - ' + obj[k]);
+        htmlcode = htmlcode + "<th>" + k + "</th><th>" + obj[k] + "</th>";
+        htmlcode = htmlcode + "</tr><tr>";
+      });
+      htmlcode = htmlcode + "</tr></table>"
+      return htmlcode;
+    }
     return {
       pagination,
-      pagesNumber: computed(() => Math.ceil(props.rows.length / pagination.value.rowsPerPage))
+      pagesNumber: computed(() => Math.ceil(props.rows.length / pagination.value.rowsPerPage)),
+      alert: ref(false),
+      selected_row: ref({}),
+      checkDetail,
+      generateTable
     }
   },
 };

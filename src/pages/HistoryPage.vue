@@ -77,138 +77,87 @@
 import { ref } from 'vue'
 import { toThousands } from 'src/utils/index.js'
 import dataTable from 'src/components/DataTable.vue';
-
+import { useUserStore } from "../stores";
+import { api } from 'boot/axios'
+import { useQuasar } from 'quasar'
+const orderType = [
+  "", "信用卡分期", "信用卡一般", "銀聯卡", "ApplePay", "GooglePay", "SamsungPay", "虛擬帳號", "EACH", "超商繳費", "電信代收", "點數代收"
+]
+const orderStatus = [
+  "訂單退款", "訂單取消", "訂單逾期", "未付款", "已付款", "已付款(金額有誤)"
+]
 const columns = [
-  { name: "name", required: true, label: "日期", field: "date", align: 'left' },
-  { name: "calories", label: "類型", field: "type", align: 'center' },
-  { name: "fat", label: "用戶名稱", field: "name", align: 'center' },
-  { name: "carbs", label: "狀態", field: "state", align: 'center' },
+  { name: "MerchantId", label: "商戶", field: "MerchantId", align: 'left', sortable: true },
+  { name: "TerminalId", label: "終端", field: "TerminalId", align: 'left', sortable: true },
   {
-    name: "protein",
+    name: "CreateTime", label: "日期", field: "CreateTime", align: 'left',
+    format: (val) => (val.slice(0, 10)), sortable: true
+  },
+  {
+    name: "Type", label: "類型", field: "Type", align: 'center',
+    format: (v) => (orderType[v]), sortable: true
+  },
+  { name: "OrderNO", label: "交易編號", field: "OrderNO", align: 'center', sortable: true },
+  { name: "CustomId", label: "訂單編號", field: "CustomId", align: 'center', sortable: true },
+  {
+    name: "Status", label: "狀態", field: "Status", align: 'center',
+    format: (v) => (orderStatus[v + 3]), sortable: true
+  },
+  {
+    name: "OrderAmount",
+    label: "訂單金額",
+    field: "OrderAmount",
+    //format: (val) => (toThousands(val)),
+    align: 'center', sortable: true
+  },
+  { name: "PayAmount", label: "支付金額", field: "PayAmount", align: 'center', sortable: true },
+
+  {
+    name: "Fee",
     label: "手續費",
-    field: "fee",
-    format: (val) => `NTD$ ${toThousands(val)}`,
-    align: 'center'
-  },
-  {
-    name: "sodium",
-    label: "淨額",
-    field: "amt",
-    format: (val) => `NTD$ ${toThousands(val)}`,
-    align: 'right'
+    field: "Fee",
+    align: 'right', sortable: true
   },
 ];
-
-const rows = [
-  {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已付款",
-    fee: 15,
-    amt: 5678,
-  }, {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已提領",
-    fee: 1,
-    amt: 89,
-  }, {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已退款",
-    fee: 5,
-    amt: 100,
-  }, {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已完成",
-    fee: 1,
-    amt: 10,
-  }, {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已完成",
-    fee: 0,
-    amt: 200,
-  }, {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已完成",
-    fee: 0,
-    amt: 200,
-  }, {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已完成",
-    fee: 0,
-    amt: 200,
-  }, {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已完成",
-    fee: 0,
-    amt: 200,
-  }, {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已完成",
-    fee: 0,
-    amt: 200,
-  }, {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已完成",
-    fee: 0,
-    amt: 200,
-  }, {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已完成",
-    fee: 0,
-    amt: 200,
-  }, {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已完成",
-    fee: 0,
-    amt: 200,
-  }, {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已完成",
-    fee: 0,
-    amt: 200,
-  }, {
-    date: "2024/02/06",
-    type: "收款",
-    name: "Digiflow tech.",
-    state: "已完成",
-    fee: 0,
-    amt: 200,
-  },
-];
-
 export default {
   name: "HistoryPage",
   components: {
     dataTable
   },
   setup() {
-
+    const $q = useQuasar()
+    const rows = ref([]);
+    function loadOrders() {
+      api.post('/Order/Query', {
+        Start: 0,
+        PageSize: 99,
+        MerchantId: 142864983000001
+      }, {
+        headers: {}
+      })
+        .then((response) => {
+          console.log(response.data);
+          if (response.data.completeFlag) {
+            rows.value = response.data.records
+          }
+        })
+        .catch(function (error) {
+          // handle error
+          //console.log(error);
+          $q.notify({
+            color: 'warning',
+            message: "連線失敗 " + error,
+            position: "center",
+            multiLine: true,
+            actions: [
+              { icon: 'close', color: 'white', round: true, handler: () => { /* ... */ } }
+            ]
+          });
+        })
+    }
+    loadOrders();
     return {
+      loadOrders,
       text: ref(''),
       model: ref(null),
       OrderState: ref(null),
