@@ -21,6 +21,7 @@
     "vue": "^3.2.29",
     "vue-ccard": "^1.0.7",
     "vue-paycard": "^0.7.0",
+    "vue-plugin-load-script": "^2.1.1",
     "vue-router": "^4.0.12"
   },
   "devDependencies": {

@@ -2904,6 +2904,11 @@ vue-paycard@^0.7.0:
   dependencies:
     vue "^2.6.14"
 
+vue-plugin-load-script@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/vue-plugin-load-script/-/vue-plugin-load-script-2.1.1.tgz#5c16fbb428dae38440022dbf7ab02bf0b2429e26"
+  integrity sha512-IViO0hNj4O39M8I1taX74B5PR5RI7IrlEt+dvAjOk3NRLwQ7ZrdexUo9+K++KBzGPJtaVL1+emTyMWeOtjZojw==
+
 vue-router@^4.0.12:
   version "4.2.5"
   resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-4.2.5.tgz#b9e3e08f1bd9ea363fdd173032620bc50cf0e98a"

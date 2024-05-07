@@ -22,7 +22,6 @@
   </q-card>
   <q-card class="my-card q-ma-md q-pa-md" bordered>
     <h5 class="mainTitle">付款方式</h5>
-
     <div class="inputGroup q-mb-lg">
       <q-btn-toggle v-model="PayType" color="grey" toggle-color="warning" :options="paymentMethod" size="15px" no-caps
         unelevated rounded />
@@ -88,10 +87,10 @@
 
       <!--銀行帳戶-->
       <q-tab-panel name="Bank" class="PayPanel">
-        <div class="inputGroup">
+        <!-- <div class="inputGroup">
           <p>請選擇合作銀行</p>
           <q-select v-model="Bank" :options="bankList" option-label="labal" option-value="value" outlined />
-        </div>
+        </div> -->
         <q-tab-panels v-model="Bank.value" class="q-my-md">
           <q-tab-panel :name="bankItem.value" v-for="(bankItem, index) in bankList" :key="index">
             <q-list bordered separator>
@@ -161,12 +160,11 @@
       </ol>
     </div>
   </q-card>
-
 </template>
-
 <script>
 import { ref } from "vue";
 import { useQuasar } from 'quasar'
+import { loadScript } from "vue-plugin-load-script";
 export default {
   name: 'PayComponent',
   data() {
@@ -228,7 +226,7 @@ export default {
           labal: '台北富邦銀行',
           value: 'tpfubon',
           code: '012',
-          account: '12345678901234',
+          account: '1234567890123456',
           amount: '300',
           deadline: '2024-04-02 13:41:04'
         }
@@ -253,14 +251,36 @@ export default {
     const issuerIcon = ref('');
     const issuerState = ref(false);
     const $q = useQuasar()
-    function CheckPay(e, go) {
+    function CheckPay() {
+      // 檢查輸入
+      if (CVC.value.length == 3 && cardNumber.value.length == 16) {
+
+      }
+      // 引入既有的加密
+      loadScript("https://robot.wepay.tw/s/content/jsencrypt.min.js")
+        .then(() => {
+          var tCardInfo = cardNumber.value + ',' + expM.value + ',' + expY.value + ',' + CVC.value;
+          // 加密card Info
+          var encrypt = new JSEncrypt();
+          const publicKey = "-----BEGIN PUBLIC KEY-----\
+                          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvjhCPqzmRkTb10b1uETg/+jQYc++HX3z\
+                          VWE2MBLa1pIoY7SDVKgbZaYOVR0vm/kxJSWSFhO+Px6fN+jj1yBx8MbAqY4//hs8maQ9zo9um2d8\
+                          DpwBYSMxte0bvtVUm+fRjDbsPAcYpDMemaqMeR8g8Gk0iMGquE2HbfkzTel+AoO1jfhvZiIq439Y\
+                          ShFxysCY1pmDoU90wic/XuldlLNnuSUt6XIRidI8GxzB0AynsSi+UEOk3U5asMoWB+7cbfshZRR0\
+                          0Bh/P60u4thjZ+QpxfLOgNIwLvpKIHPiNnIPhtwEOrMVqDhIvDeMGVFCDF0GPjR4GUxSh08wCWCY\
+                          y35SvQIDAQAB\
+                          -----END PUBLIC KEY-----";
+          encrypt.setPublicKey(publicKey);
+          var encrypted = encrypt.encrypt(tCardInfo);
+          console.log(encrypted);
+          $q.notify({
+            type: 'positive',
+            message: "呼叫數位鎏付款API",
+            position: "center",
+          });
+        })
       var message = cardNumber.value + "|" + issuer.value + "|" + expM.value + "/" + expY.value + "|" + emailAddress.value;
-      $q.notify({
-        type: 'positive',
-        message: "呼叫數位鎏付款API",
-        caption: message,
-        position: "center",
-      });
+
       return;
     }
     function Clean() {
