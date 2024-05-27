@@ -86,7 +86,7 @@ export default {
       const authStore = useUserStore();
       authStore.setUser(username);
       // 假設登入成功後導航至其他頁面
-      this.$router.push("/");
+      this.$router.push("/Management/History");
     },
     // 刷新验证码
     refreshIdentifyCode() {

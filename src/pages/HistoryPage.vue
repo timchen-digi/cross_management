@@ -3,25 +3,28 @@
     <div class="row fit row justify-between">
       <div class="col-12">
         <div class="BlockContent q-pr-lg">
-          <h5 class="mainTitle">查詢交易活動</h5>
-          <q-input v-model="text" label="依用戶名稱或電子郵件搜尋" bottom-slots rounded outlined>
+          <h5 class="mainTitle">商戶交易紀錄查詢</h5>
+          <!-- <q-input v-model="text" label="依用戶名稱或電子郵件搜尋" bottom-slots rounded outlined>
             <template v-slot:prepend><q-icon name="search" /></template>
-            <template v-slot:append><q-icon v-if="text !== ''" name="close" @click="text = ''"
+<template v-slot:append><q-icon v-if="text !== ''" name="close" @click="text = ''"
                 class="cursor-pointer" /></template>
-            <template v-slot:after>
+<template v-slot:after>
               <q-btn color="warning" text-color="black" label="下載月結單" size="lg" class="q-px-xl" rounded />
             </template>
-          </q-input>
+</q-input> -->
           <div class="filterBlock q-gutter-md">
-            <h5>篩選</h5>
-            <q-btn color="warning" label="全部" size="lg" class="q-px-xl" rounded unelevated outline />
-
-            <q-btn-dropdown color="warning" class="q-px-xl" label="日期區間" size="lg" rounded outline>
+            <!-- <h5>篩選</h5> -->
+            <!-- <q-btn color="warning" label="清除條件" size="lg" class="q-px-xl" rounded unelevated outline
+              @click="clearFilter" /> -->
+            <q-input v-model="customId" label="訂單編號" rounded outlined>
+              <template v-slot:prepend><q-icon name="search" /></template>
+            </q-input>
+            <q-btn-dropdown color="warning" class="q-px-xl" label="建立時間" size="lg" rounded outline>
               <div class="row no-wrap q-pa-md">
                 <div class="col-12">
-                  <div class="text-h6 q-mb-sm">日期</div>
+                  <!-- <div class="text-h6 q-mb-sm">日期</div>
                   <q-option-group :options="dateOptions" type="radio" v-model="dateGroup" />
-                  <q-separator class="q-my-lg" />
+                  <q-separator class="q-my-lg" /> -->
                   <div class="text-h6 q-mb-sm">日期區間</div>
                   <div class="DateRange">
                     <q-input filled v-model="dateStart" mask="date" :rules="['date']" class="DateInput">
@@ -55,17 +58,61 @@
                 </div>
               </div>
             </q-btn-dropdown>
-
-            <q-select color="warning" size="lg" v-model="OrderTypeState" :options="OrderTypeOptions" label="類型" rounded
+            <q-select color="warning" size="lg" v-model="MerchantValue" :options="MerchantList" label="商戶" rounded
+              outlined />
+            <q-select color="warning" size="lg" v-model="OrderTypeValue" :options="orderType" label="類型" rounded
               outlined />
 
-            <q-select color="warning" size="lg" v-model="OrderState" :options="OrderStateOptions" label="狀態" rounded
+            <q-select color="warning" size="lg" v-model="OrderStateValue" :options="orderStatus" label="狀態" rounded
               outlined />
-
+            <q-btn color="warning" text-color="black" label="搜尋" size="lg" class="q-px-xl" rounded
+              @click="loadOrders" />
+          </div>
+          <div class="filterBlock q-gutter-md">
+            <q-btn color="warning" label="清除條件" size="lg" class="q-px-xl" rounded unelevated outline
+              @click="clearFilter" />
           </div>
           <div class="OrderTableBlock q-my-lg">
-            <dataTable title="" label="" link="/History" :rows="rows" :columns="columns" :showBottom="false" />
+            <q-table class="OrderTable" title="商戶交易紀錄" :rows="rows" :columns="columns" :row-key="rows.name"
+              v-model:pagination="pagination" :rows-per-page-options="[10, 25, 50]"
+              no-data-label="I didn't find anything for you" :loading="isLoading" @request="loadOrders" flat>
+              <template v-slot:no-data="">
+                <div class="noData">
+                  <h5>查無紀錄</h5>
+                  <p>請嘗試使用其他條件篩選</p>
+                </div>
+              </template>
+              <template v-slot:body="props">
+                <q-tr class="cursor-pointer" :props="props" @click="checkDetail(props.row)">
+                  <q-td v-for="col in props.cols" :key="col.name" :props="props">
+                    {{ col.value }}
+                  </q-td>
+                </q-tr>
+              </template>
+              <template v-slot:loading>
+                <q-inner-loading showing color="primary" />
+              </template>
+              <template v-slot:top-right>
+                <q-btn color="primary" icon-right="archive" label="下載交易紀錄" no-caps @click="exportTable" />
+              </template>
+            </q-table>
+            <q-dialog v-model="showDetail">
+              <q-card>
+                <q-card-section>
+                  <div class="text-h6">訂單詳細資料</div>
+                </q-card-section>
+                <q-card-section class="q-pt-none">
+                  <div v-html="generateTable(selected_row)"></div>
+                  <!-- {{ generateTable(selected_row) }} -->
+                  <!-- 這邊顯示詳細資料 -->
+                </q-card-section>
+                <q-card-actions align="right">
+                  <q-btn flat label="OK" color="primary" @click="showDetail = false" v-close-popup />
+                </q-card-actions>
+              </q-card>
+            </q-dialog>
           </div>
+          <!-- <q-btn color="warning" text-color="black" label="下載交易紀錄" size="lg" class="q-px-xl" rounded /> -->
         </div>
       </div>
     </div>
@@ -79,7 +126,7 @@ import { toThousands } from 'src/utils/index.js'
 import dataTable from 'src/components/DataTable.vue';
 import { useUserStore } from "../stores";
 import { api } from 'boot/axios'
-import { useQuasar } from 'quasar'
+import { exportFile, useQuasar } from 'quasar'
 const orderType = [
   "", "信用卡分期", "信用卡一般", "銀聯卡", "ApplePay", "GooglePay", "SamsungPay", "虛擬帳號", "EACH", "超商繳費", "電信代收", "點數代收"
 ]
@@ -119,31 +166,108 @@ const columns = [
     align: 'right', sortable: true
   },
 ];
+const OrderStateValue = ref(null);
+const OrderTypeValue = ref(null);
+const MerchantValue = ref(null);
+const dateStart = ref('');
+const dateEnd = ref('');
+const customId = ref('');
+const pagination = ref({
+  sortBy: 'desc',
+  descending: true,
+  page: 1,
+  rowsPerPage: 10,
+  rowsNumber: 10
+})
 export default {
   name: "HistoryPage",
   components: {
-    dataTable
+    //dataTable
   },
   setup() {
     const $q = useQuasar()
     const rows = ref([]);
-    function loadOrders() {
-      api.post('/Order/Query', {
-        Start: 0,
-        PageSize: 99,
-        MerchantId: 142864983000001
-      }, {
+    const isLoading = ref(false);
+    function clearFilter() {
+      OrderStateValue.value = null;
+      OrderTypeValue.value = null;
+      MerchantValue.value = null;
+      dateStart.value = '';
+      dateEnd.value = '';
+      customId.value = '';
+    }
+    function loadOrders(props) {
+
+      const { page, rowsPerPage, sortBy, descending } = props.pagination ? props.pagination : pagination.value
+      var query = {
+        Start: (page - 1) * pagination.value.rowsPerPage,
+        PageSize: rowsPerPage,
+        //MerchantId: 142864983000001
+      }
+      if (OrderStateValue.value) {
+        query.Status = orderStatus.indexOf(OrderStateValue.value) - 3;
+      }
+      if (OrderTypeValue.value) {
+        query.Type = orderType.indexOf(OrderTypeValue.value);
+      }
+      if (customId.value != "") {
+        query.CustomId = customId.value;
+      }
+      if (MerchantValue.value) {
+        query.MerchantId = MerchantValue.value.value;
+      }
+      if (dateStart.value) {
+        query.sCreateTime = dateStart.value.replaceAll('/', '-');
+      } else {
+        query.sCreateTime = "";
+      }
+      if (dateEnd.value) {
+        query.eCreateTime = dateEnd.value.replaceAll('/', '-');
+      } else {
+        query.eCreateTime = "";
+      }
+      if (sortBy) {
+        query.SortField = sortBy;
+      }
+      if (descending) {
+        query.SortDir = "DESC";
+      } else {
+        query.SortDir = "ASC";
+      }
+
+      isLoading.value = true;
+      api.post('/Order/Query', query, {
         headers: {}
       })
         .then((response) => {
-          console.log(response.data);
+          //console.log(response.data);
           if (response.data.completeFlag) {
             rows.value = response.data.records
+            pagination.value.rowsNumber = response.data.count
+            pagination.value.page = page
+            pagination.value.rowsPerPage = rowsPerPage
+            pagination.value.sortBy = sortBy
+            pagination.value.descending = descending
+            // handle sortBy
+            if (sortBy) {
+              const sortFn = sortBy === 'desc'
+                ? (descending
+                  ? (a, b) => (a.name > b.name ? -1 : a.name < b.name ? 1 : 0)
+                  : (a, b) => (a.name > b.name ? 1 : a.name < b.name ? -1 : 0)
+                )
+                : (descending
+                  ? (a, b) => (parseFloat(b[sortBy]) - parseFloat(a[sortBy]))
+                  : (a, b) => (parseFloat(a[sortBy]) - parseFloat(b[sortBy]))
+                )
+              rows.value.sort(sortFn)
+            }
           }
+          isLoading.value = false;
         })
         .catch(function (error) {
           // handle error
           //console.log(error);
+          isLoading.value = false;
           $q.notify({
             color: 'warning',
             message: "連線失敗 " + error,
@@ -155,21 +279,99 @@ export default {
           });
         })
     }
-    loadOrders();
+    function checkDetail(row) {
+      this.selected_row = row;
+      this.showDetail = true;
+    }
+    function wrapCsvValue(val, formatFn, row) {
+      let formatted = formatFn !== void 0
+        ? formatFn(val, row)
+        : val
+
+      formatted = formatted === void 0 || formatted === null
+        ? ''
+        : String(formatted)
+
+      formatted = formatted.split('"').join('""')
+      /**
+       * Excel accepts \n and \r in strings, but some other CSV parsers do not
+       * Uncomment the next two lines to escape new lines
+       */
+      // .split('\n').join('\\n')
+      // .split('\r').join('\\r')
+
+      return `"${formatted}"`
+    }
+    function generateTable(obj) {
+      // 不安全，待改
+      var htmlcode = "<table><tr>";
+      Object.keys(obj).forEach(function (k) {
+        //console.log(k + ' - ' + obj[k]);
+        htmlcode = htmlcode + "<th>" + k + "</th><th>" + obj[k] + "</th>";
+        htmlcode = htmlcode + "</tr><tr>";
+      });
+      htmlcode = htmlcode + "</tr></table>"
+      return htmlcode;
+    }
+    function exportTable() {
+      // naive encoding to csv format
+      const fileName = "商戶交易紀錄.csv"
+      const content = [columns.map(col => wrapCsvValue(col.label))].concat(
+        rows.value.map(row => columns.map(col => wrapCsvValue(
+          typeof col.field === 'function'
+            ? col.field(row)
+            : row[col.field === void 0 ? col.name : col.field],
+          col.format,
+          row
+        )).join(','))
+      ).join('\r\n')
+      // utf-8 BOM
+      const status = exportFile(
+        fileName,
+        '\ufeff' + content,
+        'text/csv'
+      )
+      if (status !== true) {
+        $q.notify({
+          color: 'warning',
+          message: "下載失敗 " + error,
+          position: "center",
+          multiLine: true,
+          actions: [
+            { icon: 'close', color: 'white', round: true, handler: () => { /* ... */ } }
+          ]
+        })
+      }
+    }
+    loadOrders({
+      sortBy: 'desc',
+      descending: true,
+      page: 1,
+      rowsPerPage: 10,
+      rowsNumber: 10
+    });
     return {
       loadOrders,
-      text: ref(''),
+      exportTable,
+      checkDetail,
+      generateTable,
+      clearFilter,
+      showDetail: ref(false),
+      customId,
       model: ref(null),
-      OrderState: ref(null),
-      OrderTypeState: ref(null),
+      OrderStateValue,
+      OrderTypeValue,
       dateGroup: ref(null),
-      dateStart: ref('2019/02/01'),
-      dateEnd: ref('2019/02/01'),
-      OrderStateOptions: [
-        '交易中', '已完成', '已提領', '已退款', '處理中', '已取消'
-      ],
-      OrderTypeOptions: [
-        '付款', '提領', '取消'
+      dateStart,
+      dateEnd,
+      orderType,
+      orderStatus,
+      MerchantValue,
+      MerchantList: [
+        { label: '數位鎏', value: '142864983000001' },
+        { label: '五七國際', value: '183062446000001' },
+        { label: 'Waffo', value: '332715810000001' },
+        { label: 'Airwallex', value: '391440300000001' }
       ],
       dateOptions: [
         { label: '本月', value: 'month', color: 'warning' },
@@ -179,7 +381,9 @@ export default {
         { label: '去年', value: 'lastYear', color: 'warning' }
       ],
       columns,
-      rows
+      rows,
+      isLoading,
+      pagination
     }
   }
 };

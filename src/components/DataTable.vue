@@ -2,10 +2,11 @@
   <div v-if="title" class="text-h5 q-mb-xs">{{ title }}</div>
   <div class="q-my-md row">
     <q-table class="OrderTable" :rows="rows" :columns="columns" :row-key="rows.name" v-model:pagination="pagination"
-      :rows-per-page-options="[10, 25, 50]" no-data-label="I didn't find anything for you" :filter="filter" flat>
+      :rows-per-page-options="[10, 25, 50]" no-data-label="I didn't find anything for you" :filter="filter"
+      :loading="isLoading" flat>
       <template v-slot:no-data="">
         <div class="noData">
-          <h5>查無交易明細</h5>
+          <h5>查無紀錄</h5>
           <p>請嘗試使用其他條件篩選</p>
         </div>
       </template>
@@ -15,6 +16,9 @@
             {{ col.value }}
           </q-td>
         </q-tr>
+      </template>
+      <template v-slot:loading>
+        <q-inner-loading showing color="primary" />
       </template>
     </q-table>
     <q-dialog v-model="alert">
@@ -38,7 +42,8 @@
       active-color="warning" gutter="md" />
   </div> -->
   <div v-if="label" class="row justify-center q-my-md">
-    <q-btn color="warning" size="18px" class="q-px-xl text-black" :label="label" to="/History" unelevated rounded />
+    <q-btn color="warning" size="18px" class="q-px-xl text-black" :label="label" to="/Management/History" unelevated
+      rounded />
   </div>
 </template>
 
@@ -77,6 +82,10 @@ export default {
     },
     rows: {
       type: Array
+    },
+    isLoading: {
+      type: Boolean,
+      default: false
     }
   },
   setup(props) {
@@ -93,6 +102,7 @@ export default {
       this.alert = true;
     }
     function generateTable(obj) {
+      // 不安全，待改
       var htmlcode = "<table><tr>";
       Object.keys(obj).forEach(function (k) {
         //console.log(k + ' - ' + obj[k]);

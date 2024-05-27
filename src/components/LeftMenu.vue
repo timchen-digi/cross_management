@@ -24,7 +24,7 @@ export default {
             },
             {
               label: "登出",
-              path: "/Logout",
+              path: "/Management/Logout",
             },
           ],
         },
@@ -44,8 +44,8 @@ export default {
               path: "/",
             },
             {
-              label: "API交易紀錄",
-              path: "/",
+              label: "API紀錄查詢",
+              path: "/Management/ApiLog",
             },
             {
               label: "維運計畫",
