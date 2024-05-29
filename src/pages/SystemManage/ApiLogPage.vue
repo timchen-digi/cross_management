@@ -80,7 +80,7 @@
 import { ref } from 'vue'
 import { toThousands } from 'src/utils/index.js'
 import dataTable from 'src/components/DataTable.vue';
-import { useUserStore } from "../stores";
+import { useUserStore } from "../../stores";
 import { api } from 'boot/axios'
 import { exportFile, useQuasar } from 'quasar'
 const ApiNameList = [

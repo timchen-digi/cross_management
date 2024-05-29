@@ -20,7 +20,7 @@ export default {
           children: [
             {
               label: "變更密碼",
-              path: "/",
+              path: "/Management/SetPwd",
             },
             {
               label: "登出",
@@ -33,15 +33,15 @@ export default {
           children: [
             {
               label: "員工帳號管理",
-              path: "/",
+              path: "/Management/User",
             },
             {
               label: "員工操作紀錄",
-              path: "/",
+              path: "/Management/UserLog",
             },
             {
               label: "批次作業日誌",
-              path: "/",
+              path: "/Management/BatchLog",
             },
             {
               label: "API紀錄查詢",
@@ -49,7 +49,7 @@ export default {
             },
             {
               label: "維運計畫",
-              path: "/",
+              path: "/Management/Maintain",
             },
           ],
         },
