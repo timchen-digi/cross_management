@@ -4,6 +4,8 @@
       <div class="col-12">
         <div class="BlockContent q-pr-lg">
           <h5 class="mainTitle">商戶管理</h5>
+          <q-btn color="accent" label="新增商戶" size="lg" class="q-px-xl" rounded unelevated outline
+            @click="merchantWindow = true" />
           <div class="filterBlock q-gutter-md">
             <q-select color="warning" size="lg" v-model="StatusValue" :options="StatusList" label="商戶狀態" rounded
               outlined />
@@ -39,11 +41,19 @@
                   <div class="text-h6">商戶詳細資料</div>
                 </q-card-section>
                 <q-card-section class="q-pt-none">
-                  <div v-html="generateTable(selected_row)"></div>
+                  <!-- <div v-html="generateTable(selected_row)"></div> -->
                   <!-- {{ generateTable(selected_row) }} -->
                   <!-- 這邊顯示詳細資料 -->
+                  <q-list separator>
+                    <q-item v-for="(item, key) in selected_row" :key="item.value">
+                      <q-item-section><q-item-label>{{ MerchantColumn[key] }}</q-item-label></q-item-section>
+                      <q-item-section side><q-item-label> {{ item }}</q-item-label></q-item-section>
+                    </q-item>
+                  </q-list>
                   <q-btn color="accent" @click="getApiInfo(selected_row)" icon="vpn_key">取得API金鑰</q-btn>
+                  <br><br>
                   <q-btn color="accent" @click="getApplyPaymentService(selected_row)" icon="credit_card">信用卡支付資訊</q-btn>
+                  <br><br>
                   <q-btn color="accent" @click="getApplyService(selected_row)" icon="payments">支付渠道資訊</q-btn>
                 </q-card-section>
                 <q-card-actions align="right">
@@ -55,6 +65,21 @@
         </div>
       </div>
     </div>
+    <q-dialog v-model="merchantWindow" persistent>
+      <q-card style="min-width: 500px">
+        <q-card-section>
+          <div class="text-h6">填寫商戶基本資料</div>
+        </q-card-section>
+        <q-card-section class="q-pt">
+          <q-input v-for="(item, key) in newMerchant" :key="key" v-model="newMerchant[key]"
+            :label="MerchantColumn[key]"></q-input>
+        </q-card-section>
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat label="取消" v-close-popup></q-btn>
+          <q-btn flat label="新增" v-close-popup @click="registMerchant(newMerchant)"></q-btn>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -86,6 +111,52 @@ const pagination = ref({
   rowsPerPage: 10,
   rowsNumber: 10
 })
+const MerchantColumn = {
+  MerchantId: '商戶ID',
+  UBN: '統編/身分證號',
+  Type: '註冊類型',
+  RegistName: '登記名稱/姓名',
+  BusinessName: '營業名稱',
+  EnglishName: '英文名稱',
+  RegistAddress: '事業登記地址/戶籍地址',
+  BusinessAddress: '營業地址',
+  BillMail: '帳務電子郵件',
+  BossName: '負責人姓名',
+  BossSID: '負責人身分證號',
+  ContactName: '聯絡人姓名',
+  ContactMobile: '聯絡人手機',
+  ContactTel: '聯絡人市話',
+  ContactMail: '聯絡人電子郵件',
+  BankBranch: '收款銀行分行',
+  BankAccount: '收款銀行帳號',
+  Mcc: '營業種類(MCC)',
+  AnnualFee: '年費',
+  OpenDate: '開通日',
+  Status: '狀態',
+  UpdateTime: '更新時間',
+  CreateTime: '建立時間',
+}
+const newMerchant = ref({
+  MerchantId: '',
+  UBN: '',
+  Type: 2,
+  RegistName: '',
+  BusinessName: '',
+  EnglishName: '',
+  RegistAddress: '',
+  BusinessAddress: '',
+  BillMail: '',
+  BossName: '',
+  BossSID: '',
+  ContactName: '',
+  ContactMobile: '',
+  ContactTel: '',
+  ContactMail: '',
+  BankBranch: '',
+  BankAccount: '',
+  Mcc: '',
+  AnnualFee: 0
+})
 export default {
   name: "MerchantPage",
   components: {
@@ -100,6 +171,39 @@ export default {
       ApiNameValue.value = null;
       BusinessResultValue.value = '';
       RequestDate.value = '';
+    }
+    function registMerchant(merchant) {
+      // for (var i in newMerchant.value) {
+      //   console.log(i + i.value);
+      // }
+      // 檢查輸入(必填/格式)
+      console.log(merchant.MerchantId);
+      api.post('/Merchant/Create', merchant, {
+        headers: {}
+      })
+        .then((response) => {
+          //console.log(response.data);
+          if (response.data.completeFlag) {
+            $q.notify({
+              type: 'positive',
+              message: "金鑰已複製至剪貼簿",
+              position: "center",
+            })
+          } else {
+            $q.notify({
+              type: 'negative',
+              message: "商戶建立失敗",
+              position: "center",
+            })
+          }
+        })
+        .catch(function (error) {
+          $q.notify({
+            type: 'negative',
+            message: "商戶建立失敗" + error,
+            position: "center",
+          })
+        })
     }
     function getApiInfo(obj) {
       var query = {
@@ -125,6 +229,7 @@ export default {
           console.log(error);
         })
     }
+    // 取得商戶
     function getApplyPaymentService(obj) {
       var query = {
         MerchantId: obj['MerchantId']
@@ -262,7 +367,11 @@ export default {
       generateTable,
       clearFilter,
       getApiInfo,
+      registMerchant,
+      MerchantColumn,
       showDetail: ref(false),
+      merchantWindow: ref(false),
+      newMerchant,
       StatusValue,
       StatusList,
       model: ref(null),
