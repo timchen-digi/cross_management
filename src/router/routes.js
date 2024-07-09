@@ -20,6 +20,7 @@ const routes = [
       { path: "Confirm", component: () => import("pages/PayPageConfirm.vue") },
       { path: "Home", component: () => import("pages/HomePage.vue") }, // 首頁
       { path: "History", component: () => import("pages/HistoryPage.vue") }, // 訂單紀錄
+      { path: "Refund", component: () => import("pages/RefundPage.vue") }, // 訂單紀錄
       { path: "Logout", component: () => import("pages/LogoutPage.vue") }, // 登出
       //{ path: "Alarm", component: () => import("pages/AlarmPage.vue") }, // 警示帳戶查詢
       //{ path: "Settle", component: () => import("pages/SettlePage.vue") }, // 商戶對帳查詢

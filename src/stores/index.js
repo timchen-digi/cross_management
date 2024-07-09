@@ -1,8 +1,7 @@
 import { createPinia } from "pinia";
 import { defineStore, acceptHMRUpdate } from "pinia";
-import Router from "../router";
 const pinia = createPinia();
-
+import { useRouter } from "vue-router";
 export const useUserStore = defineStore({
   id: "user",
   state: () => ({
@@ -14,6 +13,9 @@ export const useUserStore = defineStore({
       this.username = username;
       window.localStorage.setItem("userName", this.username);
     },
+    setToken(token) {
+      window.localStorage.setItem("token", token);
+    },
     logout() {
       //alert("登出");
       this.$patch({
@@ -21,7 +23,8 @@ export const useUserStore = defineStore({
       });
       window.localStorage.setItem("userName", "");
       //Router.push("Login");
-      window.location.href = "/Login";
+      const router = useRouter();
+      router.push("/#/Login");
     },
   },
 });

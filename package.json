@@ -2,7 +2,7 @@
   "name": "quasar-project",
   "version": "0.0.1",
   "description": "A Quasar Project",
-  "productName": "數位鎏跨境交易系統",
+  "productName": "數位鎏聚合支付管理後台",
   "author": "Tim",
   "private": true,
   "scripts": {

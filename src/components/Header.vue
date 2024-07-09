@@ -2,13 +2,14 @@
   <q-header elevated class="header">
     <q-toolbar class="Toolbar text-white">
       <q-btn flat @click="drawer = !drawer" icon="menu" />
-      <a href="/"><img src="~assets/logos/DigiFlow_logo_White.svg" class="mainLOGO" /></a>
+      <img src="~assets/logos/DigiFlow_logo_White.svg" class="mainLOGO" />
       <q-tabs v-model="tab" inline-label class="tabs" indicator-color="warning">
         <!-- <q-route-tab name="home" label="首頁" to="/Home" /> -->
         <q-route-tab name="merchant" label="商戶管理" to="/Management/Merchant" />
         <!-- <q-route-tab name="pay" label="付款" to="/Pay" />
         <q-route-tab name="wallet" label="錢包" to="/Wallet" /> -->
         <q-route-tab name="history" label="交易紀錄" to="/Management/History" />
+        <q-route-tab name="history" label="退款交易紀錄" to="/Management/Refund" />
       </q-tabs>
       <q-space />
       <q-btn class="q-mx-md" icon="notifications" round>
