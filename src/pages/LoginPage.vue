@@ -59,7 +59,7 @@ export default {
   data() {
     return {
       identifyCode: "", //密碼登入圖形驗證碼
-      identifyCodes: "1234567890abcdefghizklmnopqrstuvwxyz", //生成圖形驗證碼依據
+      identifyCodes: "23456789abcdefghjkmnpqrstuvwxyz", //生成圖形驗證碼依據
       account: "",
       password: "",
       isPwd: ref(true),
@@ -68,25 +68,53 @@ export default {
   },
   methods: {
     login() {
-      // 假設這裡進行登入驗證，成功後將資料保存至 Pinia
-      // api.post('/auth/login', form)
-      // .then(response => {
-      //   api.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token
-      //   commit('login', {token: response.data.token, user: response.data.user})
-      // })
-      var username = "";
-      if (this.account == "digiflow") {
-        username = "數位鎏測試商戶";
-      } else if (this.account == "admin") {
-        username = "後台系統管理員";
-      } else {
-        alert("使用者名稱或密碼錯誤");
+      //圖形驗證碼
+      if (this.identifyCode != this.verify) {
+        alert("驗證碼錯誤");
         return;
       }
-      const authStore = useUserStore();
-      authStore.setUser(username);
-      // 假設登入成功後導航至其他頁面
-      this.$router.push("/Management/History");
+      var username = "";
+      var isAdmin = false;
+      var token = "";
+      //登入驗證
+      var form = {
+        Account: this.account,
+        Password: this.password,
+      }
+      api.post('/Auth/Login', form)
+        .then(response => {
+          console.log(response);
+          if (response.data.completeFlag == true) {
+            // 成功登入
+            var user = response.data.records[0];
+            username = user.UserName;
+            isAdmin = user.isAdmin;
+            token = user.Token;
+          }
+          else {
+            alert("使用者名稱或密碼錯誤");
+            return;
+          }
+          console.log(username);
+          const authStore = useUserStore();
+          authStore.setUser(username);
+          authStore.setToken(token);
+          // 登入成功後導航至其他頁面
+          this.$router.push("/Management/History");
+
+        }).catch(function (error) {
+          // handle error
+          console.log(error);
+          alert("使用者名稱或密碼錯誤");
+        })
+      // if (this.account == "digiflow") {
+      //   username = "數位鎏測試商戶";
+      // } else if (this.account == "admin") {
+      //   username = "後台系統管理員";
+      // } else {
+      //   alert("使用者名稱或密碼錯誤");
+      //   return;
+      // }
     },
     // 刷新验证码
     refreshIdentifyCode() {

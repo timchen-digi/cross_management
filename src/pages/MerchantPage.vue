@@ -38,14 +38,22 @@
             <q-dialog v-model="showDetail">
               <q-card>
                 <q-card-section>
-                  <div class="text-h6">商戶詳細資料</div>
+                  <div class="text-h6">商戶基本資料</div>
                 </q-card-section>
                 <q-card-section class="q-pt-none">
-                  <!-- <div v-html="generateTable(selected_row)"></div> -->
-                  <!-- {{ generateTable(selected_row) }} -->
-                  <!-- 這邊顯示詳細資料 -->
                   <q-list separator>
-                    <q-item v-for="(item, key) in selected_row" :key="item.value">
+                    <q-item v-for="(item, key) in rowHandler(selected_row)" :key="item.value">
+                      <q-item-section><q-item-label>{{ MerchantColumn[key] }}</q-item-label></q-item-section>
+                      <q-item-section side><q-item-label> {{ item }}</q-item-label></q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-card-section>
+                <q-card-section>
+                  <div class="text-h6">商戶帳務資料</div>
+                </q-card-section>
+                <q-card-section class="q-pt-none">
+                  <q-list separator>
+                    <q-item v-for="(item, key) in MerchantAccount" :key="item.value">
                       <q-item-section><q-item-label>{{ MerchantColumn[key] }}</q-item-label></q-item-section>
                       <q-item-section side><q-item-label> {{ item }}</q-item-label></q-item-section>
                     </q-item>
@@ -92,16 +100,20 @@ import { useUserStore } from "../stores";
 import { api } from 'boot/axios'
 import { exportFile, useQuasar } from 'quasar'
 const StatusList = [
+  { label: '銷戶', value: '-4' },
+  { label: '退件', value: '-3' },
+  { label: '停權', value: '-2' },
+  { label: '申請中', value: '-1' },
+  { label: '待放行', value: '0' },
   { label: '停用', value: '1' },
-  { label: '啟用', value: '2' },
-  { label: '停用', value: '0' }
+  { label: '啟用', value: '2' }
 ]
 const columns = [
   { name: "MerchantId", label: "商戶ID", field: "MerchantId", align: 'left', sortable: true },
   { name: "UBN", label: "統編", field: "UBN", align: 'left', sortable: true },
   { name: "RegistName", label: "註冊名稱", field: "RegistName", align: 'left', sortable: true },
   { name: "BusinessName", label: "營業名稱", field: "BusinessName", align: 'left', sortable: true },
-  { name: "Status", label: "狀態", field: "Status", align: 'left', sortable: true, format: (v) => (v == "2" ? "啟用" : "暫時停用") }
+  { name: "Status", label: "狀態", field: "Status", align: 'left', sortable: true, format: (v) => (StatusList[v + 4].label) }
 ];
 const StatusValue = ref(null);
 const pagination = ref({
@@ -135,7 +147,18 @@ const MerchantColumn = {
   Status: '狀態',
   UpdateTime: '更新時間',
   CreateTime: '建立時間',
+  tranLimit: '單筆交易限額',
+  dailyLimit: '日交易限額',
+  monthlyLimit: '月交易限額',
+  refundQuota: '退款額度'
 }
+const MerchantAccount = ref({
+  AnnualFee: 0,
+  dailyLimit: -1,
+  monthlyLimit: -1,
+  tranLimit: -1,
+  refundQuota: -1
+})
 const newMerchant = ref({
   MerchantId: '',
   UBN: '',
@@ -205,6 +228,32 @@ export default {
           })
         })
     }
+    function getAccountInfo(obj) {
+      MerchantAccount.value.AnnualFee = 0
+      MerchantAccount.value.dailyLimit = -1
+      MerchantAccount.value.monthlyLimit = -1
+      MerchantAccount.value.tranLimit = -1
+      MerchantAccount.value.refundQuota = -1
+      var query = {
+        MerchantId: obj['MerchantId']
+      }
+      api.post('/Merchant/GetPaymentLimit', query, {
+        headers: {}
+      })
+        .then((response) => {
+          var record = response.data
+          if (record != undefined) {
+            MerchantAccount.value.dailyLimit = record.dailyLimit
+            MerchantAccount.value.monthlyLimit = record.monthlyLimit
+            MerchantAccount.value.tranLimit = record.tranLimit
+            MerchantAccount.value.refundQuota = record.refundQuota
+          }
+          console.log(MerchantAccount.value)
+        })
+        .catch(function (error) {
+          console.log(error);
+        })
+    }
     function getApiInfo(obj) {
       var query = {
         MerchantId: obj['MerchantId']
@@ -254,9 +303,47 @@ export default {
           console.log(error);
         })
     }
+    function rowHandler(rows) {
+      if (Object.prototype.hasOwnProperty.call(rows, 'BillMail')) {
+        delete rows.BillMail
+      }
+      if (Object.prototype.hasOwnProperty.call(rows, 'AnnualFee')) {
+        delete rows.AnnualFee
+      }
+      if (Object.prototype.hasOwnProperty.call(rows, 'BankBranch')) {
+        if (rows.BankBranch == '') {
+          //跨境模式
+          rows.BankBranch = 'ESUNTWTP'
+        }
+        //rows.BankBranch = 'ESUNTWTP'
+      }
+      if (Object.prototype.hasOwnProperty.call(rows, 'Mcc')) {
+        if (rows.Mcc == '5816') {
+          rows.Mcc = '5816-線上遊戲'
+        }
+      }
+      // if (Object.prototype.hasOwnProperty.call(rows, 'Status')) {
+      //   for (let i = 0; i < StatusList.length; i++) {
+      //     if (rows.Status == StatusList[i].value) {
+      //       rows.Status = StatusList[i].label
+      //       break
+      //     }
+      //   }
+      // }
+      if (Object.prototype.hasOwnProperty.call(rows, 'Type')) {
+        if (rows.Type == 3) {
+          rows.Type = '境外'
+        } else if (rows.Type == 2) {
+          rows.Type = '法人'
+        } else if (rows.Type == 1) {
+          rows.Type = '個人'
+        }
+      }
+      return rows
+    }
     function getApplyService(obj) {
       var query = {
-        MerchantId: obj['MerchantId']
+        MerchantId: obj['MerchantId'],
       }
       api.post('/Merchant/QueryApplyService', query, {
         headers: {}
@@ -283,6 +370,7 @@ export default {
       var query = {
         Start: (page - 1) * pagination.value.rowsPerPage,
         PageSize: rowsPerPage,
+        AuthToken: "XAufzlN0GVAnq_VYkQELvS4DmqECEqCtovr01UhzHe0"
       }
       if (StatusValue.value) {
         query.Status = StatusValue.value.value;
@@ -340,35 +428,27 @@ export default {
         })
     }
     function checkDetail(row) {
-      this.selected_row = row;
-      this.showDetail = true;
-    }
-    function generateTable(obj) {
-      // 不安全，待改
-      var htmlcode = "<table><tr>";
-      Object.keys(obj).forEach(function (k) {
-        //console.log(k + ' - ' + obj[k]);
-        htmlcode = htmlcode + "<th>" + k + "</th><th>" + obj[k] + "</th>";
-        htmlcode = htmlcode + "</tr><tr>";
-      });
-      htmlcode = htmlcode + "</tr></table>"
-      return htmlcode;
+      this.selected_row = row
+      this.showDetail = true
+      getAccountInfo(row)
     }
     loadOrders({
       sortBy: 'desc',
       descending: true,
       page: 1,
       rowsPerPage: 10,
-      rowsNumber: 10
+      rowsNumber: 10,
+      AuthToken: "XAufzlN0GVAnq_VYkQELvS4DmqECEqCtovr01UhzHe0"
     });
     return {
       loadOrders,
       checkDetail,
-      generateTable,
       clearFilter,
       getApiInfo,
       registMerchant,
+      rowHandler,
       MerchantColumn,
+      MerchantAccount,
       showDetail: ref(false),
       merchantWindow: ref(false),
       newMerchant,
@@ -391,7 +471,7 @@ export default {
   display: flex
   flex-wrap: nowrap
   align-items: center
-  margin: 20px 0
+  margin: 10px 0
 
   h5
     margin: 0 10px 0 0

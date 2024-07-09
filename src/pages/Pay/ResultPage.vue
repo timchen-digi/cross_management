@@ -31,7 +31,7 @@ export default {
     return {
       Title: "%這裡放店家名稱%",
       OrderStatus: true,
-      OrderStatusText: "交易失敗",
+      OrderStatusText: "交易成功",
       Order: [
         {
           Title: '特店名稱：',

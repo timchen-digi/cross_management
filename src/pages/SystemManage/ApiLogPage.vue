@@ -52,15 +52,21 @@
                 <q-inner-loading showing color="primary" />
               </template>
             </q-table>
-            <q-dialog v-model="showDetail">
+            <q-dialog v-model="showDetail" full-width>
               <q-card>
                 <q-card-section>
                   <div class="text-h6">API詳細資料</div>
                 </q-card-section>
                 <q-card-section class="q-pt-none">
-                  <div v-html="generateTable(selected_row)"></div>
+                  <!-- <div v-html="generateTable(selected_row)"></div> -->
                   <!-- {{ generateTable(selected_row) }} -->
                   <!-- 這邊顯示詳細資料 -->
+                  <q-list separator>
+                    <q-item v-for="(item, key) in selected_row" :key="item.value">
+                      <q-item-section><q-item-label>{{ ApiLogColumn[key] }}</q-item-label></q-item-section>
+                      <q-item-section side><q-item-label> {{ item }}</q-item-label></q-item-section>
+                    </q-item>
+                  </q-list>
                 </q-card-section>
                 <q-card-actions align="right">
                   <q-btn flat label="OK" color="primary" @click="showDetail = false" v-close-popup />
@@ -78,7 +84,7 @@
 <script>
 
 import { ref } from 'vue'
-import { toThousands } from 'src/utils/index.js'
+import { toThousands, GetMerchantName } from 'src/utils/index.js'
 import dataTable from 'src/components/DataTable.vue';
 import { useUserStore } from "../../stores";
 import { api } from 'boot/axios'
@@ -86,22 +92,59 @@ import { exportFile, useQuasar } from 'quasar'
 const ApiNameList = [
   { label: '建立訂單', value: 'Create' },
   { label: '付款通知', value: 'Notify' },
-  { label: '訂單查詢', value: 'Query' }
+  { label: '訂單查詢', value: 'Query' },
+  { label: '退款', value: 'Refund' },
+  { label: '退款查詢', value: 'QueryRefund' },
+  { label: '日終檔下載', value: 'Reconciliation' }
 ]
 const BusinessResultList = [
   { label: '成功', value: 'Y' },
   { label: '失敗', value: 'N' },
   { label: '全選', value: '' }
 ]
+const MerchantList = ref([
+  { label: '數位鎏', value: '142864983000001' },
+  { label: '五七國際', value: '183062446000001' },
+  { label: 'Waffo', value: '332715810000001' },
+  { label: 'Airwallex', value: '391440300000001' }
+])
 const columns = [
-  { name: "MerchantId", label: "商戶", field: "MerchantId", align: 'left', sortable: true },
+  {
+    name: "MerchantId", label: "商戶", field: "MerchantId", align: 'left', sortable: true,
+    format: (v) => (GetMerchantName(v, MerchantList.value))
+  },
   // { name: "TerminalId", label: "終端", field: "TerminalId", align: 'left', sortable: true },
   { name: "CreateTime", label: "時間", field: "RequestTime", align: 'left', sortable: true, format: (v) => (v.replaceAll('T', ' ').replaceAll('-', '/')) },
   { name: "ApiName", label: "API名稱", field: "ApiName", align: 'left', sortable: true },
-  { name: "BusinessRecord", label: "執行結果", field: "BusinessRecord", align: 'left', sortable: true, format: (v) => (v == "Y" ? "成功" : "失敗") },
+  { name: "BusinessRecord", label: "執行結果", field: "BusinessResult", align: 'left', sortable: true, format: (v) => (v == "Y" ? "成功" : "失敗") },
   { name: "ErrorCode", label: "錯誤代碼", field: "ErrorCode", align: 'left', sortable: true },
   { name: "ErrorMessage", label: "錯誤訊息", field: "ErrorMessage", align: 'left', sortable: false }
 ];
+const ApiLogColumn = {
+  RowId: '紀錄序號',
+  RequestDate: '請求日期',
+  ApServer: '伺服器ID',
+  MerchantId: '商戶ID',
+  TermainlId: '終端ID',
+  ApiName: 'API名稱',
+  BusinessRecord: '業務紀錄',
+  BusinessRecordId: '業務紀錄ID',
+  ClientIp: '客戶端IP',
+  ServiceUrl: '服務網址',
+  RequestTime: '請求時間',
+  RequestHead: '請求標頭',
+  RequestMessage: '請求電文',
+  ResponseTime: '回覆時間',
+  ResponseMessage: '回覆電文',
+  ProcessSecond: '處理秒數',
+  ErrorCode: '錯誤代碼',
+  ErrorMessage: '錯誤訊息',
+  Exception: '系統異常紀錄',
+  Key1: '相關主鍵1',
+  Key2: '相關主鍵2',
+  Key3: '相關主鍵3',
+  BusinessResult: '業務執行結果'
+}
 const MerchantValue = ref(null);
 const ApiNameValue = ref(null);
 const BusinessResultValue = ref(null);
@@ -119,7 +162,7 @@ export default {
     //dataTable
   },
   setup() {
-    const $q = useQuasar()
+    const $q = useQuasar();
     const rows = ref([]);
     const isLoading = ref(false);
     function clearFilter() {
@@ -228,9 +271,10 @@ export default {
     return {
       loadOrders,
       checkDetail,
-      generateTable,
+      //generateTable,
       clearFilter,
       showDetail: ref(false),
+      ApiLogColumn,
       MerchantValue,
       ApiNameValue,
       BusinessResultValue,
@@ -239,20 +283,7 @@ export default {
       model: ref(null),
       dateGroup: ref(null),
       RequestDate,
-
-      MerchantList: [
-        { label: '數位鎏', value: '142864983000001' },
-        { label: '五七國際', value: '183062446000001' },
-        { label: 'Waffo', value: '332715810000001' },
-        { label: 'Airwallex', value: '391440300000001' }
-      ],
-      dateOptions: [
-        { label: '本月', value: 'month', color: 'warning' },
-        { label: '上個月', value: 'lastMonth', color: 'warning' },
-        { label: '最近三個月', value: 'season', color: 'warning' },
-        { label: '今年', value: 'year', color: 'warning' },
-        { label: '去年', value: 'lastYear', color: 'warning' }
-      ],
+      MerchantList,
       columns,
       rows,
       isLoading,
@@ -268,7 +299,7 @@ export default {
   display: flex
   flex-wrap: nowrap
   align-items: center
-  margin: 20px 0
+  margin: 10px 0
 
   h5
     margin: 0 10px 0 0
