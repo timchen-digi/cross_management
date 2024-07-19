@@ -121,7 +121,7 @@
 <script>
 
 import { ref } from 'vue'
-import { toThousands, GetMerchantName } from 'src/utils/index.js'
+import { toThousands, GetMerchantName, MerchantList } from 'src/utils/index.js'
 import dataTable from 'src/components/DataTable.vue';
 import { useUserStore } from "../stores";
 import { api } from 'boot/axios'
@@ -179,12 +179,6 @@ const pagination = ref({
   rowsPerPage: 10,
   rowsNumber: 10
 })
-const MerchantList = ref([
-  { label: '數位鎏', value: '142864983000001' },
-  { label: '五七國際', value: '183062446000001' },
-  { label: 'Waffo', value: '332715810000001' },
-  { label: 'Airwallex', value: '391440300000001' }
-])
 const actualMerchant = ref(MerchantList.value)
 export default {
   name: "HistoryPage",
@@ -210,6 +204,7 @@ export default {
         Start: (page - 1) * pagination.value.rowsPerPage,
         PageSize: rowsPerPage,
         //MerchantId: 142864983000001
+        // 測試區不做驗證
         //AuthToken: window.localStorage.getItem("token")
         AuthToken: "XAufzlN0GVAnq_VYkQELvS4DmqECEqCtovr01UhzHe0"
       }
@@ -372,6 +367,7 @@ export default {
       page: 1,
       rowsPerPage: 10,
       rowsNumber: 10,
+      // 測試區不做驗證
       AuthToken: "XAufzlN0GVAnq_VYkQELvS4DmqECEqCtovr01UhzHe0"
     });
     return {

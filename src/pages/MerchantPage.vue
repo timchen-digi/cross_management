@@ -304,42 +304,27 @@ export default {
         })
     }
     function rowHandler(rows) {
-      if (Object.prototype.hasOwnProperty.call(rows, 'BillMail')) {
-        delete rows.BillMail
+      let returnRow = { ...rows }
+      delete returnRow.BillMail
+      delete returnRow.AnnualFee
+      returnRow.CreateTime = returnRow.CreateTime.replace('T', ' ')
+      returnRow.UpdateTime = returnRow.UpdateTime.replace('T', ' ')
+      if (returnRow.BankBranch == '') {
+        //跨境模式
+        returnRow.BankBranch = 'ESUNTWTP'
       }
-      if (Object.prototype.hasOwnProperty.call(rows, 'AnnualFee')) {
-        delete rows.AnnualFee
+      if (returnRow.Mcc == '5816') {
+        returnRow.Mcc = '5816-線上遊戲'
       }
-      if (Object.prototype.hasOwnProperty.call(rows, 'BankBranch')) {
-        if (rows.BankBranch == '') {
-          //跨境模式
-          rows.BankBranch = 'ESUNTWTP'
-        }
-        //rows.BankBranch = 'ESUNTWTP'
+      returnRow.Status = StatusList[returnRow.Status + 4].label
+      if (returnRow.Type == 3) {
+        returnRow.Type = '境外'
+      } else if (rows.Type == 2) {
+        returnRow.Type = '法人'
+      } else if (rows.Type == 1) {
+        returnRow.Type = '個人'
       }
-      if (Object.prototype.hasOwnProperty.call(rows, 'Mcc')) {
-        if (rows.Mcc == '5816') {
-          rows.Mcc = '5816-線上遊戲'
-        }
-      }
-      // if (Object.prototype.hasOwnProperty.call(rows, 'Status')) {
-      //   for (let i = 0; i < StatusList.length; i++) {
-      //     if (rows.Status == StatusList[i].value) {
-      //       rows.Status = StatusList[i].label
-      //       break
-      //     }
-      //   }
-      // }
-      if (Object.prototype.hasOwnProperty.call(rows, 'Type')) {
-        if (rows.Type == 3) {
-          rows.Type = '境外'
-        } else if (rows.Type == 2) {
-          rows.Type = '法人'
-        } else if (rows.Type == 1) {
-          rows.Type = '個人'
-        }
-      }
-      return rows
+      return returnRow
     }
     function getApplyService(obj) {
       var query = {
@@ -370,6 +355,7 @@ export default {
       var query = {
         Start: (page - 1) * pagination.value.rowsPerPage,
         PageSize: rowsPerPage,
+        // 測試區不做驗證
         AuthToken: "XAufzlN0GVAnq_VYkQELvS4DmqECEqCtovr01UhzHe0"
       }
       if (StatusValue.value) {
@@ -438,6 +424,7 @@ export default {
       page: 1,
       rowsPerPage: 10,
       rowsNumber: 10,
+      // 測試區不做驗證
       AuthToken: "XAufzlN0GVAnq_VYkQELvS4DmqECEqCtovr01UhzHe0"
     });
     return {
@@ -447,6 +434,7 @@ export default {
       getApiInfo,
       registMerchant,
       rowHandler,
+      getApplyPaymentService,
       MerchantColumn,
       MerchantAccount,
       showDetail: ref(false),

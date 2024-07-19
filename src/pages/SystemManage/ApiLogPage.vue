@@ -84,7 +84,7 @@
 <script>
 
 import { ref } from 'vue'
-import { toThousands, GetMerchantName } from 'src/utils/index.js'
+import { toThousands, GetMerchantName, MerchantList } from 'src/utils/index.js'
 import dataTable from 'src/components/DataTable.vue';
 import { useUserStore } from "../../stores";
 import { api } from 'boot/axios'
@@ -102,12 +102,6 @@ const BusinessResultList = [
   { label: '失敗', value: 'N' },
   { label: '全選', value: '' }
 ]
-const MerchantList = ref([
-  { label: '數位鎏', value: '142864983000001' },
-  { label: '五七國際', value: '183062446000001' },
-  { label: 'Waffo', value: '332715810000001' },
-  { label: 'Airwallex', value: '391440300000001' }
-])
 const columns = [
   {
     name: "MerchantId", label: "商戶", field: "MerchantId", align: 'left', sortable: true,

@@ -120,7 +120,7 @@
 <script>
 
 import { ref } from 'vue'
-import { toThousands, GetMerchantName } from 'src/utils/index.js'
+import { toThousands, GetMerchantName, MerchantList } from 'src/utils/index.js'
 import dataTable from 'src/components/DataTable.vue';
 import { useUserStore } from "../stores";
 import { api } from 'boot/axios'
@@ -145,7 +145,7 @@ const columns = [
     name: "Type", label: "支付通路", field: "Type", align: 'center',
     format: (v) => (orderType[v]), sortable: true
   },
-  { name: "OrderNO", label: "交易編號", field: "OrderNO", align: 'center', sortable: true },
+  { name: "OrderNO", label: "閘道交易編號", field: "OrderNO", align: 'center', sortable: true },
   { name: "CustomId", label: "訂單編號", field: "CustomId", align: 'center', sortable: true },
   {
     name: "Status", label: "狀態", field: "Status", align: 'center',
@@ -231,12 +231,6 @@ const pagination = ref({
   rowsPerPage: 10,
   rowsNumber: 10
 })
-const MerchantList = ref([
-  { label: '數位鎏', value: '142864983000001' },
-  { label: '五七國際', value: '183062446000001' },
-  { label: 'Waffo', value: '332715810000001' },
-  { label: 'Airwallex', value: '391440300000001' }
-])
 const actualMerchant = ref(MerchantList.value)
 export default {
   name: "HistoryPage",
@@ -262,6 +256,7 @@ export default {
         Start: (page - 1) * pagination.value.rowsPerPage,
         PageSize: rowsPerPage,
         //MerchantId: 142864983000001
+        // 測試區不做驗證
         AuthToken: "XAufzlN0GVAnq_VYkQELvS4DmqECEqCtovr01UhzHe0"
       }
       if (OrderStateValue.value) {
@@ -302,10 +297,10 @@ export default {
         .then((response) => {
           //console.log(response.data);
           if (response.data.completeFlag) {
-            //數位劉帳單編號
             for (var i = 0; i < response.data.count; i++) {
-              console.log(response.data.records[i]);
               if (response.data.records[i]) {
+                // 閘道交易編號 = 數位鎏帳單編號處理
+                // 從前端作比較快
                 response.data.records[i].OrderNO = 'V' + response.data.records[i].CreateTime.replaceAll('-', '').substring(0, 8) + response.data.records[i].Id.padStart(11, '0')
               }
             }
@@ -492,6 +487,7 @@ export default {
       page: 1,
       rowsPerPage: 10,
       rowsNumber: 10,
+      // 測試區不做驗證
       AuthToken: "XAufzlN0GVAnq_VYkQELvS4DmqECEqCtovr01UhzHe0"
     });
     return {
