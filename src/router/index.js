@@ -34,10 +34,11 @@ export default route(function (/* { store, ssrContext } */) {
   });
   // 檢查登入狀態
   const user = useUserStore();
+  var home = process.env.deployPath || '';
   Router.beforeEach((to, from, next) => {
-    console.log("to", to);
-    console.log("from", from);
-    console.log("next", next);
+    console.log("to.fullPath: ", to.fullPath);
+    console.log("to.path: ", to.path);
+    console.log("to.href: ", to.href);
     if (to.path.startsWith("/Pay")) {
       next();
     }

@@ -12,3 +12,19 @@ export const toThousands = (num) => {
   }
   return result;
 };
+export function GetMerchantName(id, arr) {
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].value === id) {
+      return arr[i].label;
+    }
+  }
+}
+
+// TODO: API取商戶清單
+import { ref } from 'vue'
+export const MerchantList = ref([
+  { label: '數位鎏', value: '142864983000001' },
+  { label: '五七國際', value: '183062446000001' },
+  { label: 'Waffo', value: '332715810000001' },
+  { label: 'Airwallex', value: '391440300000001' }
+])

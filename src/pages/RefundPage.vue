@@ -3,7 +3,7 @@
     <div class="row fit row justify-between">
       <div class="col-12">
         <div class="BlockContent q-pr-lg">
-          <h5 class="mainTitle">商戶交易紀錄查詢</h5>
+          <h5 class="mainTitle">商戶退款紀錄查詢</h5>
           <!-- <q-input v-model="text" label="依用戶名稱或電子郵件搜尋" bottom-slots rounded outlined>
             <template v-slot:prepend><q-icon name="search" /></template>
 <template v-slot:append><q-icon v-if="text !== ''" name="close" @click="text = ''"
@@ -19,7 +19,7 @@
             <q-input v-model="customId" label="訂單編號" rounded outlined>
               <template v-slot:prepend><q-icon name="search" /></template>
             </q-input>
-            <q-btn-dropdown color="warning" label="建立時間" rounded outline>
+            <q-btn-dropdown color="warning" class="q-px-xl" label="建立時間" size="lg" rounded outline>
               <div class="row no-wrap q-pa-md">
                 <div class="col-12">
                   <!-- <div class="text-h6 q-mb-sm">日期</div>
@@ -58,17 +58,21 @@
                 </div>
               </div>
             </q-btn-dropdown>
-            <q-select color="warning" v-model="MerchantValue" use-input :options="actualMerchant" @filter="filterFn"
-              label="商戶" rounded outlined />
-            <q-select color="warning" v-model="OrderTypeValue" :options="orderType" label="類型" rounded outlined />
-            <q-select color="warning" v-model="OrderStateValue" :options="orderStatus" label="狀態" rounded outlined />
-            <q-btn color="warning" text-color="black" label="搜尋" rounded @click="loadOrders" size="lg" />
+            <q-select color="warning" size="lg" v-model="MerchantValue" use-input :options="actualMerchant"
+              @filter="filterFn" label="商戶" rounded outlined />
+            <q-select color="warning" size="lg" v-model="OrderTypeValue" :options="orderType" label="類型" rounded
+              outlined />
+
+            <q-select color="warning" size="lg" v-model="OrderStateValue" :options="orderStatus" label="狀態" rounded
+              outlined />
+            <q-btn color="warning" text-color="black" label="搜尋" size="lg" class="q-px-s" rounded @click="loadOrders" />
           </div>
           <div class="filterBlock q-gutter-md">
-            <q-btn color="warning" label="清除條件" rounded unelevated outline @click="clearFilter" />
+            <q-btn color="warning" label="清除條件" size="lg" class="q-px-xl" rounded unelevated outline
+              @click="clearFilter" />
           </div>
           <div class="OrderTableBlock q-my-lg">
-            <q-table class="OrderTable" title="" :rows="rows" :columns="columns" :row-key="rows.name"
+            <q-table class="OrderTable" title="商戶退款紀錄" :rows="rows" :columns="columns" :row-key="rows.name"
               v-model:pagination="pagination" :rows-per-page-options="[10, 25, 50]"
               no-data-label="I didn't find anything for you" :loading="isLoading" @request="loadOrders" flat>
               <template v-slot:no-data="">
@@ -88,21 +92,18 @@
                 <q-inner-loading showing color="primary" />
               </template>
               <template v-slot:top-right>
-                <q-btn color="primary" icon-right="archive" label="下載交易紀錄" no-caps @click="exportTable" />
+                <q-btn color="primary" icon-right="archive" label="下載退款紀錄" no-caps @click="exportTable" />
               </template>
             </q-table>
             <q-dialog v-model="showDetail">
               <q-card>
                 <q-card-section>
-                  <div class="text-h6">訂單詳細資料</div>
+                  <div class="text-h6">退款詳細資料</div>
                 </q-card-section>
                 <q-card-section class="q-pt-none">
-                  <q-list separator>
-                    <q-item v-for="(item, key) in rowHandler(selected_row)" :key="item.value">
-                      <q-item-section><q-item-label>{{ OrderColumn[key] }}</q-item-label></q-item-section>
-                      <q-item-section side><q-item-label> {{ item }}</q-item-label></q-item-section>
-                    </q-item>
-                  </q-list>
+                  <div v-html="generateTable(selected_row)"></div>
+                  <!-- {{ generateTable(selected_row) }} -->
+                  <!-- 這邊顯示詳細資料 -->
                 </q-card-section>
                 <q-card-actions align="right">
                   <q-btn flat label="OK" color="primary" @click="showDetail = false" v-close-popup />
@@ -129,95 +130,42 @@ const orderType = [
   "", "信用卡分期", "信用卡一般", "銀聯卡", "ApplePay", "GooglePay", "SamsungPay", "虛擬帳號", "EACH", "超商繳費", "電信代收", "點數代收"
 ]
 const orderStatus = [
-  "訂單退款", "訂單取消", "訂單逾期", "未付款", "已付款", "已付款(金額有誤)"
+  "退款處理中", "退款成功", "退款失敗"
 ]
 const columns = [
   {
     name: "MerchantId", label: "商戶", field: "MerchantId", align: 'left', sortable: true,
     format: (v) => (GetMerchantName(v, MerchantList.value))
   },
-  //{ name: "TerminalId", label: "終端", field: "TerminalId", align: 'left', sortable: true },
+  { name: "TerminalId", label: "終端", field: "TerminalId", align: 'left', sortable: true },
   {
-    name: "CreateTime", label: "交易時間", field: "CreateTime", align: 'left',
-    format: (val) => (val.replace('T', ' ')), sortable: true
+    name: "CreateTime", label: "日期", field: "CreateTime", align: 'left',
+    format: (val) => (val.slice(0, 10)), sortable: true
   },
   {
-    name: "Type", label: "支付通路", field: "Type", align: 'center',
+    name: "Type", label: "類型", field: "Type", align: 'center',
     format: (v) => (orderType[v]), sortable: true
   },
-  { name: "OrderNO", label: "閘道交易編號", field: "OrderNO", align: 'center', sortable: true },
+  { name: "RefundCustomId", label: "退款訂單編號", field: "RefundCustomId", align: 'center', sortable: true },
   { name: "CustomId", label: "訂單編號", field: "CustomId", align: 'center', sortable: true },
   {
     name: "Status", label: "狀態", field: "Status", align: 'center',
-    format: (v) => (orderStatus[v + 3]), sortable: true
+    format: (v) => (orderStatus[v]), sortable: true
   },
   {
-    name: "OrderAmount",
-    label: "訂單金額",
-    field: "OrderAmount",
+    name: "RefundAmount",
+    label: "退款金額",
+    field: "RefundAmount",
     //format: (val) => (toThousands(val)),
     align: 'center', sortable: true
   },
-  { name: "PayAmount", label: "交易金額", field: "PayAmount", align: 'center', sortable: true },
-  { name: "RefundAmount", label: "退款金額", field: "RefundAmount", align: 'center', sortable: true },
   {
-    name: "CancelTime", label: "退款時間", field: "CancelTime", align: 'left',
-    format: (val) => (val.replace('T', ' ')), sortable: true
+    name: "RefundFee",
+    label: "退款手續費",
+    field: "RefundFee",
+    align: 'right', sortable: true
   },
 ];
-const OrderColumn = {
-  Id: '交易ID',
-  TxId: '原始交易ID',
-  MerchantId: '特店編號',
-  TerminalId: '終端編號',
-  OrderNO: '數位鎏訂單編號',
-  CustomId: '商戶訂單編號',
-  Type: '類型',
-  CurrencyId: '幣別編號',
-  OrderAmount: '訂單金額',
-  PayAmount: '交易金額',
-  OrderDesc: '訂單說明',
-  ExpiryTime: '付款期限',
-  BuyerName: '消費者姓名',
-  BuyerID: '身分證/統一編號',
-  BuyerMobile: '消費者手機號碼',
-  BuyerMail: '消費者電子郵件信箱',
-  IPAddress: 'IP位址',
-  CardholderVerifyType: '持卡人驗證方式',
-  Installment: '分期期數',
-  ExtData: '商戶額外資訊',
-  PaymentTime: '付款時間',
-  AcquirerBank: '收單銀行',
-  Onus: '自行交易',
-  Issuer: '信用卡發卡行',
-  CardBrand: '信用卡別',
-  CardNo: '卡號末四碼',
-  AutoCapture: '是否自動請款',
-  VirtualBank: '虛擬帳號轉入銀行',
-  VirtualAccount: '虛擬帳號',
-  RemitCode: '轉出款分行代碼',
-  RemitAccount: '轉出款銀行帳號',
-  CVStoreId: '超商編號',
-  StoreCode1: '超商繳款第一段條碼',
-  StoreCode2: '超商繳款第二段條碼',
-  StoreCode3: '超商繳款第三段條碼',
-  CardNo: '卡號末四碼',
-  CancelTime: '撤銷時間',
-  CancelTrxId: '撤銷交易ID',
-  CaptureTime: '請款時間',
-  CaptureAmount: '對付款人請款金額',
-  CaptureTrxId: '請款交易ID',
-  RefundAmount: '退款給付款人金額',
-  RefundCount: '退款次數',
-  CaptureSettleDate: '請款結算日',
-  RuleId: '手續費計算規則ID',
-  FeeRate: '交易手續費率',
-  Fee: '代收交易手續費',
-  Status: '訂單狀態',
-  UpdateTime: '更新時間',
-  CreateTime: '建立時間',
-}
-
 const OrderStateValue = ref(null);
 const OrderTypeValue = ref(null);
 const MerchantValue = ref(null);
@@ -257,6 +205,7 @@ export default {
         PageSize: rowsPerPage,
         //MerchantId: 142864983000001
         // 測試區不做驗證
+        //AuthToken: window.localStorage.getItem("token")
         AuthToken: "XAufzlN0GVAnq_VYkQELvS4DmqECEqCtovr01UhzHe0"
       }
       if (OrderStateValue.value) {
@@ -291,19 +240,12 @@ export default {
       }
 
       isLoading.value = true;
-      api.post('/Order/Query', query, {
+      api.post('/Order/QueryRefund', query, {
         headers: {}
       })
         .then((response) => {
           //console.log(response.data);
           if (response.data.completeFlag) {
-            for (var i = 0; i < response.data.count; i++) {
-              if (response.data.records[i]) {
-                // 閘道交易編號 = 數位鎏帳單編號處理
-                // 從前端作比較快
-                response.data.records[i].OrderNO = 'V' + response.data.records[i].CreateTime.replaceAll('-', '').substring(0, 8) + response.data.records[i].Id.padStart(11, '0')
-              }
-            }
             rows.value = response.data.records
             pagination.value.rowsNumber = response.data.count
             pagination.value.page = page
@@ -364,68 +306,6 @@ export default {
 
       return `"${formatted}"`
     }
-    function rowHandler(rows) {
-      // clone
-      let returnRow = { ...rows }
-      returnRow.Type = orderType[rows.Type]
-      returnRow.Status = orderStatus[rows.Status + 3]
-      returnRow.CreateTime = returnRow.CreateTime.replace('T', ' ')
-      returnRow.UpdateTime = returnRow.UpdateTime.replace('T', ' ')
-      returnRow.FeeRate = parseFloat(returnRow.FeeRate * 0.0001) + '%'
-      returnRow.Fee = parseFloat(returnRow.Fee * 100).toFixed(2)
-      //delete returnRow.Id
-      delete returnRow.RuleId
-      delete returnRow.TxId
-      delete returnRow.CurrencyId
-      // 依付款方式移除不需要的欄位
-      //信用卡
-      if (rows.Type == 1 || rows.Type == 2 || rows.Type == 3) {
-        delete returnRow.VirtualBank
-        delete returnRow.VirtualAccount
-        delete returnRow.RemitCode
-        delete returnRow.RemitAccount
-
-        delete returnRow.CVStoreId
-        delete returnRow.StoreCode1
-        delete returnRow.StoreCode2
-        delete returnRow.StoreCode3
-      }
-      //虛擬帳號
-      if (rows.Type == 7) {
-        delete returnRow.CardholderVerifyType
-        delete returnRow.CardNo
-        delete returnRow.Issuer
-        delete returnRow.CardBrand
-        delete returnRow.AcquirerBank
-        delete returnRow.Onus
-
-        delete returnRow.CVStoreId
-        delete returnRow.StoreCode1
-        delete returnRow.StoreCode2
-        delete returnRow.StoreCode3
-      }
-      //EACH
-      if (rows.Type == 8) {
-        delete returnRow.VirtualBank
-        delete returnRow.VirtualAccount
-        delete returnRow.RemitCode
-        delete returnRow.RemitAccount
-
-        delete returnRow.CardholderVerifyType
-        delete returnRow.CardNo
-        delete returnRow.Issuer
-        delete returnRow.CardBrand
-        delete returnRow.AcquirerBank
-        delete returnRow.Onus
-      }
-      delete returnRow.AnnualFee
-      // if (Object.prototype.hasOwnProperty.call(returnRow, 'BankBranch')) {
-      //   returnRow.BankBranch = 'ESUNTWTP'
-      // }
-      // console.log('new:')
-      // console.log(rows)
-      return returnRow
-    }
     function generateTable(obj) {
       // 不安全，待改
       var htmlcode = "<table><tr>";
@@ -439,7 +319,7 @@ export default {
     }
     function exportTable() {
       // naive encoding to csv format
-      const fileName = "商戶交易紀錄.csv"
+      const fileName = "商戶退款紀錄.csv"
       const content = [columns.map(col => wrapCsvValue(col.label))].concat(
         rows.value.map(row => columns.map(col => wrapCsvValue(
           typeof col.field === 'function'
@@ -494,11 +374,8 @@ export default {
       loadOrders,
       exportTable,
       checkDetail,
-      //generateTable,
+      generateTable,
       clearFilter,
-      filterFn,
-      rowHandler,
-      OrderColumn,
       showDetail: ref(false),
       customId,
       model: ref(null),
@@ -509,8 +386,9 @@ export default {
       dateEnd,
       orderType,
       orderStatus,
+      filterFn,
       MerchantValue,
-      //MerchantList,
+      MerchantList,
       actualMerchant,
       dateOptions: [
         { label: '本月', value: 'month', color: 'warning' },
@@ -535,13 +413,14 @@ export default {
   flex-wrap: nowrap
   align-items: center
   margin: 10px 0
+
   h5
     margin: 0 10px 0 0
 
   button, .q-field
     min-width: 130px
     margin: 0 5px
-    //max-height: 60px
+
     span
       color: #333
 

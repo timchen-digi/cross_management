@@ -2,7 +2,13 @@ import { boot } from "quasar/wrappers";
 import axios from "axios";
 
 // 後端路徑
-const api = axios.create({ baseURL: "https://localhost:7084" });
+// 開發環境
+//const api = axios.create({ baseURL: "https://localhost:7084" });
+// 測試環境
+const api = axios.create({ baseURL: "https://mp.1qr.tw/AP.Management" });
+// 正式環境
+//const api = axios.create({ baseURL: "" });
+
 //const api = axios.create({ baseURL: "https://rational-mutt-vigorously.ngrok-free.app" });
 
 

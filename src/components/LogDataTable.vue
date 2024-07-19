@@ -1,18 +1,7 @@
 <template>
   <div class="q-pa-md">
-    <q-table
-      flat bordered
-      ref="tableRef"
-      title="Treats"
-      :rows="rows"
-      :columns="columns"
-      row-key="id"
-      v-model:pagination="pagination"
-      :loading="loading"
-      :filter="filter"
-      binary-state-sort
-      @request="onRequest"
-    >
+    <q-table flat bordered ref="tableRef" title="Treats" :rows="rows" :columns="columns" row-key="id"
+      v-model:pagination="pagination" :loading="loading" :filter="filter" binary-state-sort @request="onRequest">
       <template v-slot:top-right>
         <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
           <template v-slot:append>
@@ -47,7 +36,6 @@ const columns = [
   { name: 'calcium', label: 'Calcium (%)', field: 'calcium', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) },
   { name: 'iron', label: 'Iron (%)', field: 'iron', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) }
 ]
-
 const originalRows = [
   { id: 1, name: 'Frozen Yogurt', calories: 159, fat: 6.0, carbs: 24, protein: 4.0, sodium: 87, calcium: '14%', iron: '1%' },
   { id: 2, name: 'Ice cream sandwich', calories: 237, fat: 9.0, carbs: 37, protein: 4.3, sodium: 129, calcium: '8%', iron: '1%' },
@@ -92,7 +80,7 @@ const originalRows = [
 ]
 
 export default {
-  setup () {
+  setup() {
     const tableRef = ref()
     const rows = ref([])
     const filter = ref('')
@@ -106,43 +94,43 @@ export default {
     })
 
     // SELECT * FROM ... WHERE...LIMIT...
-    function fetchFromServer (startRow, count, filter, sortBy, descending) {
+    function fetchFromServer(startRow, count, filter, sortBy, descending) {
       let data = [];
       const config = {
-      headers:{
-      },
-      params: {
-        // startRow,count,filter,sortBy,descending
-      },
-    }
-    api.get('/Log/GetMerchantLog',config)
-      .then((response) => {
-        console.log(response.data);
-        data = response.data
-      })
-      .catch(function (error) {
-        // handle error
-        //console.log(error);
-        $q.notify({
-          color: 'warning',
-          message:"連線失敗 "+error,
-          position: "center",
-          multiLine: true,
-          actions: [
-            { icon: 'close', color: 'white', round: true, handler: () => { /* ... */ } }
-          ]
-        });
-      })
+        headers: {
+        },
+        params: {
+          // startRow,count,filter,sortBy,descending
+        },
+      }
+      api.get('/Log/GetMerchantLog', config)
+        .then((response) => {
+          console.log(response.data);
+          data = response.data
+        })
+        .catch(function (error) {
+          // handle error
+          //console.log(error);
+          $q.notify({
+            color: 'warning',
+            message: "連線失敗 " + error,
+            position: "center",
+            multiLine: true,
+            actions: [
+              { icon: 'close', color: 'white', round: true, handler: () => { /* ... */ } }
+            ]
+          });
+        })
       return data
     }
 
     // emulate 'SELECT count(*) FROM ...WHERE...'
-    function getRowsNumberCount (filter) {
+    function getRowsNumberCount(filter) {
       let count = 5;
       return count;
     }
 
-    function onRequest (props) {
+    function onRequest(props) {
       const { page, rowsPerPage, sortBy, descending } = props.pagination
       const filter = props.filter
 
