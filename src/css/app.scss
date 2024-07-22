@@ -29,3 +29,55 @@
     }
   }
 }
+
+.btn {
+  color: #333;
+  min-height: 50px;
+  max-height: 55px;
+}
+
+.filterBlock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 10px 0;
+
+  h5 {
+    margin: 0 10px 0 0;
+  }
+
+  button,
+  .q-field {
+    min-width: 130px;
+    min-height: 55px;
+    margin: 5px;
+    font-size: 1rem;
+
+    span {
+      color: #333;
+    }
+  }
+
+  .q-field--outlined .q-field__control:before {
+    border: 1px solid #fcb335;
+  }
+
+  .q-field__label {
+    color: #333;
+  }
+}
+
+.DateRange {
+  display: inline-flex;
+  align-items: baseline;
+
+  .DateSpace {
+    width: 20px;
+    text-align: center;
+  }
+
+  .DateInput {
+    width: calc(50% - 20px);
+    max-width: 200px;
+  }
+}

@@ -3,7 +3,7 @@
     <!-- content -->
     <div class="row fit row justify-between">
       <div class="col-md-7 col-12">
-        <div class="BlockContent q-pr-lg">
+        <div class="BlockContent">
           <h5 class="mainTitle">支付</h5>
           <q-input rounded outlined v-model="searchUserByPay" label="姓名、用戶名、電子郵件、手機">
             <template v-slot:prepend><q-icon name="search" /></template>
@@ -14,7 +14,7 @@
         </div>
       </div>
       <div class="col-md-5 col-12">
-        <div class="BlockContent q-pr-lg">
+        <div class="BlockContent">
           <h5 class="mainTitle">聯絡人</h5>
           <q-input rounded outlined v-model="searchUser" label="搜尋">
             <template v-slot:prepend>
@@ -24,7 +24,7 @@
         </div>
         <div class="q-my-md">
           <q-list padding separator>
-            <q-item class="q-py-md" clickable v-for="(contactUser, index) in  contactUser" :key="index">
+            <q-item class="q-py-md" clickable v-for="(contactUser, index) in contactUser" :key="index">
               <q-item-section top avatar>
                 <q-avatar>
                   <img :src="contactUser.avatar">

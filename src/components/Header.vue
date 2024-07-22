@@ -9,7 +9,7 @@
         <!-- <q-route-tab name="pay" label="付款" to="/Pay" />
         <q-route-tab name="wallet" label="錢包" to="/Wallet" /> -->
         <q-route-tab name="history" label="交易紀錄" to="/Management/History" />
-        <q-route-tab name="history" label="退款交易紀錄" to="/Management/Refund" />
+        <q-route-tab name="refund" label="退款交易紀錄" to="/Management/Refund" />
       </q-tabs>
       <q-space />
       <q-btn class="q-mx-md" icon="notifications" round>

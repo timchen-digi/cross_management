@@ -2,7 +2,7 @@
   <q-page padding>
     <div class="row fit row justify-between">
       <div class="col-12">
-        <div class="BlockContent q-pr-lg">
+        <div class="BlockContent">
           <h5 class="mainTitle">商戶退款紀錄查詢</h5>
           <!-- <q-input v-model="text" label="依用戶名稱或電子郵件搜尋" bottom-slots rounded outlined>
             <template v-slot:prepend><q-icon name="search" /></template>
@@ -19,13 +19,18 @@
             <q-input v-model="customId" label="訂單編號" rounded outlined>
               <template v-slot:prepend><q-icon name="search" /></template>
             </q-input>
-            <q-btn-dropdown color="warning" class="q-px-xl" label="建立時間" size="lg" rounded outline>
+            <q-btn-dropdown class="col q-mb-sm" color="warning" size="lg" rounded outline menu-self="top middle">
+              <template v-slot:label>
+                <div class="text-subtitle1 row items-center no-wrap">
+                  <div class="text-center">建立時間</div>
+                </div>
+              </template>
               <div class="row no-wrap q-pa-md">
                 <div class="col-12">
                   <!-- <div class="text-h6 q-mb-sm">日期</div>
                   <q-option-group :options="dateOptions" type="radio" v-model="dateGroup" />
                   <q-separator class="q-my-lg" /> -->
-                  <div class="text-h6 q-mb-sm">日期區間</div>
+                  <div class="text-subtitle1 q-pb-md">日期區間</div>
                   <div class="DateRange">
                     <q-input filled v-model="dateStart" mask="date" :rules="['date']" class="DateInput">
                       <template v-slot:append>
@@ -58,18 +63,14 @@
                 </div>
               </div>
             </q-btn-dropdown>
-            <q-select color="warning" size="lg" v-model="MerchantValue" use-input :options="actualMerchant"
+            <q-select class="col" color="warning" size="lg" v-model="MerchantValue" use-input :options="actualMerchant"
               @filter="filterFn" label="商戶" rounded outlined />
-            <q-select color="warning" size="lg" v-model="OrderTypeValue" :options="orderType" label="類型" rounded
-              outlined />
-
-            <q-select color="warning" size="lg" v-model="OrderStateValue" :options="orderStatus" label="狀態" rounded
-              outlined />
-            <q-btn color="warning" text-color="black" label="搜尋" size="lg" class="q-px-s" rounded @click="loadOrders" />
-          </div>
-          <div class="filterBlock q-gutter-md">
-            <q-btn color="warning" label="清除條件" size="lg" class="q-px-xl" rounded unelevated outline
-              @click="clearFilter" />
+            <q-select class="col" color="warning" size="lg" v-model="OrderTypeValue" :options="orderType" label="類型"
+              rounded outlined />
+            <q-select class="col" color="warning" size="lg" v-model="OrderStateValue" :options="orderStatus" label="狀態"
+              rounded outlined />
+            <q-btn class="btn" color="grey-4" label="清除條件" rounded unelevated @click="clearFilter" size="1rem" />
+            <q-btn class="btn" color="warning" label="搜尋" rounded @click="loadOrders" size="1rem" />
           </div>
           <div class="OrderTableBlock q-my-lg">
             <q-table class="OrderTable" title="商戶退款紀錄" :rows="rows" :columns="columns" :row-key="rows.name"
@@ -405,41 +406,3 @@ export default {
   }
 };
 </script>
-
-<style lang="sass">
-
-.filterBlock
-  display: flex
-  flex-wrap: nowrap
-  align-items: center
-  margin: 10px 0
-
-  h5
-    margin: 0 10px 0 0
-
-  button, .q-field
-    min-width: 130px
-    margin: 0 5px
-
-    span
-      color: #333
-
-  .q-field--outlined .q-field__control:before
-    border: 1px solid #fcb335
-  .q-field__label
-    color: #333
-
-.DateRange
-  display: inline-flex
-  align-items: baseline
-
-  .DateSpace
-    width: 20px
-    text-align: center
-
-  .DateInput
-    width: calc(50% - 20px)
-    max-width: 200px
-
-
-</style>
