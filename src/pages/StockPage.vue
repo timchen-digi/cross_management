@@ -112,11 +112,3 @@ export default {
 }
 
 </script>
-<style lang="sass">
-.filterBlock
-  display: flex
-  flex-wrap: nowrap
-  align-items: center
-  margin: 20px 0
-
-</style>

@@ -2,18 +2,20 @@
   <q-page padding>
     <div class="row fit row justify-between">
       <div class="col-12">
-        <div class="BlockContent q-pr-lg">
-          <h5 class="mainTitle">商戶管理</h5>
-          <q-btn color="accent" label="新增商戶" size="lg" class="q-px-xl" rounded unelevated outline
-            @click="merchantWindow = true" />
-          <div class="filterBlock q-gutter-md">
-            <q-select color="warning" size="lg" v-model="StatusValue" :options="StatusList" label="商戶狀態" rounded
-              outlined />
-            <q-btn color="warning" text-color="black" label="搜尋" size="lg" class="q-px-xl" rounded
-              @click="loadOrders" />
-            <q-btn color="warning" label="清除條件" size="lg" class="q-px-xl" rounded unelevated outline
-              @click="clearFilter" />
+        <div class="BlockContent">
+
+          <div class="row justify-between items-center mainTitle">
+            <span class="text-h5 q-my-0">商戶管理</span>
+            <q-btn class="btn q-px-xl" color="warning" label="新增商戶" unelevated rounded @click="merchantWindow = true" />
           </div>
+
+          <div class="filterBlock q-gutter-md">
+            <q-select color="warning" size="lg" v-model="StatusValue" :options="StatusList" label="商戶狀態"
+              rounded outlined />
+            <q-btn class="q-py-md" color="grey-4" label="清除條件" rounded unelevated @click="clearFilter" size="1rem" />
+            <q-btn class="q-py-md" color="warning" label="搜尋" rounded @click="loadOrders" size="1rem" />
+          </div>
+
           <div class="OrderTableBlock q-my-lg">
             <q-table class="OrderTable" title="商戶清單" :rows="rows" :columns="columns" :row-key="rows.name"
               v-model:pagination="pagination" :rows-per-page-options="[10, 25, 50]"
@@ -452,41 +454,3 @@ export default {
   }
 };
 </script>
-
-<style lang="sass">
-
-.filterBlock
-  display: flex
-  flex-wrap: nowrap
-  align-items: center
-  margin: 10px 0
-
-  h5
-    margin: 0 10px 0 0
-
-  button, .q-field
-    min-width: 130px
-    margin: 0 5px
-
-    span
-      color: #333
-
-  .q-field--outlined .q-field__control:before
-    border: 1px solid #fcb335
-  .q-field__label
-    color: #333
-
-.DateRange
-  display: inline-flex
-  align-items: baseline
-
-  .DateSpace
-    width: 20px
-    text-align: center
-
-  .DateInput
-    width: calc(50% - 20px)
-    max-width: 200px
-
-
-</style>
