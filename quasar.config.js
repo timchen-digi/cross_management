@@ -61,8 +61,13 @@ module.exports = configure(function (/* ctx */) {
       // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
 
       // publicPath: '/',
+      publicPath: "/m/",
       // analyze: true,
-      // env: {},
+      env: {
+        //API_BASE: 'http://localhost:5002',
+        API_BASE: 'https://mp.1qr.tw/ap-management',
+        //APP_BASE_PATH: "/management"
+      },
       // rawDefine: {}
       // ignorePublicFolder: true,
       // minify: false,

@@ -1,9 +1,9 @@
 {
   "name": "quasar-project",
   "version": "0.0.1",
-  "description": "A Quasar Project",
+  "description": "數位鎏聚合支付管理後台",
   "productName": "數位鎏聚合支付管理後台",
-  "author": "Tim",
+  "author": "Digiflow",
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.vue ./",
