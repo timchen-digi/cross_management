@@ -9,6 +9,7 @@ const routes = [
       { path: "Index", component: () => import("pages/HomePage.vue") },
       { path: "Wallet", component: () => import("pages/WalletPage.vue") },
       { path: "Merchant", component: () => import("pages/MerchantPage.vue") }, // 商戶管理
+      { path: "WeekSettle", component: () => import("pages/WeekSettlePage.vue") }, // 商戶管理
       { path: "ApiLog", component: () => import("pages/SystemManage/ApiLogPage.vue") }, // 銀行API交易紀錄
       { path: "BatchLog", component: () => import("pages/SystemManage/BatchLogPage.vue") }, // 批次作業日誌
       { path: "User", component: () => import("pages/SystemManage/UserPage.vue") }, // 員工帳號管理

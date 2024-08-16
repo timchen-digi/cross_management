@@ -19,6 +19,22 @@ export function GetMerchantName(id, arr) {
     }
   }
 }
+export function GetStaticMerchantName(id) {
+  const arr = [
+    { label: '數位鎏', value: '142864983000001' },
+    { label: '五七國際', value: '183062446000001' },
+    { label: 'Waffo', value: '332715810000001' },
+    { label: 'Airwallex', value: '391440300000001' }
+  ]
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].value === id) {
+      return arr[i].label;
+    }
+  }
+}
+export function FixNumrber(num) {
+  return (Math.round(num * 100) / 100).toFixed(4);
+}
 
 // TODO: API取商戶清單
 import { ref } from 'vue'
