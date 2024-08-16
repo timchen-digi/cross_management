@@ -170,6 +170,7 @@ export default {
         Start: (page - 1) * pagination.value.rowsPerPage,
         PageSize: rowsPerPage,
         //MerchantId: 142864983000001
+        AuthToken: window.localStorage.getItem("token")
       }
       if (MerchantValue.value) {
         query.MerchantId = MerchantValue.value.value;
@@ -258,7 +259,8 @@ export default {
       descending: true,
       page: 1,
       rowsPerPage: 10,
-      rowsNumber: 10
+      rowsNumber: 10,
+      AuthToken: window.localStorage.getItem("token")
     });
     return {
       loadOrders,

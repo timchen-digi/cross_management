@@ -17,6 +17,9 @@
             <q-icon :name="isPwd2 ? 'visibility_off' : 'visibility'" class="cursor-pointer" @click="isPwd2 = !isPwd2" />
           </template>
         </q-input>
+        <q-input color="warning" v-model="password" type="password" rounded outlined>
+
+        </q-input>
       </div>
       <div class="inputGroup">
         <div class="text-subtitle1">再次輸入新密碼</div>
@@ -25,7 +28,7 @@
       </div>
     </div>
     <div class="BtnGroup">
-      <q-btn color="warning" text-color="black" label="確認變更" @click="login" size="lg" rounded />
+      <q-btn color="warning" text-color="black" label="確認變更" @click="resetPwd" size="lg" rounded />
     </div>
   </q-page>
 </template>
@@ -44,7 +47,7 @@ export default {
     }
   },
   methods: {
-    login() {
+    resetPwd() {
       alert("開發中");
     }
   }

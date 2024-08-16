@@ -10,8 +10,8 @@
           </div>
 
           <div class="filterBlock q-gutter-md">
-            <q-select color="warning" size="lg" v-model="StatusValue" :options="StatusList" label="商戶狀態"
-              rounded outlined />
+            <q-select color="warning" size="lg" v-model="StatusValue" :options="StatusList" label="商戶狀態" rounded
+              outlined />
             <q-btn class="q-py-md" color="grey-4" label="清除條件" rounded unelevated @click="clearFilter" size="1rem" />
             <q-btn class="q-py-md" color="warning" label="搜尋" rounded @click="loadOrders" size="1rem" />
           </div>
@@ -145,6 +145,7 @@ const MerchantColumn = {
   BankAccount: '收款銀行帳號',
   Mcc: '營業種類(MCC)',
   AnnualFee: '年費',
+  InvoiceEnable: '開立發票',
   OpenDate: '開通日',
   Status: '狀態',
   UpdateTime: '更新時間',
@@ -180,7 +181,8 @@ const newMerchant = ref({
   BankBranch: '',
   BankAccount: '',
   Mcc: '',
-  AnnualFee: 0
+  AnnualFee: 0,
+  InvoiceEnable: false
 })
 export default {
   name: "MerchantPage",
@@ -358,7 +360,7 @@ export default {
         Start: (page - 1) * pagination.value.rowsPerPage,
         PageSize: rowsPerPage,
         // 測試區不做驗證
-        AuthToken: "XAufzlN0GVAnq_VYkQELvS4DmqECEqCtovr01UhzHe0"
+        AuthToken: window.localStorage.getItem("token")
       }
       if (StatusValue.value) {
         query.Status = StatusValue.value.value;
@@ -427,7 +429,7 @@ export default {
       rowsPerPage: 10,
       rowsNumber: 10,
       // 測試區不做驗證
-      AuthToken: "XAufzlN0GVAnq_VYkQELvS4DmqECEqCtovr01UhzHe0"
+      AuthToken: window.localStorage.getItem("token")
     });
     return {
       loadOrders,

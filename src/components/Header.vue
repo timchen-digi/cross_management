@@ -1,18 +1,19 @@
 <template>
   <q-header elevated class="header">
     <q-toolbar class="Toolbar text-white">
-      <q-btn flat @click="drawer = !drawer" icon="menu" />
+      <q-btn flat @click="drawer = !drawer" icon="menu" v-show="showMerchantSelect" />
       <img src="~assets/logos/DigiFlow_logo_White.svg" class="mainLOGO" />
       <q-tabs v-model="tab" inline-label class="tabs" indicator-color="warning">
         <!-- <q-route-tab name="home" label="首頁" to="/Home" /> -->
-        <q-route-tab name="merchant" label="商戶管理" to="/Management/Merchant" />
+        <q-route-tab name="merchant" label="商戶管理" to="/Management/Merchant" v-show="showMerchantSelect" />
         <!-- <q-route-tab name="pay" label="付款" to="/Pay" />
         <q-route-tab name="wallet" label="錢包" to="/Wallet" /> -->
         <q-route-tab name="history" label="交易紀錄" to="/Management/History" />
         <q-route-tab name="refund" label="退款交易紀錄" to="/Management/Refund" />
+        <q-route-tab name="refund" label="商戶周結檔下載" to="/Management/WeekSettle" />
       </q-tabs>
       <q-space />
-      <q-btn class="q-mx-md" icon="notifications" round>
+      <!-- <q-btn class="q-mx-md" icon="notifications" round>
         <q-badge floating color="red">{{ notify.length }}</q-badge>
         <q-menu auto-close :offset="[0, 5]">
           <q-toolbar class="shadow-2">
@@ -34,11 +35,14 @@
             </q-item>
           </q-list>
         </q-menu>
-      </q-btn>
+      </q-btn> -->
       <q-tabs shrink>
         <q-item-section color="warning">{{ username }}</q-item-section>
       </q-tabs>
-
+      <q-tabs>
+        <q-btn color="warning" size="md" class="q-mt-md" icon="logout" outline rounded
+          @click="$router.replace('/Management/Logout')">登出</q-btn>
+      </q-tabs>
       <!-- <q-tabs shrink>
         <q-btn round>
           <q-avatar>
@@ -79,6 +83,7 @@
 import { ref } from "vue";
 import { useUserStore } from "../stores";
 import MyQMenu from "./LeftMenu.vue";
+const showMerchantSelect = ref(window.localStorage.getItem("merchantId") == "");
 const menuList = [
   {
     label: "帳號管理",
@@ -171,6 +176,7 @@ export default {
       drawer: ref(false),
       //miniState: ref(true),
       menuList,
+      showMerchantSelect,
       logout() {
         useUserStore().logout();
       },

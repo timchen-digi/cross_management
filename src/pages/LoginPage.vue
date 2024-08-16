@@ -76,6 +76,7 @@ export default {
       var username = "";
       var isAdmin = false;
       var token = "";
+      var merchantId = "";
       //登入驗證
       var form = {
         Account: this.account,
@@ -90,6 +91,7 @@ export default {
             username = user.UserName;
             isAdmin = user.isAdmin;
             token = user.Token;
+            merchantId = user.MerchantId;
           }
           else {
             alert("使用者名稱或密碼錯誤");
@@ -99,9 +101,12 @@ export default {
           const authStore = useUserStore();
           authStore.setUser(username);
           authStore.setToken(token);
+          authStore.setMerchant(merchantId);
+          authStore.setAuth(isAdmin);
           // 登入成功後導航至其他頁面
+          // Vue.forceUpdate();
           this.$router.push("/Management/History");
-
+          //window.location.reload("/Management/History");
         }).catch(function (error) {
           // handle error
           console.log(error);

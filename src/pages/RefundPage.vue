@@ -64,7 +64,7 @@
               </div>
             </q-btn-dropdown>
             <q-select class="col" color="warning" size="lg" v-model="MerchantValue" use-input :options="actualMerchant"
-              @filter="filterFn" label="商戶" rounded outlined />
+              v-show="showMerchantSelect" @filter="filterFn" label="商戶" rounded outlined />
             <q-select class="col" color="warning" size="lg" v-model="OrderTypeValue" :options="orderType" label="類型"
               rounded outlined />
             <q-select class="col" color="warning" size="lg" v-model="OrderStateValue" :options="orderStatus" label="狀態"
@@ -180,6 +180,7 @@ const pagination = ref({
   rowsPerPage: 10,
   rowsNumber: 10
 })
+const showMerchantSelect = (window.localStorage.getItem("merchantId") == "");
 const actualMerchant = ref(MerchantList.value)
 export default {
   name: "HistoryPage",
@@ -204,10 +205,9 @@ export default {
       var query = {
         Start: (page - 1) * pagination.value.rowsPerPage,
         PageSize: rowsPerPage,
-        //MerchantId: 142864983000001
+        MerchantId: window.localStorage.getItem("merchantId"),
         // 測試區不做驗證
-        //AuthToken: window.localStorage.getItem("token")
-        AuthToken: "XAufzlN0GVAnq_VYkQELvS4DmqECEqCtovr01UhzHe0"
+        AuthToken: window.localStorage.getItem("token")
       }
       if (OrderStateValue.value) {
         query.Status = orderStatus.indexOf(OrderStateValue.value) - 3;
@@ -369,7 +369,7 @@ export default {
       rowsPerPage: 10,
       rowsNumber: 10,
       // 測試區不做驗證
-      AuthToken: "XAufzlN0GVAnq_VYkQELvS4DmqECEqCtovr01UhzHe0"
+      AuthToken: window.localStorage.getItem("token")
     });
     return {
       loadOrders,
@@ -391,6 +391,7 @@ export default {
       MerchantValue,
       MerchantList,
       actualMerchant,
+      showMerchantSelect,
       dateOptions: [
         { label: '本月', value: 'month', color: 'warning' },
         { label: '上個月', value: 'lastMonth', color: 'warning' },
