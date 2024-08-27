@@ -102,12 +102,30 @@
                   <div class="text-h6">退款詳細資料</div>
                 </q-card-section>
                 <q-card-section class="q-pt-none">
-                  <div v-html="generateTable(selected_row)"></div>
-                  <!-- {{ generateTable(selected_row) }} -->
-                  <!-- 這邊顯示詳細資料 -->
+                  <q-list separator>
+                    <q-item v-for="(item, key) in rowHandler(selected_row)" :key="item.value">
+                      <q-item-section><q-item-label>{{ OrderColumn[key] }}</q-item-label></q-item-section>
+                      <q-item-section side><q-item-label> {{ item }}</q-item-label></q-item-section>
+                    </q-item>
+                  </q-list>
                 </q-card-section>
                 <q-card-actions align="right">
-                  <q-btn flat label="OK" color="primary" @click="showDetail = false" v-close-popup />
+                  <q-btn flat label="更新銀行退款狀態" color="primary" @click="CheckRefund(selected_row)" />
+                  <q-btn flat label="關閉" color="primary" @click="showDetail = false" v-close-popup />
+                </q-card-actions>
+              </q-card>
+            </q-dialog>
+            <q-dialog v-model="remitPrompt" persistent>
+              <q-card style="min-width: 350px">
+                <q-card-section>
+                  <div class="text-h6">請輸入匯款交易序號</div>
+                </q-card-section>
+                <q-card-section class="q-pt-none">
+                  <q-input dense v-model="RemitTrxId" autofocus />
+                </q-card-section>
+                <q-card-actions align="right" class="text-primary">
+                  <q-btn flat label="取消" v-close-popup @click="CancelRefund()" />
+                  <q-btn flat label="送出" v-close-popup @click="DoRefund(selected_row)" />
                 </q-card-actions>
               </q-card>
             </q-dialog>
@@ -124,14 +142,18 @@
 import { ref } from 'vue'
 import { toThousands, GetMerchantName, MerchantList } from 'src/utils/index.js'
 import dataTable from 'src/components/DataTable.vue';
-import { useUserStore } from "../stores";
+import { useUserStore, useMerchantStore } from "../stores";
 import { api } from 'boot/axios'
 import { exportFile, useQuasar } from 'quasar'
+const MerchantStore = useMerchantStore();
+const MerchantListNew = ref(MerchantStore.MerchantMap);
+const remitPrompt = ref(false)
+const RemitTrxId = ref("")
 const orderType = [
   "", "信用卡分期", "信用卡一般", "銀聯卡", "ApplePay", "GooglePay", "SamsungPay", "虛擬帳號", "EACH", "超商繳費", "電信代收", "點數代收"
 ]
 const orderStatus = [
-  "退款處理中", "退款成功", "退款失敗"
+  "退款中", "退款成功", "退款失敗"
 ]
 const columns = [
   {
@@ -167,6 +189,67 @@ const columns = [
     align: 'right', sortable: true
   },
 ];
+const OrderColumn = {
+  Id: '交易ID',
+  TxId: '原始交易ID',
+  MerchantId: '特店編號',
+  TerminalId: '終端編號',
+  OrderNO: '數位鎏訂單編號',
+  CustomId: '商戶訂單編號',
+  RefundCustomId: '商戶退款編號',
+  RefundAmount: '退款金額',
+  RefundFee: '退款手續費',
+  RemitTrxId: '匯款交易序號',
+  InBankBranch: '入帳銀行分行',
+  InAccount: '入帳帳號',
+  RefundSettleDate: '退款結算日',
+  RefundTime: '退款時間',
+  Remark: '備註',
+  Type: '類型',
+  CurrencyId: '幣別編號',
+  OrderAmount: '訂單金額',
+  PayAmount: '交易金額',
+  OrderDesc: '訂單說明',
+  ExpiryTime: '付款期限',
+  BuyerName: '消費者姓名',
+  BuyerID: '身分證/統一編號',
+  BuyerMobile: '消費者手機號碼',
+  BuyerMail: '消費者電子郵件信箱',
+  IPAddress: 'IP位址',
+  CardholderVerifyType: '持卡人驗證方式',
+  Installment: '分期期數',
+  ExtData: '商戶額外資訊',
+  PaymentTime: '付款時間',
+  AcquirerBank: '收單銀行',
+  Onus: '自行交易',
+  Issuer: '信用卡發卡行',
+  CardBrand: '信用卡別',
+  CardNo: '卡號末四碼',
+  AutoCapture: '是否自動請款',
+  VirtualBank: '虛擬帳號轉入銀行',
+  VirtualAccount: '虛擬帳號',
+  RemitCode: '轉出款分行代碼',
+  RemitAccount: '轉出款銀行帳號',
+  CVStoreId: '超商編號',
+  StoreCode1: '超商繳款第一段條碼',
+  StoreCode2: '超商繳款第二段條碼',
+  StoreCode3: '超商繳款第三段條碼',
+  CardNo: '卡號末四碼',
+  CancelTime: '撤銷時間',
+  CancelTrxId: '撤銷交易ID',
+  CaptureTime: '請款時間',
+  CaptureAmount: '對付款人請款金額',
+  CaptureTrxId: '請款交易ID',
+  RefundAmount: '退款給付款人金額',
+  RefundCount: '退款次數',
+  CaptureSettleDate: '請款結算日',
+  RuleId: '手續費計算規則ID',
+  FeeRate: '交易手續費率',
+  Fee: '代收交易手續費',
+  Status: '訂單狀態',
+  UpdateTime: '更新時間',
+  CreateTime: '建立時間',
+}
 const OrderStateValue = ref(null);
 const OrderTypeValue = ref(null);
 const MerchantValue = ref(null);
@@ -180,7 +263,7 @@ const pagination = ref({
   rowsPerPage: 10,
   rowsNumber: 10
 })
-const showMerchantSelect = (window.localStorage.getItem("merchantId") == "");
+
 const actualMerchant = ref(MerchantList.value)
 export default {
   name: "HistoryPage",
@@ -191,6 +274,8 @@ export default {
     const $q = useQuasar()
     const rows = ref([]);
     const isLoading = ref(false);
+    const loginUser = useUserStore();
+    const showMerchantSelect = (loginUser.merchantId == "");
     function clearFilter() {
       OrderStateValue.value = null;
       OrderTypeValue.value = null;
@@ -205,12 +290,13 @@ export default {
       var query = {
         Start: (page - 1) * pagination.value.rowsPerPage,
         PageSize: rowsPerPage,
-        MerchantId: window.localStorage.getItem("merchantId"),
+        MerchantId: loginUser.merchantId,
         // 測試區不做驗證
-        AuthToken: window.localStorage.getItem("token")
+        AuthToken: loginUser.token
       }
       if (OrderStateValue.value) {
-        query.Status = orderStatus.indexOf(OrderStateValue.value) - 3;
+        //query.Status = orderStatus.indexOf(OrderStateValue.value) - 3;
+        query.Status = orderStatus.indexOf(OrderStateValue.value);
       }
       if (OrderTypeValue.value) {
         query.Type = orderType.indexOf(OrderTypeValue.value);
@@ -307,16 +393,35 @@ export default {
 
       return `"${formatted}"`
     }
-    function generateTable(obj) {
-      // 不安全，待改
-      var htmlcode = "<table><tr>";
-      Object.keys(obj).forEach(function (k) {
-        //console.log(k + ' - ' + obj[k]);
-        htmlcode = htmlcode + "<th>" + k + "</th><th>" + obj[k] + "</th>";
-        htmlcode = htmlcode + "</tr><tr>";
-      });
-      htmlcode = htmlcode + "</tr></table>"
-      return htmlcode;
+    function rowHandler(rows) {
+      let returnRow = { ...rows }
+      // delete returnRow.BillMail
+      // delete returnRow.AnnualFee
+      returnRow.CreateTime = returnRow.CreateTime.replace('T', ' ')
+      returnRow.UpdateTime = returnRow.UpdateTime.replace('T', ' ')
+      if (returnRow.RefundTime != "") {
+        returnRow.RefundTime = returnRow.RefundTime.substring(0, 4) + '-' + returnRow.RefundTime.substring(4, 6) + '-' + returnRow.RefundTime.substring(6, 8)
+          + " " + returnRow.RefundTime.substring(8, 10) + ":" + returnRow.RefundTime.substring(10, 12) + ":" + returnRow.RefundTime.substring(12, 14)
+      }
+      if (returnRow.RemitTrxId == "") {
+        delete returnRow.RemitTrxId;
+      }
+      // if (returnRow.BankBranch == '') {
+      //   //跨境模式
+      //   returnRow.BankBranch = 'ESUNTWTP'
+      // }
+      // if (returnRow.Mcc == '5816') {
+      //   returnRow.Mcc = '5816-線上遊戲'
+      // }
+      // returnRow.Status = StatusList[returnRow.Status + 4].label
+      // if (returnRow.Type == 3) {
+      //   returnRow.Type = '境外'
+      // } else if (rows.Type == 2) {
+      //   returnRow.Type = '法人'
+      // } else if (rows.Type == 1) {
+      //   returnRow.Type = '個人'
+      // }
+      return returnRow
     }
     function exportTable() {
       // naive encoding to csv format
@@ -348,6 +453,66 @@ export default {
         })
       }
     }
+    function CheckRefund(order) {
+      if (order["Status"] != 0) {
+        $q.notify({
+          color: 'warning',
+          message: "僅可處理退款中交易",
+          position: "center",
+          multiLine: true
+        });
+        return
+      }
+      remitPrompt.value = true;
+    }
+    function DoRefund(order) {
+      console.log(order);
+      // console.log(RemitTrxId);
+      // console.log(this.RemitTrxId);
+      // send api
+      // 插入操作人資料
+      let refundOrder = { ...order }
+      refundOrder["AuthToken"] = loginUser.AuthToken;
+      refundOrder["RemitTrxId"] = this.RemitTrxId;
+      console.log(refundOrder);
+      remitPrompt.value = false;
+      this.RemitTrxId = "";
+      api.post('/Order/CheckRefund', refundOrder).then((response) => {
+        console.log(response.data);
+        if (response.data.completeFlag) {
+          $q.notify({
+            message: "帳單已更新狀態",
+            position: "center",
+            multiLine: true,
+            actions: [
+              { icon: 'close', color: 'white', round: true, handler: () => { /* ... */ } }
+            ]
+          });
+        }
+        else {
+          $q.notify({
+            color: 'warning',
+            message: "操作失敗",
+            position: "center"
+          });
+        }
+      })
+        .catch(function (error) {
+          console.log(error);
+          $q.notify({
+            color: 'warning',
+            message: "操作失敗 " + error,
+            position: "center",
+            multiLine: true,
+            actions: [
+              { icon: 'close', color: 'white', round: true, handler: () => { /* ... */ } }
+            ]
+          });
+        })
+    }
+    function CancelRefund() {
+      this.RemitTrxId.value = "";
+    }
     function filterFn(val, update) {
       if (val === '') {
         update(() => {
@@ -369,14 +534,18 @@ export default {
       rowsPerPage: 10,
       rowsNumber: 10,
       // 測試區不做驗證
-      AuthToken: window.localStorage.getItem("token")
+      AuthToken: loginUser.token
     });
     return {
       loadOrders,
       exportTable,
       checkDetail,
-      generateTable,
+      rowHandler,
       clearFilter,
+      CheckRefund,
+      DoRefund,
+      CancelRefund,
+      OrderColumn,
       showDetail: ref(false),
       customId,
       model: ref(null),
@@ -392,6 +561,8 @@ export default {
       MerchantList,
       actualMerchant,
       showMerchantSelect,
+      remitPrompt,
+      RemitTrxId,
       dateOptions: [
         { label: '本月', value: 'month', color: 'warning' },
         { label: '上個月', value: 'lastMonth', color: 'warning' },

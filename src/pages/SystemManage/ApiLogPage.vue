@@ -3,7 +3,7 @@
     <div class="row fit row justify-between">
       <div class="col-12">
         <div class="BlockContent">
-          <h5 class="mainTitle">API紀錄查詢</h5>
+          <h5 class="mainTitle">商戶API紀錄查詢</h5>
           <div class="filterBlock q-gutter-md">
             <q-input v-model="RequestDate" mask="date" class="DateInput" label="日期" color="warning" outlined rounded>
               <template v-slot:append>
@@ -30,7 +30,7 @@
 
           </div>
           <div class="OrderTableBlock q-my-lg">
-            <q-table class="OrderTable" title="商戶API紀錄" :rows="rows" :columns="columns" :row-key="rows.name"
+            <q-table class="OrderTable" :rows="rows" :columns="columns" :row-key="rows.name"
               v-model:pagination="pagination" :rows-per-page-options="[10, 25, 50]"
               no-data-label="I didn't find anything for you" :loading="isLoading" @request="loadOrders" flat>
               <template v-slot:no-data="">
@@ -156,6 +156,7 @@ export default {
   setup() {
     const $q = useQuasar();
     const rows = ref([]);
+    const loginUser = useUserStore();
     const isLoading = ref(false);
     function clearFilter() {
       MerchantValue.value = null;
@@ -170,7 +171,7 @@ export default {
         Start: (page - 1) * pagination.value.rowsPerPage,
         PageSize: rowsPerPage,
         //MerchantId: 142864983000001
-        AuthToken: window.localStorage.getItem("token")
+        AuthToken: loginUser.token
       }
       if (MerchantValue.value) {
         query.MerchantId = MerchantValue.value.value;
@@ -260,7 +261,7 @@ export default {
       page: 1,
       rowsPerPage: 10,
       rowsNumber: 10,
-      AuthToken: window.localStorage.getItem("token")
+      AuthToken: loginUser.token
     });
     return {
       loadOrders,

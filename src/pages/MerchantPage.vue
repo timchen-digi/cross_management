@@ -192,6 +192,7 @@ export default {
   setup() {
     const $q = useQuasar()
     const rows = ref([]);
+    const loginUser = useUserStore();
     const isLoading = ref(false);
     function clearFilter() {
       MerchantValue.value = null;
@@ -359,8 +360,7 @@ export default {
       var query = {
         Start: (page - 1) * pagination.value.rowsPerPage,
         PageSize: rowsPerPage,
-        // 測試區不做驗證
-        AuthToken: window.localStorage.getItem("token")
+        AuthToken: loginUser.token
       }
       if (StatusValue.value) {
         query.Status = StatusValue.value.value;
@@ -428,8 +428,7 @@ export default {
       page: 1,
       rowsPerPage: 10,
       rowsNumber: 10,
-      // 測試區不做驗證
-      AuthToken: window.localStorage.getItem("token")
+      AuthToken: loginUser.token
     });
     return {
       loadOrders,

@@ -151,6 +151,7 @@ export default {
     const $q = useQuasar()
     const rows = ref([]);
     const sum = ref();
+    const loginUser = useUserStore();
     const isLoading = ref(false);
     function clearFilter() {
       OrderStateValue.value = null;
@@ -163,9 +164,8 @@ export default {
     }
     function loadOrders(props) {
       var query = {
-        // 測試區不做驗證
-        MerchantId: window.localStorage.getItem("merchantId"),
-        AuthToken: window.localStorage.getItem("token")
+        MerchantId: loginUser.merchantId,
+        AuthToken: loginUser.token
       }
       if (SettleDate.value) {
         //query.sSettleDate = SettleDate.value.replaceAll('/', '-');
@@ -257,7 +257,7 @@ export default {
     }
     function exportTable() {
       // naive encoding to csv format
-      var merchantName = GetMerchantName(window.localStorage.getItem("merchantId"), MerchantList.value)
+      var merchantName = GetMerchantName(loginUser.merchantId, MerchantList.value)
       if (merchantName == null) {
         merchantName = ""
       }

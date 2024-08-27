@@ -123,10 +123,10 @@
 
 <script>
 
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { toThousands, GetMerchantName, MerchantList } from 'src/utils/index.js'
 import dataTable from 'src/components/DataTable.vue';
-import { useUserStore } from "../stores";
+import { useUserStore, useMerchantStore } from "../stores";
 import { api } from 'boot/axios'
 import { exportFile, useQuasar } from 'quasar'
 const orderType = [
@@ -135,10 +135,14 @@ const orderType = [
 const orderStatus = [
   "訂單退款", "訂單取消", "訂單逾期", "未付款", "已付款", "已付款(金額有誤)"
 ]
+const MerchantStore = useMerchantStore();
+const MerchantListNew = ref(MerchantStore.MerchantMap);
+// console.log("INIT");
+// console.log(MerchantList.value);
 const columns = [
   {
     name: "MerchantId", label: "商戶", field: "MerchantId", align: 'left', sortable: true,
-    format: (v) => (GetMerchantName(v, MerchantList.value))
+    format: (v) => (GetMerchantName(v, MerchantStore.merchantMap))
   },
   //{ name: "TerminalId", label: "終端", field: "TerminalId", align: 'left', sortable: true },
   {
@@ -235,12 +239,10 @@ const pagination = ref({
   rowsPerPage: 10,
   rowsNumber: 10
 })
-const showMerchantSelect = (window.localStorage.getItem("merchantId") == "");
-console.log(window.localStorage.getItem("merchantId"))
-console.log(showMerchantSelect)
+//const actualMerchant = MerchantList;
 const actualMerchant = ref(MerchantList.value)
-console.log("商戶ID")
-console.log(actualMerchant.value)
+//console.log("商戶ID")
+//console.log(actualMerchant.value)
 export default {
   name: "HistoryPage",
   components: {
@@ -249,6 +251,8 @@ export default {
   setup() {
     const $q = useQuasar()
     const rows = ref([]);
+    const loginUser = useUserStore();
+    const showMerchantSelect = (loginUser.merchantId == "");
     const isLoading = ref(false);
     function clearFilter() {
       OrderStateValue.value = null;
@@ -265,7 +269,7 @@ export default {
         Start: (page - 1) * pagination.value.rowsPerPage,
         PageSize: rowsPerPage,
         // 測試區不做驗證
-        AuthToken: window.localStorage.getItem("token")
+        AuthToken: loginUser.token
       }
       if (OrderStateValue.value) {
         query.Status = orderStatus.indexOf(OrderStateValue.value) - 3;
@@ -279,8 +283,8 @@ export default {
       if (MerchantValue.value) {
         query.MerchantId = MerchantValue.value.value;
       }
-      if (window.localStorage.getItem("merchantId") != "") {
-        query.MerchantId = window.localStorage.getItem("merchantId");
+      if (loginUser.merchantId != "") {
+        query.MerchantId = loginUser.merchantId;
       }
       if (dateStart.value) {
         query.sCreateTime = dateStart.value.replaceAll('/', '-');
@@ -437,17 +441,6 @@ export default {
       // console.log(rows)
       return returnRow
     }
-    function generateTable(obj) {
-      // 不安全，待改
-      var htmlcode = "<table><tr>";
-      Object.keys(obj).forEach(function (k) {
-        //console.log(k + ' - ' + obj[k]);
-        htmlcode = htmlcode + "<th>" + k + "</th><th>" + obj[k] + "</th>";
-        htmlcode = htmlcode + "</tr><tr>";
-      });
-      htmlcode = htmlcode + "</tr></table>"
-      return htmlcode;
-    }
     function exportTable() {
       // naive encoding to csv format
       const fileName = "商戶交易紀錄.csv"
@@ -479,6 +472,12 @@ export default {
       }
     }
     function filterFn(val, update) {
+      // actualMerchant.value = MerchantStore.MerchantMap;
+      // MerchantList.value = MerchantStore.MerchantMap;
+      // console.log("actualMerchant")
+      // console.log(actualMerchant.value);
+      // console.log("MerchantList")
+      // console.log(MerchantList.value);
       if (val === '') {
         update(() => {
           actualMerchant.value = MerchantList.value
@@ -487,10 +486,16 @@ export default {
       }
       update(() => {
         const needle = val.toLowerCase()
+        console.log(MerchantList.value);
         //actualMerchant.value = MerchantList.value.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
         // 用商戶名或商戶編號過濾
         actualMerchant.value = MerchantList.value.filter(v => { return (v.label.toLowerCase().indexOf(needle) > -1 || v.value.indexOf(needle) > -1) })
       })
+    }
+    //console.log(loginUser);
+    if (loginUser.getReload()) {
+      loginUser.setReload(false);
+      location.reload();
     }
     loadOrders({
       sortBy: 'desc',
@@ -498,9 +503,8 @@ export default {
       page: 1,
       rowsPerPage: 10,
       rowsNumber: 10,
-      // 測試區不做驗證
-      MerchantId: window.localStorage.getItem("merchantId"),
-      AuthToken: window.localStorage.getItem("token")
+      MerchantId: loginUser.merchantId,
+      AuthToken: loginUser.token
     });
     return {
       loadOrders,

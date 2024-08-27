@@ -48,6 +48,7 @@
 
 import { ref } from "vue";
 import Sidentify from "/src/utils/identify.vue"
+import { getSHA256Hash } from 'src/utils/index.js'
 import { useUserStore } from "../stores";
 import { api } from 'boot/axios'
 
@@ -78,48 +79,33 @@ export default {
       var token = "";
       var merchantId = "";
       //登入驗證
-      var form = {
-        Account: this.account,
-        Password: this.password,
-      }
-      api.post('/Auth/Login', form)
-        .then(response => {
+      getSHA256Hash(this.password).then(hashPwd => {
+        //console.log(hashPwd)
+        api.post('/Auth/Login', {
+          Account: this.account,
+          Password: hashPwd,
+        }).then(response => {
           console.log(response);
+          const authStore = useUserStore();
           if (response.data.completeFlag == true) {
             // 成功登入
             var user = response.data.records[0];
-            username = user.UserName;
-            isAdmin = user.isAdmin;
-            token = user.Token;
+            console.log(user);
             merchantId = user.MerchantId;
+            authStore.setUserState(user);
           }
           else {
             alert("使用者名稱或密碼錯誤");
             return;
           }
-          console.log(username);
-          const authStore = useUserStore();
-          authStore.setUser(username);
-          authStore.setToken(token);
-          authStore.setMerchant(merchantId);
-          authStore.setAuth(isAdmin);
           // 登入成功後導航至其他頁面
-          // Vue.forceUpdate();
           this.$router.push("/Management/History");
-          //window.location.reload("/Management/History");
         }).catch(function (error) {
           // handle error
           console.log(error);
           alert("使用者名稱或密碼錯誤");
         })
-      // if (this.account == "digiflow") {
-      //   username = "數位鎏測試商戶";
-      // } else if (this.account == "admin") {
-      //   username = "後台系統管理員";
-      // } else {
-      //   alert("使用者名稱或密碼錯誤");
-      //   return;
-      // }
+      });
     },
     // 刷新验证码
     refreshIdentifyCode() {
