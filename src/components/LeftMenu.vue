@@ -32,7 +32,7 @@ export default {
           label: "系統管理",
           children: [
             {
-              label: "員工帳號管理",
+              label: "使用者帳號管理",
               path: "/Management/User",
             },
             {
@@ -44,94 +44,98 @@ export default {
               path: "/Management/BatchLog",
             },
             {
-              label: "API紀錄查詢",
+              label: "商戶API紀錄查詢",
               path: "/Management/ApiLog",
             },
             {
-              label: "維運計畫",
-              path: "/Management/Maintain",
+              label: "系統API紀錄查詢",
+              path: "/Management/DigiflowLog",
             },
+            // {
+            //   label: "維運計畫",
+            //   path: "/Management/Maintain",
+            // },
           ],
         },
-        {
-          label: "客戶管理",
-        },
-        {
-          label: "銀行代收管理",
-          children: [
-            {
-              label: "信用卡大特店資訊",
-              path: "/",
-            },
-            {
-              label: "信用卡BIN管理",
-              path: "/",
-            },
-            {
-              label: "銀行虛擬帳號管理",
-              path: "/",
-            },
-            {
-              label: "虛擬帳號交易查詢",
-              path: "/",
-            },
-          ],
-        },
-        {
-          label: "超商代收管理",
-        },
-        {
-          label: "物流管理",
-          children: [
-            {
-              label: "物流維護",
-              path: "/",
-            },
-            {
-              label: "物流API介接管理",
-              path: "/",
-            },
-            {
-              label: "物流訂單管理",
-              path: "/",
-            },
-            {
-              label: "正物流管理",
-              path: "/",
-            },
-            {
-              label: "逆物流管理",
-              path: "/",
-            },
-            {
-              label: "異常處理",
-              path: "/",
-            },
-          ],
-        },
+        // {
+        //   label: "客戶管理",
+        // },
+        // {
+        //   label: "銀行代收管理",
+        //   children: [
+        //     {
+        //       label: "信用卡大特店資訊",
+        //       path: "/",
+        //     },
+        //     {
+        //       label: "信用卡BIN管理",
+        //       path: "/",
+        //     },
+        //     {
+        //       label: "銀行虛擬帳號管理",
+        //       path: "/",
+        //     },
+        //     {
+        //       label: "虛擬帳號交易查詢",
+        //       path: "/",
+        //     },
+        //   ],
+        // },
+        // {
+        //   label: "超商代收管理",
+        // },
+        // {
+        //   label: "物流管理",
+        //   children: [
+        //     {
+        //       label: "物流維護",
+        //       path: "/",
+        //     },
+        //     {
+        //       label: "物流API介接管理",
+        //       path: "/",
+        //     },
+        //     {
+        //       label: "物流訂單管理",
+        //       path: "/",
+        //     },
+        //     {
+        //       label: "正物流管理",
+        //       path: "/",
+        //     },
+        //     {
+        //       label: "逆物流管理",
+        //       path: "/",
+        //     },
+        //     {
+        //       label: "異常處理",
+        //       path: "/",
+        //     },
+        //   ],
+        // },
         {
           label: "帳務管理",
           children: [
-            {
-              label: "牌告匯率查詢/維護",
-              path: "/",
-            },
-            {
-              label: "虛擬帳號代收對帳單",
-              path: "/",
-            },
-            {
-              label: "繳費代碼代收對帳單",
-              path: "/",
-            },
-            {
-              label: "外匯待撥款查詢",
-              path: "/",
-            },
-            {
-              label: "外匯已撥款查詢",
-              path: "/",
-            },
+            // {
+            //   label: "牌告匯率查詢/維護",
+            //   path: "/",
+            // },
+            // {
+            //   label: "虛擬帳號代收對帳單",
+            //   path: "/",
+            // },
+            // {
+            //   label: "繳費代碼代收對帳單",
+            //   path: "/",
+            // },
+            // {
+            //   label: "外匯待撥款查詢",
+            //   path: "/",
+            // },
+            // {
+            //   label: "外匯已撥款查詢",
+            //   path: "/",
+            // },
           ],
         },
       ],

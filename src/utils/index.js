@@ -1,3 +1,26 @@
+// API取商戶清單
+import { ref } from 'vue'
+import { api } from 'boot/axios'
+import { useUserStore, useMerchantStore } from "../stores";
+// async function GetAllMerchant() {
+//   api.get('/Merchant/GetList')
+//     .then((response) => {
+//       console.log(response.data);
+//       resolveComponent()
+//     })
+//     .catch(function (error) {
+//       console.log(error);
+//     })
+// }
+//export const MerchantList = ref(GetAllMerchant());
+
+export const MerchantList = ref([
+  { label: '數位鎏', value: '142864983000001' },
+  { label: '五七國際', value: '183062446000001' },
+  { label: 'Waffo', value: '332715810000001' },
+  { label: 'Airwallex', value: '391440300000001' }
+])
+
 //數字千分位
 export const toThousands = (num) => {
   var result = "",
@@ -13,6 +36,13 @@ export const toThousands = (num) => {
   return result;
 };
 export function GetMerchantName(id, arr) {
+  //console.log(arr);
+  if (!arr) {
+    console.log("FETCH");
+    const MerchantStore = useMerchantStore();
+    arr = MerchantStore.MerchantMap;
+    console.log(arr);
+  }
   for (let i = 0; i < arr.length; i++) {
     if (arr[i].value === id) {
       return arr[i].label;
@@ -20,27 +50,45 @@ export function GetMerchantName(id, arr) {
   }
 }
 export function GetStaticMerchantName(id) {
-  const arr = [
-    { label: '數位鎏', value: '142864983000001' },
-    { label: '五七國際', value: '183062446000001' },
-    { label: 'Waffo', value: '332715810000001' },
-    { label: 'Airwallex', value: '391440300000001' }
-  ]
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i].value === id) {
-      return arr[i].label;
-    }
-  }
+  api.get('/Merchant/GetList')
+    .then((response) => {
+      console.log(response.data);
+      arr = response.data;
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].value === id) {
+          return arr[i].label;
+        }
+      }
+    })
+    .catch(function (error) {
+      console.log(error);
+      return []
+    })
 }
+
 export function FixNumrber(num) {
   return (Math.round(num * 100) / 100).toFixed(4);
 }
 
-// TODO: API取商戶清單
-import { ref } from 'vue'
-export const MerchantList = ref([
-  { label: '數位鎏', value: '142864983000001' },
-  { label: '五七國際', value: '183062446000001' },
-  { label: 'Waffo', value: '332715810000001' },
-  { label: 'Airwallex', value: '391440300000001' }
-])
+
+export const getSHA256Hash = async (input) => {
+  const textAsBuffer = new TextEncoder().encode(input);
+  const hashBuffer = await window.crypto.subtle.digest("SHA-256", textAsBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hash = hashArray
+    .map((item) => item.toString(16).padStart(2, "0"))
+    .join("");
+  return hash;
+};
+
+
+export function GetBatchName(batchId) {
+  switch (batchId) {
+    case '01': return '每日結算'
+    case '02': return '撥款清算'
+    case '03': return '額度重置'
+    case '04': return '發票開立'
+    case '05': return '補發通知'
+    default: return ''
+  }
+};

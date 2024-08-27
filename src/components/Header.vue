@@ -83,7 +83,8 @@
 import { ref } from "vue";
 import { useUserStore } from "../stores";
 import MyQMenu from "./LeftMenu.vue";
-const showMerchantSelect = ref(window.localStorage.getItem("merchantId") == "");
+const user = useUserStore();
+const showMerchantSelect = ref(user.merchantId == "");
 const menuList = [
   {
     label: "帳號管理",

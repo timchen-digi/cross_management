@@ -33,16 +33,16 @@ export default route(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   });
   // 檢查登入狀態
-  const user = useUserStore();
+  const loginUser = useUserStore();
   var home = process.env.deployPath || '';
   Router.beforeEach((to, from, next) => {
-    console.log("to.fullPath: ", to.fullPath);
-    console.log("to.path: ", to.path);
-    console.log("to.href: ", to.href);
+    // console.log("to.fullPath: ", to.fullPath);
+    // console.log("to.path: ", to.path);
+    // console.log("to.href: ", to.href);
     if (to.path.startsWith("/Pay")) {
       next();
     }
-    if (!to.path.startsWith("/Login") && !user.username) {
+    if (!to.path.startsWith("/Login") && !loginUser.username) {
       alert("請先登入");
       next("/Login");
     } else {
