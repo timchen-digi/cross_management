@@ -4,7 +4,7 @@
     <div class="inputContent">
       <div class="inputGroup">
         <div class="text-subtitle1">舊密碼</div>
-        <q-input color="warning" v-model="password" :type="isPwd ? 'password' : 'text'" rounded outlined>
+        <q-input color="warning" v-model="oldPwd" :type="isPwd ? 'password' : 'text'" rounded outlined>
           <template v-slot:append>
             <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" class="cursor-pointer" @click="isPwd = !isPwd" />
           </template>
@@ -12,18 +12,18 @@
       </div>
       <div class="inputGroup">
         <div class="text-subtitle1">新密碼</div>
-        <q-input color="warning" v-model="oldPwd" type="password" rounded outlined>
+        <q-input color="warning" v-model="password" :type="isPwd2 ? 'password' : 'text'" rounded outlined>
           <template v-slot:append>
             <q-icon :name="isPwd2 ? 'visibility_off' : 'visibility'" class="cursor-pointer" @click="isPwd2 = !isPwd2" />
           </template>
-        </q-input>
-        <q-input color="warning" v-model="password" type="password" rounded outlined>
-
         </q-input>
       </div>
       <div class="inputGroup">
         <div class="text-subtitle1">再次輸入新密碼</div>
         <q-input color="warning" v-model="password2" :type="isPwd2 ? 'password' : 'text'" rounded outlined>
+          <template v-slot:append>
+            <q-icon :name="isPwd2 ? 'visibility_off' : 'visibility'" class="cursor-pointer" @click="isPwd2 = !isPwd2" />
+          </template>
         </q-input>
       </div>
     </div>
@@ -35,6 +35,9 @@
 
 <script>
 import { ref } from "vue";
+import { useUserStore } from "../../stores";
+import { getSHA256Hash } from 'src/utils/index.js'
+import { api } from 'boot/axios'
 export default {
   name: "SetPwdPage",
   data() {
@@ -48,7 +51,47 @@ export default {
   },
   methods: {
     resetPwd() {
-      alert("開發中");
+      if (this.password != this.oldPwd) {
+        alert("新密碼不可與舊密碼相同");
+        return;
+      }
+      if (this.password != this.password2) {
+        alert("兩次新密碼不同");
+        return;
+      }
+      const authStore = useUserStore();
+      getSHA256Hash(this.oldPwd).then(hashPwd => {
+        getSHA256Hash(this.password).then(hashPwd2 => {
+          api.post('/User/ChangePassword', {
+            userId: authStore.userId,
+            pswd: hashPwd,
+            pswd2: hashPwd2
+          }).then(response => {
+            console.log(response);
+            if (response.data.completeFlag == true) {
+              // 成功變更
+              $q.notify({
+                message: "使用者密碼已變更",
+                position: "center",
+                multiLine: true,
+                actions: [
+                  { icon: 'close', color: 'white', round: true, handler: () => { /* ... */ } }
+                ]
+              });
+              //TODO: 重新登入
+              return;
+            }
+            else {
+              alert("使用者名稱或密碼錯誤");
+              return;
+            }
+          }).catch(function (error) {
+            // handle error
+            console.log(error);
+            alert("使用者名稱或密碼錯誤");
+          })
+        })
+      });
     }
   }
 }

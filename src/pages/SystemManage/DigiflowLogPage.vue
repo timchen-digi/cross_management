@@ -3,9 +3,9 @@
     <div class="row fit row justify-between">
       <div class="col-12">
         <div class="BlockContent">
-          <h5 class="mainTitle">批次作業日誌查詢</h5>
+          <h5 class="mainTitle">系統API紀錄查詢</h5>
           <div class="filterBlock q-gutter-md">
-            <!-- <q-input v-model="RequestDate" mask="date" class="DateInput" label="日期" color="warning" outlined rounded>
+            <q-input v-model="RequestDate" mask="date" class="DateInput" label="日期" color="warning" outlined rounded>
               <template v-slot:append>
                 <q-icon name="event" class="cursor-pointer">
                   <q-popup-proxy cover transition-show="scale" transition-hide="scale">
@@ -17,14 +17,13 @@
                   </q-popup-proxy>
                 </q-icon>
               </template>
-</q-input> -->
-            <!-- <q-select color="warning" size="lg" v-model="ApiNameValue" :options="ApiNameList" label="API名稱" rounded
-              outlined /> -->
-            <!-- <q-select color="warning" size="lg" v-model="BusinessResultValue" :options="BusinessResultList" label="執行結果"
-              rounded outlined /> -->
-            <!-- <q-btn class="btn" color="grey-4" label="清除條件" rounded unelevated @click="clearFilter" size="1rem" />
-            <q-btn class="btn" color="warning" label="搜尋" rounded @click="loadOrders" size="1rem" /> -->
-
+            </q-input>
+            <q-select color="warning" size="lg" v-model="ApiNameValue" :options="ApiNameList" label="API名稱" rounded
+              outlined />
+            <q-select color="warning" size="lg" v-model="BusinessResultValue" :options="BusinessResultList" label="執行結果"
+              rounded outlined />
+            <q-btn class="btn" color="grey-4" label="清除條件" rounded unelevated @click="clearFilter" size="1rem" />
+            <q-btn class="btn" color="warning" label="搜尋" rounded @click="loadOrders" size="1rem" />
           </div>
           <div class="OrderTableBlock q-my-lg">
             <q-table class="OrderTable" :rows="rows" :columns="columns" :row-key="rows.name"
@@ -47,10 +46,10 @@
                 <q-inner-loading showing color="primary" />
               </template>
             </q-table>
-            <q-dialog v-model="showDetail">
+            <q-dialog v-model="showDetail" full-width>
               <q-card>
                 <q-card-section>
-                  <div class="text-h6">批次作業詳細資料</div>
+                  <div class="text-h6">API詳細資料</div>
                 </q-card-section>
                 <q-card-section class="q-pt-none">
                   <!-- <div v-html="generateTable(selected_row)"></div> -->
@@ -79,18 +78,16 @@
 <script>
 
 import { ref } from 'vue'
-import { toThousands, GetMerchantName, MerchantList, GetBatchName } from 'src/utils/index.js'
+import { toThousands, GetMerchantName, MerchantList } from 'src/utils/index.js'
 import dataTable from 'src/components/DataTable.vue';
 import { useUserStore } from "../../stores";
 import { api } from 'boot/axios'
 import { exportFile, useQuasar } from 'quasar'
 const ApiNameList = [
-  { label: '建立訂單', value: 'Create' },
-  { label: '付款通知', value: 'Notify' },
-  { label: '訂單查詢', value: 'Query' },
-  { label: '退款', value: 'Refund' },
-  { label: '退款查詢', value: 'QueryRefund' },
-  { label: '日終檔下載', value: 'Reconciliation' }
+  { label: '虛擬帳號取號', value: 'DigiflowVA' },
+  { label: '商戶資訊查詢', value: 'DigiflowQuery' },
+  { label: '發票開立', value: 'InvoiceCreate' },
+  { label: '發票折讓', value: 'InvoiceAllowance' }
 ]
 const BusinessResultList = [
   { label: '成功', value: 'Y' },
@@ -98,20 +95,42 @@ const BusinessResultList = [
   { label: '全選', value: '' }
 ]
 const columns = [
-  { name: "BatchId", label: "批次作業編號", field: "BatchId", align: 'left', sortable: true, format: (v) => (GetBatchName(v)) },
-  { name: "Success", label: "執行結果", field: "Success", align: 'left', sortable: true, format: (v) => (v == "Y" ? "成功" : "失敗") },
-  { name: "StartTime", label: "開始時間", field: "StartTime", align: 'left', sortable: true, format: (v) => (v.replaceAll('T', ' ').replaceAll('-', '/')) },
-  { name: "EndTime", label: "結束時間", field: "EndTime", align: 'left', sortable: true, format: (v) => (v.replaceAll('T', ' ').replaceAll('-', '/')) },
+  {
+    name: "MerchantId", label: "商戶", field: "MerchantId", align: 'left', sortable: true
+  },
+  // { name: "TerminalId", label: "終端", field: "TerminalId", align: 'left', sortable: true },
+  { name: "CreateTime", label: "時間", field: "RequestTime", align: 'left', sortable: true, format: (v) => (v.replaceAll('T', ' ').replaceAll('-', '/')) },
+  { name: "ApiName", label: "API名稱", field: "ApiName", align: 'left', sortable: true },
+  { name: "BusinessRecord", label: "執行結果", field: "BusinessResult", align: 'left', sortable: true, format: (v) => (v == "Y" ? "成功" : "失敗") },
+  { name: "ErrorCode", label: "錯誤代碼", field: "ErrorCode", align: 'left', sortable: true },
+  { name: "ErrorMessage", label: "錯誤訊息", field: "ErrorMessage", align: 'left', sortable: false }
 ];
 const ApiLogColumn = {
   RowId: '紀錄序號',
-  BatchId: '批次作業編號',
+  RequestDate: '請求日期',
   ApServer: '伺服器ID',
-  Success: '執行結果',
-  Log: '執行紀錄',
-  StartTime: '開始時間',
-  EndTime: '結束時間',
+  MerchantId: '商戶ID',
+  TermainlId: '終端ID',
+  ApiName: 'API名稱',
+  BusinessRecord: '業務紀錄',
+  BusinessRecordId: '業務紀錄ID',
+  ClientIp: '客戶端IP',
+  ServiceUrl: '服務端網址',
+  RequestTime: '接收請求時間',
+  RequestHead: '請求電文頭',
+  RequestMessage: '請求電文內容',
+  ResponseTime: '回覆時間',
+  ResponseMessage: '回覆電文內容',
+  ProcessSecond: '交易處理秒數',
+  ErrorCode: '錯誤代碼',
+  ErrorMessage: '錯誤訊息',
+  Exception: '系統異常紀錄',
+  Key1: '相關主鍵1',
+  Key2: '相關主鍵2',
+  Key3: '相關主鍵3',
+  BusinessResult: '業務執行結果'
 }
+const MerchantValue = ref(null);
 const ApiNameValue = ref(null);
 const BusinessResultValue = ref(null);
 const RequestDate = ref('');
@@ -122,9 +141,8 @@ const pagination = ref({
   rowsPerPage: 10,
   rowsNumber: 10
 })
-
 export default {
-  name: "BatchLogPage",
+  name: "ApiLogPage",
   components: {
     //dataTable
   },
@@ -134,10 +152,10 @@ export default {
     const loginUser = useUserStore();
     const isLoading = ref(false);
     function clearFilter() {
-      // MerchantValue.value = null;
-      // ApiNameValue.value = null;
-      // BusinessResultValue.value = '';
-      // RequestDate.value = '';
+      MerchantValue.value = null;
+      ApiNameValue.value = null;
+      BusinessResultValue.value = '';
+      RequestDate.value = '';
     }
     function loadOrders(props) {
 
@@ -148,20 +166,20 @@ export default {
         //MerchantId: 142864983000001
         AuthToken: loginUser.token
       }
-      // if (MerchantValue.value) {
-      //   query.MerchantId = MerchantValue.value.value;
-      // }
-      // if (ApiNameValue.value) {
-      //   query.ApiName = ApiNameValue.value.value;
-      // }
-      // if (BusinessResultValue.value) {
-      //   if (BusinessResultValue.value != "") {
-      //     query.BusinessResult = BusinessResultValue.value.value;
-      //   }
-      // }
-      // if (RequestDate.value != "") {
-      //   query.RequestDate = RequestDate.value.replaceAll('/', '');
-      // }
+      if (MerchantValue.value) {
+        query.MerchantId = MerchantValue.value.value;
+      }
+      if (ApiNameValue.value) {
+        query.ApiName = ApiNameValue.value.value;
+      }
+      if (BusinessResultValue.value) {
+        if (BusinessResultValue.value != "") {
+          query.BusinessResult = BusinessResultValue.value.value;
+        }
+      }
+      if (RequestDate.value != "") {
+        query.RequestDate = RequestDate.value.replaceAll('/', '');
+      }
       if (sortBy) {
         query.SortField = sortBy;
       }
@@ -172,7 +190,7 @@ export default {
       }
 
       isLoading.value = true;
-      api.post('/MerchantLog/QueryBatch', query, {
+      api.post('/MerchantLog/Digiflow', query, {
         headers: {}
       })
         .then((response) => {
@@ -219,6 +237,17 @@ export default {
       this.selected_row = row;
       this.showDetail = true;
     }
+    function generateTable(obj) {
+      // 不安全，待改
+      var htmlcode = "<table><tr>";
+      Object.keys(obj).forEach(function (k) {
+        //console.log(k + ' - ' + obj[k]);
+        htmlcode = htmlcode + "<th>" + k + "</th><th>" + obj[k] + "</th>";
+        htmlcode = htmlcode + "</tr><tr>";
+      });
+      htmlcode = htmlcode + "</tr></table>"
+      return htmlcode;
+    }
     loadOrders({
       sortBy: 'desc',
       descending: true,
@@ -232,9 +261,10 @@ export default {
       checkDetail,
       //generateTable,
       clearFilter,
-      //GetBatchName,
       showDetail: ref(false),
       ApiLogColumn,
+      MerchantValue,
+      ApiNameValue,
       BusinessResultValue,
       ApiNameList,
       BusinessResultList,
