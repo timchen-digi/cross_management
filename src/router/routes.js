@@ -1,9 +1,9 @@
-const Management = { template: "<div>管理後臺</div>" };
 import { useUserStore } from "../stores";
 const routes = [
   {
     path: "/Management",
     component: () => import("layouts/MainLayout.vue"),
+    meta: { title: '數位鎏聚合支付管理後台' },
     children: [
       { path: "", component: () => import("pages/HomePage.vue") },
       { path: "Index", component: () => import("pages/HomePage.vue") },
@@ -23,6 +23,8 @@ const routes = [
       { path: "Home", component: () => import("pages/HomePage.vue") }, // 首頁
       { path: "History", component: () => import("pages/HistoryPage.vue") }, // 訂單紀錄
       { path: "Refund", component: () => import("pages/RefundPage.vue") }, // 訂單紀錄
+      { path: "Refund", component: () => import("pages/RefundPage.vue") }, // 訂單紀錄
+      { path: "Backfill", component: () => import("pages/BackFillPage.vue") }, // 訂單紀錄
       { path: "Logout", component: () => import("pages/LogoutPage.vue") }, // 登出
       //{ path: "Alarm", component: () => import("pages/AlarmPage.vue") }, // 警示帳戶查詢
       //{ path: "Settle", component: () => import("pages/SettlePage.vue") }, // 商戶對帳查詢
@@ -35,6 +37,7 @@ const routes = [
   {
     path: "/Login",
     component: () => import("layouts/LoginLayout.vue"),
+    meta: { title: '數位鎏聚合支付管理後台' },
     children: [
       { path: "", component: () => import("pages/LoginPage.vue") },
       { path: "Register", component: () => import("pages/RegisterPage.vue") },
@@ -43,13 +46,31 @@ const routes = [
   {
     path: "/Pay",
     component: () => import("layouts/PayLayout.vue"),
+    meta: { title: '數位鎏線上付款平台' },
     children: [
-      { path: "Index", component: () => import("pages/Pay/PayPage.vue") }, // 付款_信用卡
+      { path: "Index", component: () => import("pages/Pay/NewPayPage.vue") }, // 付款_自選付款方式
+      //{ path: "Index", component: () => import("pages/Pay/PayPage.vue") }, // 付款_信用卡
       { path: "Bank", component: () => import("pages/Pay/BankPayPage.vue") }, // 付款_虛擬帳號
       { path: "Result", component: () => import("pages/Pay/ResultPage.vue") }, // 商戶後台
-      //{ path: "Backend", component: () => import("pages/Pay/BackendPage.vue") }, // 商戶後台
     ],
-    //  http://localhost:9000/#/Pay/Index
+  },
+  {
+    path: "/Point",
+    component: () => import("layouts/PointLayout.vue"),
+    meta: { title: '數位鎏線上付款平台' },
+    children: [
+      { path: "", component: () => import("pages/Point/IndexPage.vue") },
+      { path: "Index", component: () => import("pages/Point/IndexPage.vue") },
+      { path: "QA", component: () => import("pages/Point/QAPage.vue") }, //常見問題
+      { path: "Privacy", component: () => import("pages/Point/PrivacyPage.vue") }, //隱私權
+      { path: "About", component: () => import("pages/Point/AboutPage.vue") }, //關於我們
+      { path: "Agree", component: () => import("pages/Point/AgreePage.vue") }, //同意書
+      { path: "Contact", component: () => import("pages/Point/ContactPage.vue") }, //線上客服
+      { path: "DigiPoint", component: () => import("pages/Point/DigiPointPage.vue") },
+      { path: "GameList", component: () => import("pages/Point/GameListPage.vue") }, //合作遊戲
+      { path: "PaymentConfirm", component: () => import("pages/Point/PaymentConfirmPage.vue") },
+      { path: "PaymentDone", component: () => import("pages/Point/PaymentDonePage.vue") }
+    ],
   },
   // Always leave this as last one,
   // but you can also remove it
@@ -58,5 +79,4 @@ const routes = [
     component: () => import("pages/ErrorNotFound.vue"),
   },
 ];
-
 export default routes;
