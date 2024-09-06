@@ -31,3 +31,16 @@ yarn-error.log*
 
 # local .env files
 .env.local*
+
+# encript page
+src/utils/3d.html
+src/utils/bind*
+src/utils/jquery-1.12.2.min.js
+src/utils/jsencrypt.min.js
+src/pages/MerchantPage_OLD.vue
+src/pages/Pay/PayPage.vue
+
+#image
+*.jpg
+*.svg
+*.png
