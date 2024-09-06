@@ -56,9 +56,6 @@
                   <div class="text-h6">API詳細資料</div>
                 </q-card-section>
                 <q-card-section class="q-pt-none">
-                  <!-- <div v-html="generateTable(selected_row)"></div> -->
-                  <!-- {{ generateTable(selected_row) }} -->
-                  <!-- 這邊顯示詳細資料 -->
                   <q-list separator>
                     <q-item v-for="(item, key) in selected_row" :key="item.value">
                       <q-item-section><q-item-label>{{ ApiLogColumn[key] }}</q-item-label></q-item-section>

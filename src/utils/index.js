@@ -81,6 +81,16 @@ export const getSHA256Hash = async (input) => {
   return hash;
 };
 
+// 取import function
+// import sha256 from 'crypto-js/sha256';
+import AES from 'crypto-js/aes';
+export function enc(obj) {
+  const AESKey = "87654321876543218765432187654321".padEnd(32, '1');
+  let timestamp = new Date().getTime();
+  obj['Timestamp'] = timestamp;
+  const ciphertext = AES.encrypt(JSON.stringify(obj), AESKey).toString();
+  return ciphertext;
+}
 
 export function GetBatchName(batchId) {
   switch (batchId) {

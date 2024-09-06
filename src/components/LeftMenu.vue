@@ -116,6 +116,10 @@ export default {
         {
           label: "帳務管理",
           children: [
+            {
+              label: "AML資料補登",
+              path: "/Management/Backfill",
+            },
             // {
             //   label: "牌告匯率查詢/維護",
             //   path: "/",

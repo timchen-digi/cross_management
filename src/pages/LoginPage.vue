@@ -74,9 +74,6 @@ export default {
         alert("驗證碼錯誤");
         return;
       }
-      var username = "";
-      var isAdmin = false;
-      var token = "";
       var merchantId = "";
       //登入驗證
       getSHA256Hash(this.password).then(hashPwd => {

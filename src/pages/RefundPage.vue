@@ -481,12 +481,12 @@ export default {
         console.log(response.data);
         if (response.data.completeFlag) {
           $q.notify({
-            message: "帳單已更新狀態",
+            message: "退款狀態已更新",
             position: "center",
             multiLine: true,
-            actions: [
-              { icon: 'close', color: 'white', round: true, handler: () => { /* ... */ } }
-            ]
+            // actions: [
+            //   { icon: 'close', color: 'white', round: true, handler: () => { /* ... */ } }
+            // ]
           });
         }
         else {

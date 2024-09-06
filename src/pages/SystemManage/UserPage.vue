@@ -58,7 +58,7 @@
                 </q-card-section>
                 <q-card-actions align="right">
                   <q-btn flat :label="updateButton" color="primary" @click="UpdateUser(selected_row)" />
-                  <q-btn flat label="關閉" color="primary" @click="showDetail = false" v-close-popup />
+                  <q-btn flat label="關閉" color="primary" @click="CancelUpdate()" v-close-popup />
                 </q-card-actions>
               </q-card>
             </q-dialog>
@@ -238,6 +238,10 @@ export default {
       this.selected_row = row;
       this.showDetail = true;
     }
+    function CancelUpdate() {
+      this.showDetail = false;
+      readonly.value = false;
+    }
     function UpdateUser(user) {
       if (updateButton.value == "更新") {
         console.log(user);
@@ -310,6 +314,7 @@ export default {
           })
       });
     }
+
     loadUser({
       sortBy: 'desc',
       descending: true,
@@ -322,6 +327,7 @@ export default {
       checkDetail,
       clearFilter,
       UpdateUser,
+      CancelUpdate,
       registUser,
       loadUser,
       readonly,
