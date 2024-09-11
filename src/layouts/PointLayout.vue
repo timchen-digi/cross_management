@@ -3,7 +3,7 @@
     <q-header elevated class="header">
       <div class="menuNAV">
         <q-toolbar class="Toolbar bg-white text-black rounded-borders">
-          <img src="~assets/logos/DigiFlow_logo.svg" @click="goHome()" />
+          <img class="logo" src="~assets/logos/DigiFlow_logo.svg" @click="goHome()" />
           <q-space />
           <q-tabs v-model="tab" shrink>
             <q-route-tab name="home" label="線上付款" to="/Point/" />
@@ -23,12 +23,12 @@
       <div class="InfoBOX_L col-lg-6 col-sm-12 col-12 row">
         <div class="CommunityBOX">
           <div class="LOGO"><img src="~assets/common/mainLOGO.svg" class="img-fluid"></div>
-          <div class="CommunityBTN">
+          <!-- <div class="CommunityBTN">
             <img src="~assets/common/CommunityBTN_FB.svg" class="img-fluid" @click="goHome()">
             <img src="~assets/common/CommunityBTN_IG.svg" class="img-fluid" @click="goHome()">
             <img src="~assets/common/CommunityBTN_YT.svg" class="img-fluid" @click="goHome()">
             <img src="~assets/common/CommunityBTN_LINE.svg" class="img-fluid" @click="goHome()">
-          </div>
+          </div> -->
         </div>
         <div class="CompInfo">
           <ul>

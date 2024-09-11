@@ -14,11 +14,11 @@
       <h3 class="Title">請輸入購買資訊</h3>
       <div class="ProdBOX">
         <p class="BlockTitle">購買數量</p>
-        <q-option-group :options="PayAmountList" type="radio" v-model="PayAmount" inline />
+        <q-option-group :options="productList" type="radio" v-model="SelectedProduct" inline />
       </div>
       <div class="ProdBOX">
         <p class="BlockTitle">請選擇付款方式</p>
-        <q-option-group :options="PaymentMethodList" type="radio" v-model="PaymentMethod" inline />
+        <q-option-group :options="paymentList" type="radio" v-model="PaymentMethod" inline />
       </div>
       <div class="ProdBOX">
         <p class="BlockTitle">Email</p>
@@ -27,7 +27,7 @@
           <p id="UserEmailHelp" class="form-text text-negative">此為購點綁定帳號，請務必確認輸入正確</p>
         </div>
       </div>
-      <div class="ProdBOX">
+      <div class="ProdBOX" v-if="ShowInvoice">
         <p class="BlockTitle">發票資訊</p>
         <div class="SelectBOX mb-3">
           <!-- <q-select v-model="InvoiceMethod" :options="InvoiceMethodList" /> -->
@@ -88,7 +88,7 @@
 <script>
 import { ref } from "vue";
 import { useQuasar } from 'quasar'
-import { loadScript } from "vue-plugin-load-script";
+import { api } from 'boot/axios'
 export default {
   name: 'DigiPointComponent',
   data() {
@@ -99,21 +99,21 @@ export default {
       ],
       UserEmail: ref(''),
       UserEmailCode: ref(''),
-      PayAmount: ref(''),
-      PayAmountList: [
-        { label: '等值NTD$100', value: '100' },
-        { label: '等值NTD$500', value: '500' },
-        { label: '等值NTD$1,000', value: '1000' },
-        { label: '等值NTD$3,000', value: '3000' },
-        { label: '等值NTD$5,000', value: '5000' }
-      ],
+      SelectedProduct: ref(''),
+      // PayAmountList: [
+      //   { label: '等值NTD$100', value: '100' },
+      //   { label: '等值NTD$500', value: '500' },
+      //   { label: '等值NTD$1,000', value: '1000' },
+      //   { label: '等值NTD$3,000', value: '3000' },
+      //   { label: '等值NTD$5,000', value: '5000' }
+      // ],
       PaymentMethod: ref(''),
-      PaymentMethodList: [
-        { label: '銀行帳戶', value: '銀行帳戶' },
-        { label: '錢包', value: '錢包' },
-        { label: '點數', value: '點數' },
-        { label: '超商代碼', value: '超商代碼' }
-      ],
+      // PaymentMethodList: [
+      //   { label: '銀行帳戶', value: '銀行帳戶' },
+      //   { label: '錢包', value: '錢包' },
+      //   { label: '點數', value: '點數' },
+      //   { label: '超商代碼', value: '超商代碼' }
+      // ],
       InvoiceDonate: ref('51811'),
       InvoiceDonateOptions: [
         { label: '第一社會福利基金會', value: '51811' },
@@ -144,12 +144,16 @@ export default {
         }
         document.cookie = name + "=" + value + expires + "; path=/";
       };
+      console.log(this.UserEmail);
+      console.log(this.SelectedProduct);
+      console.log(this.PaymentMethod);
+      console.log(this.UserEmail.value);
       //const $q = useQuasar()
       if (this.UserEmail == "") {
         alert("請輸入Email");
         return;
       }
-      if (this.PayAmount == "") {
+      if (this.SelectedProduct == "") {
         alert("請選購買數量");
         return;
       }
@@ -157,22 +161,86 @@ export default {
         alert("請選擇付款方式");
         return;
       }
-      console.log(this.UserEmail);
-      console.log(this.PayAmount);
-      console.log(this.PaymentMethod);
-      //console.log(this.UserEmail.value);
       createCookie("User.Email", this.UserEmail, 10);
-      createCookie("User.Prodoct", "數位鎏點數 " + this.PayAmount + "點", 10);
-      createCookie("User.PayAmount", this.PayAmount, 10);
+      createCookie("User.Prodoct", "數位鎏點數 " + this.SelectedProduct + "點", 10);
+      createCookie("User.PayAmount", this.SelectedProduct, 10);
       createCookie("User.PaymentMethod", this.PaymentMethod, 10);
-      this.$router.push("/Point/PaymentConfirm");
+      //this.$router.push("/Point/PaymentConfirm");
+      this.$router.push("/Point/PaymentDone");
     }
   },
   mounted() {
   },
   setup() {
-    return {
+    const $q = useQuasar()
+    const defaultKey = "87654321876543218765432187654321"
+    //const MID = "142864983000001"
+    //const TID = "F001"
+    const ProductList = ref([])
+    const PaymentList = ref([])
+    const ShowInvoice = ref(false)
+    let uri = window.location.hash.split('?')[1]
+    //console.log(uri)
+    let params = new URLSearchParams(uri)
+    const MID = params.get("MID")
+    const TID = params.get("TID")
+    function getQuery(mid, tid) {
+      var query = {
+        "param": {
+          "Version": "1.0",
+          "MID": mid,
+          "TID": tid,
+        }
+      }
+      api.post('https://mp.1qr.tw/api/Product', query, {
+        headers: {
+          "Content-Type": "application/json;charset=utf-8",
+          "isCode": 0,
+          "apiKey": defaultKey,
+          "type": 0
+        }
+      })
+        .then((response) => {
+          //console.log(response.data)
+          if (response.data.param.ReturnCode == "000000") {
+            if (response.data.param.content.Product.length == 0) {
+              $q.notify({
+                type: 'warning',
+                message: "本遊戲暫無可購買品項",
+                position: "center",
+              });
+            }
+            response.data.param.content.Product.forEach(p => {
+              ProductList.value.push({ label: p.Name, value: p.ProductID })
+            });
+            response.data.param.content.Payment.forEach(p => {
+              p.InvoiceEnable = false
+              PaymentList.value.push({ label: p.PaymentName, value: p.PaymentID, invoice: p.InvoiceEnable })
+            });
+            //console.log(PaymentList.value)
+          }
+          else {
+            $q.notify({
+              type: 'negative',
+              message: "取得購買資訊失敗 " + response.data.param.ReturnMsg,
+              position: "center",
+            });
+          }
+        })
+        .catch(function (error) {
+          // handle error
+          $q.notify({
+            type: 'negative',
+            message: "取得購買資訊失敗 " + error,
+            position: "center",
+          });
+        })
     }
+    getQuery(MID, TID);
+    return {
+      productList: ProductList,
+      paymentList: PaymentList
+    };
   }
 }
 </script>
