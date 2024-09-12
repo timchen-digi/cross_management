@@ -72,6 +72,8 @@ export default {
       //圖形驗證碼
       if (this.identifyCode != this.verify) {
         alert("驗證碼錯誤");
+        this.refreshIdentifyCode()
+        this.verify = ""
         return;
       }
       var merchantId = "";

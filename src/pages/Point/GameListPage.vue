@@ -104,7 +104,7 @@ export default {
     const $q = useQuasar()
     const merchantItem = ref([])
     const defaultKey = "87654321876543218765432187654321"
-    const merchantId = 142864983000001
+    const merchantId = 332715810000001
     function getQuery(mid) {
       var query = {
         "param": {

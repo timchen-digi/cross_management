@@ -14,16 +14,17 @@
       <h3 class="Title">請輸入購買資訊</h3>
       <div class="ProdBOX">
         <p class="BlockTitle">購買數量</p>
-        <q-option-group :options="productList" type="radio" v-model="SelectedProduct" inline />
+        <q-option-group :options="ProductList" type="radio" v-model="SelectedProduct" inline />
       </div>
       <div class="ProdBOX">
         <p class="BlockTitle">請選擇付款方式</p>
-        <q-option-group :options="paymentList" type="radio" v-model="PaymentMethod" inline />
+        <q-option-group :options="PaymentList" type="radio" v-model="PaymentMethod" inline
+          @update:model-value="checkPaymentMethod" />
       </div>
       <div class="ProdBOX">
         <p class="BlockTitle">Email</p>
         <div class="form-group">
-          <q-input v-model="UserEmail" filled type="email" placeholder="請輸入您的Email" />
+          <q-input v-model="UserEmail" filled type="email" :rules="emailRules" placeholder="請輸入您的Email" />
           <p id="UserEmailHelp" class="form-text text-negative">此為購點綁定帳號，請務必確認輸入正確</p>
         </div>
       </div>
@@ -69,8 +70,20 @@
       </div>
     </div>
     <!-- 這邊加一個驗證碼 -->
+    <div class="inputGroup VerificationCode">
+      <div class="text-subtitle1 Title">驗證碼</div>
+      <q-input v-model="verify" bottom-slots rounded outlined>
+        <template v-slot:control>
+          <div class="self-center full-width no-outline" tabindex="0"></div>
+        </template>
+        <template v-slot:after>
+          <Sidentify :identifyCode="identifyCode" />
+          <q-icon class="refresh" name="refresh" @click="refreshIdentifyCode" size="md" />
+        </template>
+      </q-input>
+    </div>
     <div class="BTNGroup">
-      <button type="submit" class="BTN_sure submit" @click="goPayment()">前往付款</button>
+      <button type="submit" class="BTN_sure submit" @click="goPayment">前往付款</button>
     </div>
   </div>
   <div class="Notice">
@@ -88,9 +101,13 @@
 <script>
 import { ref } from "vue";
 import { useQuasar } from 'quasar'
+import Sidentify from "/src/utils/identify.vue"
 import { api } from 'boot/axios'
 export default {
   name: 'DigiPointComponent',
+  components: {
+    Sidentify
+  },
   data() {
     return {
       emailRules: [
@@ -107,7 +124,7 @@ export default {
       //   { label: '等值NTD$3,000', value: '3000' },
       //   { label: '等值NTD$5,000', value: '5000' }
       // ],
-      PaymentMethod: ref(''),
+
       // PaymentMethodList: [
       //   { label: '銀行帳戶', value: '銀行帳戶' },
       //   { label: '錢包', value: '錢包' },
@@ -128,27 +145,25 @@ export default {
         { label: '發票捐贈', value: 'inv_Donate' }
       ],
       PersonalInvoiceType: ref(''),
+      identifyCode: "", //密碼登入圖形驗證碼
+      identifyCodes: "23456789abcdefghjkmnpqrstuvwxyz", //生成圖形驗證碼依據
+      verify: ""
     }
   },
   methods: {
     goPayment() {
-      function createCookie(name, value, timeout) {
-        var expires;
-        if (timeout) {
-          var date = new Date();
-          date.setTime(date.getTime() + (timeout * 1000));
-          expires = "; expires=" + date.toGMTString();
-        }
-        else {
-          expires = "";
-        }
-        document.cookie = name + "=" + value + expires + "; path=/";
-      };
-      console.log(this.UserEmail);
-      console.log(this.SelectedProduct);
-      console.log(this.PaymentMethod);
-      console.log(this.UserEmail.value);
       //const $q = useQuasar()
+      //圖形驗證碼
+      if (this.identifyCode != this.verify) {
+        alert("驗證碼錯誤")
+        this.refreshIdentifyCode()
+        this.verify = ""
+        return;
+      }
+      // console.log(this.UserEmail);
+      // console.log(this.SelectedProduct);
+      // console.log(this.PaymentMethod);
+      // console.log(this.UserEmail.value);
       if (this.UserEmail == "") {
         alert("請輸入Email");
         return;
@@ -161,18 +176,46 @@ export default {
         alert("請選擇付款方式");
         return;
       }
-      createCookie("User.Email", this.UserEmail, 10);
-      createCookie("User.Prodoct", "數位鎏點數 " + this.SelectedProduct + "點", 10);
-      createCookie("User.PayAmount", this.SelectedProduct, 10);
-      createCookie("User.PaymentMethod", this.PaymentMethod, 10);
+      this.createCookie("User.Email", this.UserEmail, 10);
+      this.createCookie("User.Prodoct", "數位鎏點數 " + this.SelectedProduct + "點", 10);
+      this.createCookie("User.PayAmount", this.SelectedProduct, 10);
+      this.createCookie("User.PaymentMethod", this.PaymentMethod, 10);
       //this.$router.push("/Point/PaymentConfirm");
       this.$router.push("/Point/PaymentDone");
-    }
+    },
+    createCookie(name, value, timeout) {
+      var expires;
+      if (timeout) {
+        var date = new Date();
+        date.setTime(date.getTime() + (timeout * 1000));
+        expires = "; expires=" + date.toGMTString();
+      }
+      else {
+        expires = "";
+      }
+      document.cookie = name + "=" + value + expires + "; path=/";
+    },
+    refreshIdentifyCode() {
+      this.identifyCode = "";
+      this.makeIdentifyCode(4);
+    },
+    makeIdentifyCode(l) {
+      for (let i = 0; i < l; i++) {
+        this.identifyCode +=
+          this.identifyCodes[this.randomNum(0, this.identifyCodes.length)];
+      }
+    },
+    randomNum(min, max) {
+      return Math.floor(Math.random() * (max - min) + min);
+    },
   },
   mounted() {
+    this.identifyCode = "";
+    this.makeIdentifyCode(4);
   },
   setup() {
     const $q = useQuasar()
+    const PaymentMethod = ref('')
     const defaultKey = "87654321876543218765432187654321"
     //const MID = "142864983000001"
     //const TID = "F001"
@@ -192,7 +235,9 @@ export default {
           "TID": tid,
         }
       }
-      api.post('https://mp.1qr.tw/api/Product', query, {
+      const url = 'https://mp.1qr.tw/api/Product'
+      //const url = 'https://localhost:9999/api/Product'
+      api.post(url, query, {
         headers: {
           "Content-Type": "application/json;charset=utf-8",
           "isCode": 0,
@@ -214,7 +259,6 @@ export default {
               ProductList.value.push({ label: p.Name, value: p.ProductID })
             });
             response.data.param.content.Payment.forEach(p => {
-              p.InvoiceEnable = false
               PaymentList.value.push({ label: p.PaymentName, value: p.PaymentID, invoice: p.InvoiceEnable })
             });
             //console.log(PaymentList.value)
@@ -237,9 +281,19 @@ export default {
         })
     }
     getQuery(MID, TID);
+    function checkPaymentMethod() {
+      //console.log(PaymentMethod.value)
+      //console.log(PaymentList.value)
+      var inv = PaymentList.value.find((p) => p.value == PaymentMethod.value);
+      //console.log(inv.invoice)
+      ShowInvoice.value = inv.invoice
+    }
     return {
-      productList: ProductList,
-      paymentList: PaymentList
+      ProductList,
+      PaymentList,
+      ShowInvoice,
+      checkPaymentMethod,
+      PaymentMethod
     };
   }
 }
@@ -247,4 +301,13 @@ export default {
 <style lang="sass" scoped>
 .BannerBlock
   background-image: url(src/assets/banner/MainBanner.jpg)
+.inputGroup
+  margin-bottom: 1rem
+.VerificationCode
+.Title
+  width: 100%
+.refresh
+  cursor: pointer
+canvas
+  vertical-align: sub
 </style>

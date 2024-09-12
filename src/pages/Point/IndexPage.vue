@@ -86,6 +86,8 @@ export default {
   },
   setup() {
     const $q = useQuasar()
+    const merchantId = 332715810000001
+    const defaultKey = "87654321876543218765432187654321"
     const merchantItem = ref([])
     function getQuery(mid) {
       var query = {
@@ -98,7 +100,7 @@ export default {
         headers: {
           "Content-Type": "application/json;charset=utf-8",
           "isCode": 0,
-          "apiKey": "87654321876543218765432187654321",
+          "apiKey": defaultKey,
           "type": 0
         }
       })
@@ -142,7 +144,7 @@ export default {
           });
         })
     }
-    getQuery(142864983000001);
+    getQuery(merchantId);
     return {
       merchantItem
     };
