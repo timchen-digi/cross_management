@@ -106,6 +106,7 @@ const columns = [
   { name: "CreateTime", label: "時間", field: "RequestTime", align: 'left', sortable: true, format: (v) => (v.replaceAll('T', ' ').replaceAll('-', '/')) },
   { name: "ApiName", label: "API名稱", field: "ApiName", align: 'left', sortable: true },
   { name: "BusinessRecord", label: "執行結果", field: "BusinessResult", align: 'left', sortable: true, format: (v) => (v == "Y" ? "成功" : "失敗") },
+  { name: "ProcessSecond", label: "處理耗時", field: "ProcessSecond", align: 'right', sortable: true, format: (v) => ((v / 1000).toFixed(2)) },
   { name: "ErrorCode", label: "錯誤代碼", field: "ErrorCode", align: 'left', sortable: true },
   { name: "ErrorMessage", label: "錯誤訊息", field: "ErrorMessage", align: 'left', sortable: false }
 ];
@@ -125,7 +126,7 @@ const ApiLogColumn = {
   RequestMessage: '請求電文',
   ResponseTime: '回覆時間',
   ResponseMessage: '回覆電文',
-  ProcessSecond: '處理秒數',
+  ProcessSecond: '處理耗時(ms)',
   ErrorCode: '錯誤代碼',
   ErrorMessage: '錯誤訊息',
   Exception: '系統異常紀錄',

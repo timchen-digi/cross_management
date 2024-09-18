@@ -205,7 +205,7 @@ export default {
       //   console.log(i + i.value);
       // }
       // 檢查輸入(必填/格式)
-      console.log(merchant.MerchantId);
+      //console.log(merchant.MerchantId);
       api.post('/Merchant/Create', merchant, {
         headers: {}
       })
@@ -270,7 +270,7 @@ export default {
           //console.log(response.data);
           if (response.data.completeFlag) {
             var apiKey = response.data.records[0].Key;
-            console.log(apiKey);
+            //console.log(apiKey);
             //alert(apiKey);
             navigator.clipboard.writeText(apiKey).then(() => $q.notify({
               type: 'positive',
@@ -295,7 +295,7 @@ export default {
           //console.log(response.data);
           if (response.data.completeFlag) {
             var record = response.data.records[0];
-            console.log(record);
+            //console.log(record);
             //alert(apiKey);
             $q.notify({
               type: 'positive',
@@ -342,7 +342,7 @@ export default {
           //console.log(response.data);
           if (response.data.completeFlag) {
             var record = response.data.records[0];
-            console.log(record);
+            //console.log(record);
             //alert(apiKey);
             $q.notify({
               type: 'positive',

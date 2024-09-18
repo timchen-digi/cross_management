@@ -5,7 +5,7 @@
       <h5 class="MainTitle">登入</h5>
       <div class="inputContent">
         <div class="inputGroup">
-          <div class="text-subtitle1">電子郵件 或 手機號碼</div>
+          <div class="text-subtitle1">帳號</div>
           <q-input color="warning" v-model="account" rounded outlined />
         </div>
         <div class="inputGroup">
@@ -32,12 +32,12 @@
       <div class="BtnGroup">
 
         <q-btn color="warning" text-color="black" label="登入" @click="login" size="lg" rounded />
-        <div class="SeparatorTxt">
+        <!-- <div class="SeparatorTxt">
           <span class="line"></span>
           <span class="text">or</span>
           <span class="line"></span>
-        </div>
-        <q-btn color="black" text-color="white" label="註冊" to="/Login/Register" size="lg" rounded />
+        </div> -->
+        <!-- <q-btn color="black" text-color="white" label="註冊" to="/Login/Register" size="lg" rounded /> -->
 
       </div>
     </div>
@@ -84,24 +84,28 @@ export default {
           Account: this.account,
           Password: hashPwd,
         }).then(response => {
-          console.log(response);
+          //console.log(response);
           const authStore = useUserStore();
           if (response.data.completeFlag == true) {
             // 成功登入
             var user = response.data.records[0];
-            console.log(user);
+            //console.log(user);
             merchantId = user.MerchantId;
             authStore.setUserState(user);
           }
           else {
             alert("使用者名稱或密碼錯誤");
+            this.refreshIdentifyCode()
+            this.verify = ""
             return;
           }
           // 登入成功後導航至其他頁面
           this.$router.push("/Management/History");
         }).catch(function (error) {
           // handle error
-          console.log(error);
+          //console.log(error);
+          this.refreshIdentifyCode()
+          this.verify = ""
           alert("使用者名稱或密碼錯誤");
         })
       });

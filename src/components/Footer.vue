@@ -1,5 +1,6 @@
 <template>
   <div class="footer">
+    <!--
     <q-toolbar class="Toolbar">
       <img src="~assets/logos/DigiFlow_logo.svg" />
       <q-space />
@@ -11,6 +12,7 @@
         <q-tab name="legal" label="法律同意書" to="/" />
       </q-tabs>
     </q-toolbar>
+    -->
     <div class="copyright">Digiflow tech. ©2024</div>
   </div>
 </template>

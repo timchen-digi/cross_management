@@ -466,7 +466,7 @@ export default {
       remitPrompt.value = true;
     }
     function DoRefund(order) {
-      console.log(order);
+      //console.log(order);
       // console.log(RemitTrxId);
       // console.log(this.RemitTrxId);
       // send api
@@ -474,11 +474,11 @@ export default {
       let refundOrder = { ...order }
       refundOrder["AuthToken"] = loginUser.AuthToken;
       refundOrder["RemitTrxId"] = this.RemitTrxId;
-      console.log(refundOrder);
+      //console.log(refundOrder);
       remitPrompt.value = false;
       this.RemitTrxId = "";
       api.post('/Order/CheckRefund', refundOrder).then((response) => {
-        console.log(response.data);
+        //console.log(response.data);
         if (response.data.completeFlag) {
           $q.notify({
             message: "退款狀態已更新",

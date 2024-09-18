@@ -80,7 +80,7 @@
 <script>
 import { ref } from "vue";
 import { useQuasar } from 'quasar'
-import { api } from 'boot/axios'
+import { pointApi } from 'boot/axios'
 export default {
   name: 'GameListComponent',
   data() {
@@ -112,7 +112,7 @@ export default {
           "Merchant": [mid]
         }
       }
-      api.post('https://mp.1qr.tw/api/QueryPage', query, {
+      pointApi.post('/QueryPage', query, {
         headers: {
           "Content-Type": "application/json;charset=utf-8",
           "isCode": 0,

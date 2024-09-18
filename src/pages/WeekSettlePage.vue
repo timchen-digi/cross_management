@@ -134,6 +134,11 @@ const OrderStateValue = ref(null);
 const OrderTypeValue = ref(null);
 const MerchantValue = ref(null);
 const SettleDate = ref('');
+var prevMonday = new Date();
+prevMonday.setDate(prevMonday.getDate() - (prevMonday.getDay() + 6) % 7);
+prevMonday.setDate(prevMonday.getDate() - 7);
+SettleDate.value = prevMonday.toISOString().slice(0, 10).replace(/-/g, "/");
+//console.log(SettleDate)
 const pagination = ref({
   sortBy: 'desc',
   descending: true,

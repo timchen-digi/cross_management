@@ -74,7 +74,7 @@
   </div>
 </template>
 <script>
-import { api } from 'boot/axios'
+import { pointApi } from 'boot/axios'
 import { ref } from "vue";
 import { useQuasar } from 'quasar'
 export default {
@@ -96,7 +96,7 @@ export default {
           "Merchant": [mid]
         }
       }
-      api.post('https://mp.1qr.tw/api/QueryPage', query, {
+      pointApi.post('/QueryPage', query, {
         headers: {
           "Content-Type": "application/json;charset=utf-8",
           "isCode": 0,

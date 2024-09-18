@@ -13,15 +13,12 @@
       </div>
     </div>
     <div class="BTNGroup">
-      <button class="BTN_cancel" @click="cancelPayment()">返回</button>
-      <button class="BTN_sure submit" @click="goPayment()">確認付款</button>
+      <button class="BTN_cancel" @click="cancelPayment">返回</button>
+      <button class="BTN_sure submit" @click="goPayment">確認付款</button>
     </div>
   </div>
 </template>
 <script>
-import { ref } from "vue";
-import { useQuasar } from 'quasar'
-import { loadScript } from "vue-plugin-load-script";
 export default {
   name: 'DigiPointComponent',
   data() {

@@ -9,7 +9,7 @@
         Oops. Nothing here...
       </div>
 
-      <q-btn class="q-mt-xl" color="white" text-color="blue" unelevated to="/Management/" label="回到首頁" no-caps />
+      <q-btn class="q-mt-xl" color="white" text-color="blue" unelevated @click="$router.go(-1)" label="回到上一頁" no-caps />
     </div>
   </div>
 </template>

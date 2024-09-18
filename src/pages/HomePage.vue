@@ -1,6 +1,6 @@
 <template>
   <q-page padding>
-    <div class="row fit row justify-between">
+    <!-- <div class="row fit row justify-between">
       <div class="col-md-4 col-12">
         <q-card class="my-card q-py-md q-mb-md" bordered>
           <div class="BlockContent">
@@ -135,7 +135,7 @@
           </q-card-section>
         </q-card>
       </div>
-    </div>
+    </div> -->
   </q-page>
 </template>
 
@@ -213,7 +213,7 @@ export default {
   name: "HomePage",
   methods: {},
   components: {
-    dataTable,
+    //dataTable,
   },
   data() {
     return {

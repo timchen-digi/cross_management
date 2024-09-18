@@ -102,7 +102,7 @@
 import { ref } from "vue";
 import { useQuasar } from 'quasar'
 import Sidentify from "/src/utils/identify.vue"
-import { api } from 'boot/axios'
+import { pointApi } from 'boot/axios'
 export default {
   name: 'DigiPointComponent',
   components: {
@@ -117,20 +117,6 @@ export default {
       UserEmail: ref(''),
       UserEmailCode: ref(''),
       SelectedProduct: ref(''),
-      // PayAmountList: [
-      //   { label: '等值NTD$100', value: '100' },
-      //   { label: '等值NTD$500', value: '500' },
-      //   { label: '等值NTD$1,000', value: '1000' },
-      //   { label: '等值NTD$3,000', value: '3000' },
-      //   { label: '等值NTD$5,000', value: '5000' }
-      // ],
-
-      // PaymentMethodList: [
-      //   { label: '銀行帳戶', value: '銀行帳戶' },
-      //   { label: '錢包', value: '錢包' },
-      //   { label: '點數', value: '點數' },
-      //   { label: '超商代碼', value: '超商代碼' }
-      // ],
       InvoiceDonate: ref('51811'),
       InvoiceDonateOptions: [
         { label: '第一社會福利基金會', value: '51811' },
@@ -154,34 +140,80 @@ export default {
     goPayment() {
       //const $q = useQuasar()
       //圖形驗證碼
-      if (this.identifyCode != this.verify) {
-        alert("驗證碼錯誤")
-        this.refreshIdentifyCode()
-        this.verify = ""
-        return;
-      }
-      // console.log(this.UserEmail);
-      // console.log(this.SelectedProduct);
-      // console.log(this.PaymentMethod);
-      // console.log(this.UserEmail.value);
-      if (this.UserEmail == "") {
-        alert("請輸入Email");
-        return;
-      }
-      if (this.SelectedProduct == "") {
-        alert("請選購買數量");
-        return;
-      }
-      if (this.PaymentMethod == "") {
-        alert("請選擇付款方式");
-        return;
-      }
-      this.createCookie("User.Email", this.UserEmail, 10);
-      this.createCookie("User.Prodoct", "數位鎏點數 " + this.SelectedProduct + "點", 10);
-      this.createCookie("User.PayAmount", this.SelectedProduct, 10);
-      this.createCookie("User.PaymentMethod", this.PaymentMethod, 10);
+      // if (this.identifyCode != this.verify) {
+      //   alert("驗證碼錯誤")
+      //   this.refreshIdentifyCode()
+      //   this.verify = ""
+      //   return;
+      // }
+      // if (this.UserEmail == "") {
+      //   alert("請輸入Email");
+      //   return;
+      // }
+      // if (this.SelectedProduct == "") {
+      //   alert("請選購買數量");
+      //   return;
+      // }
+      // if (this.PaymentMethod == "") {
+      //   alert("請選擇付款方式");
+      //   return;
+      // }
+      // this.createCookie("User.Email", this.UserEmail, 10);
+      // this.createCookie("User.Prodoct", "數位鎏點數 " + this.SelectedProduct + "點", 10);
+      // this.createCookie("User.PayAmount", this.SelectedProduct, 10);
+      // this.createCookie("User.PaymentMethod", this.PaymentMethod, 10);
       //this.$router.push("/Point/PaymentConfirm");
-      this.$router.push("/Point/PaymentDone");
+
+      let uri = window.location.hash.split('?')[1]
+      let params = new URLSearchParams(uri)
+      let order = ref()
+      let query = {
+        "param": {
+          "Version": "1.0",
+          "MID": params.get("MID"),
+          "TID": params.get("TID"),
+          "Amount": this.SelectedProduct
+        }
+      }
+      console.log(query);
+      pointApi.post('/GenVA', query, {
+        headers: {
+          "Content-Type": "application/json;charset=utf-8",
+          "isCode": 0,
+          "apiKey": "87654321876543218765432187654321",
+          "type": 0
+        }
+      })
+        .then((response) => {
+          //console.log(response.data)
+          if (response.data.param.ReturnCode == "000000") {
+            //console.log(PaymentList.value)
+            console.log(response.data.param)
+            this.order = response.data.param.content
+            // this.createCookie("User.Email", this.UserEmail, 10);
+            // this.createCookie("User.Prodoct", "數位鎏點數 " + this.SelectedProduct + "點", 10);
+            // this.createCookie("User.PayAmount", this.SelectedProduct, 10);
+            // this.createCookie("User.PaymentMethod", this.PaymentMethod, 10);
+            //this.$router.push("/Point/PaymentConfirm");
+          }
+          else {
+            // $q.notify({
+            //   type: 'negative',
+            //   message: "交易建立失敗 " + response.data.param.ReturnMsg,
+            //   position: "center",
+            // });
+          }
+        })
+        .catch(function (error) {
+          // handle error
+          // $q.notify({
+          //   type: 'negative',
+          //   message: "交易建立失敗 " + error,
+          //   position: "center",
+          // });
+        })
+
+      //this.$router.push("/Point/PaymentDone");
     },
     createCookie(name, value, timeout) {
       var expires;
@@ -303,11 +335,12 @@ export default {
   background-image: url(src/assets/banner/MainBanner.jpg)
 .inputGroup
   margin-bottom: 1rem
+
 .VerificationCode
-.Title
-  width: 100%
-.refresh
-  cursor: pointer
-canvas
-  vertical-align: sub
+  .Title
+    width: 100%
+  .refresh
+    cursor: pointer
+  canvas
+    vertical-align: sub
 </style>
