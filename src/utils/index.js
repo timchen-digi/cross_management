@@ -15,10 +15,10 @@ import { useUserStore, useMerchantStore } from "../stores";
 //export const MerchantList = ref(GetAllMerchant());
 
 export const MerchantList = ref([
-  { label: '數位鎏', value: '142864983000001' },
-  { label: '五七國際', value: '183062446000001' },
+  //{ label: '數位鎏', value: '142864983000001' },
+  //{ label: '五七國際', value: '183062446000001' },
   { label: 'Waffo', value: '332715810000001' },
-  { label: 'Airwallex', value: '391440300000001' }
+  //{ label: 'Airwallex', value: '391440300000001' }
 ])
 
 //數字千分位

@@ -6,6 +6,7 @@
       <q-tabs v-model="tab" inline-label class="tabs" indicator-color="warning">
         <!-- <q-route-tab name="home" label="首頁" to="/Home" /> -->
         <q-route-tab name="merchant" label="商戶管理" to="/Management/Merchant" v-show="showMerchantSelect" />
+        <q-route-tab name="merchant" label="終端管理" to="/Management/Terminal" v-show="showMerchantSelect" />
         <!-- <q-route-tab name="pay" label="付款" to="/Pay" />
         <q-route-tab name="wallet" label="錢包" to="/Wallet" /> -->
         <q-route-tab name="history" label="交易紀錄" to="/Management/History" />
