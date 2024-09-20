@@ -5,9 +5,9 @@ const routes = [
     component: () => import("layouts/MainLayout.vue"),
     meta: { title: '數位鎏聚合支付管理後台' },
     children: [
-      { path: "", component: () => import("pages/HomePage.vue") },
+      { path: "", component: () => import("pages/HomePage.vue") }, // 首頁
+      { path: "Home", component: () => import("pages/HomePage.vue") },
       { path: "Index", component: () => import("pages/HomePage.vue") },
-      { path: "Wallet", component: () => import("pages/WalletPage.vue") },
       { path: "Merchant", component: () => import("pages/MerchantPage.vue") }, // 商戶管理
       { path: "Terminal", component: () => import("pages/TerminalPage.vue") }, // 商戶管理
       { path: "WeekSettle", component: () => import("pages/WeekSettlePage.vue") }, // 商戶管理
@@ -18,12 +18,7 @@ const routes = [
       { path: "UserLog", component: () => import("pages/SystemManage/UserLogPage.vue") }, // 員工操作紀錄
       { path: "Maintain", component: () => import("pages/SystemManage/MaintainPage.vue") }, // 維運計畫
       { path: "SetPwd", component: () => import("pages/AccountManage/SetPwdPage.vue") }, // 變更密碼
-      { path: "Pay", component: () => import("pages/PayPage.vue") },
-      { path: "Checkout", component: () => import("pages/PayPageCheckout.vue") },
-      { path: "Confirm", component: () => import("pages/PayPageConfirm.vue") },
-      { path: "Home", component: () => import("pages/HomePage.vue") }, // 首頁
       { path: "History", component: () => import("pages/HistoryPage.vue") }, // 訂單紀錄
-      { path: "Refund", component: () => import("pages/RefundPage.vue") }, // 訂單紀錄
       { path: "Refund", component: () => import("pages/RefundPage.vue") }, // 訂單紀錄
       { path: "Backfill", component: () => import("pages/BackFillPage.vue") }, // 訂單紀錄
       { path: "Logout", component: () => import("pages/LogoutPage.vue") }, // 登出
@@ -32,6 +27,10 @@ const routes = [
       //{ path: "Order", component: () => import("pages/OrderPage.vue") }, // 商戶帳務查詢
       //{ path: "Discound", component: () => import("pages/DiscoundPage.vue") }, // 商戶帳務查詢
       //{ path: "Stock", component: () => import("pages/StockPage.vue") }, // 庫存管理
+      //{ path: "Wallet", component: () => import("pages/WalletPage.vue") },
+      //{ path: "Pay", component: () => import("pages/PayPage.vue") },
+      //{ path: "Checkout", component: () => import("pages/PayPageCheckout.vue") },
+      //{ path: "Confirm", component: () => import("pages/PayPageConfirm.vue") },
 
     ],
   },
@@ -58,7 +57,7 @@ const routes = [
   {
     path: "/Point",
     component: () => import("layouts/PointLayout.vue"),
-    meta: { title: '數位鎏線上付款平台' },
+    meta: { title: '數位鎏線上購點平台' },
     children: [
       { path: "", component: () => import("pages/Point/IndexPage.vue") },
       { path: "Index", component: () => import("pages/Point/IndexPage.vue") },

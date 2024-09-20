@@ -210,7 +210,8 @@ export default {
     }
     function getTerminalPaymentInfo(obj) {
       var query = {
-        TerminalId: obj['TerminalId']
+        TerminalId: obj['TerminalId'],
+        MerchantId: loginUser.merchantId
         //MerchantId: obj['TerminalId']
       }
       // api.post('/Terminal/GetPaymentType', query, {

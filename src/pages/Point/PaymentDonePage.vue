@@ -22,7 +22,7 @@
 <script>
 import { ref } from "vue";
 import { useQuasar } from 'quasar'
-import { api } from 'boot/axios'
+import { pointApi } from 'boot/axios'
 export default {
   name: 'DigiPointComponent',
   data() {
@@ -64,7 +64,7 @@ export default {
           "Sign": ""
         }
       }
-      api.post('https://mp.1qr.tw/api/Result', query, {
+      pointApi.post('/Result', query, {
         headers: {
           "Content-Type": "application/json;charset=utf-8",
           "isCode": 0,

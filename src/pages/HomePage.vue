@@ -1,5 +1,8 @@
 <template>
   <q-page padding>
+    <div class="row fit row justify-between">
+      <h4>歡迎使用 數位鎏聚合支付管理後台</h4>
+    </div>
     <!-- <div class="row fit row justify-between">
       <div class="col-md-4 col-12">
         <q-card class="my-card q-py-md q-mb-md" bordered>
