@@ -267,7 +267,9 @@ export default {
           "TID": tid,
         }
       }
-      pointApi.post('/Product', query, {
+      const url = 'https://mp.1qr.tw/api/Product'
+      //const url = 'https://localhost:9999/api/Product'
+      pointApi.post(url, query, {
         headers: {
           "Content-Type": "application/json;charset=utf-8",
           "isCode": 0,

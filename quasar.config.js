@@ -66,11 +66,11 @@ module.exports = configure(function (/* ctx */) {
       env: {
         //API_BASE: 'https://localhost:7084',
 
-        API_BASE: 'https://mp.1qr.tw/ap-management',
-        //API_BASE: 'https://mp.digiflowtech.com/ap-management',
+        API_BASE_DEV: 'https://mp.1qr.tw/ap-management',
+        API_BASE_PROD: 'https://mp.digiflowtech.com/ap-management',
 
-        POINT_API_BASE: 'https://mp.1qr.tw/api',
-        //POINT_API_BASE: 'https://mp.digiflowtech.com/api'
+        POINT_API_BASE_DEV: 'https://mp.1qr.tw/api',
+        POINT_API_BASE_PROD: 'https://mp.digiflowtech.com/api'
       },
       // rawDefine: {}
       // ignorePublicFolder: true,

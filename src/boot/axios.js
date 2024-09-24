@@ -3,8 +3,17 @@ import axios from "axios";
 
 // 後端路徑
 // 從quasar.config.js設定
-const api = axios.create({ baseURL: process.env.API_BASE });
-const pointApi = axios.create({ baseURL: process.env.POINT_API_BASE });
+
+let api;
+let pointApi;
+if (process.env.DEV) {
+  api = axios.create({ baseURL: process.env.API_BASE_DEV });
+  pointApi = axios.create({ baseURL: process.env.POINT_API_BASE_DEV });
+}
+else {
+  api = axios.create({ baseURL: process.env.API_BASE_PROD });
+  pointApi = axios.create({ baseURL: process.env.POINT_API_BASE_PROD });
+}
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
 
