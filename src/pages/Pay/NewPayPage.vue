@@ -71,8 +71,8 @@
       <q-tab-panel name="inv_Triple" class="PayPanel">
         <div class="InputBOX invTypeBox inv_Paper" style="max-width: 50%">
           <q-input v-model="VehicleCode_Citizen" outlined placeholder='請輸入統一編號' />
-          <q-input v-model="VehicleCode_Citizen" outlined placeholder='請輸入公司名稱' />
-          <q-input v-model="VehicleCode_Citizen" outlined placeholder='發票寄送地址' />
+          <q-input v-model="VehicleCode_Citizen2" outlined placeholder='請輸入公司名稱' />
+          <q-input v-model="VehicleCode_Citizen3" outlined placeholder='發票寄送地址' />
         </div>
         <div class="Remarks">
           <p>發票於到貨後猶豫期+5個工作天以平信寄出。</p>
@@ -441,6 +441,9 @@ export default {
     const CVC = ref('964');
     const agreeSubscribe = ref(false);
     const cardNumber = ref('4029874599701007');
+    const VehicleCode_Citizen = ref('')
+    const VehicleCode_Citizen2 = ref('')
+    const VehicleCode_Citizen3 = ref('')
     const issuer = ref('');
     const issuerIcon = ref('');
     const issuerState = ref(false);

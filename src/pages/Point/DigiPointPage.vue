@@ -53,7 +53,7 @@
           <q-tab-panel name="inv_Triple_Online" class="PayPanel">
             <div class="InputBOX invTypeBox inv_Paper">
               <q-input v-model="VehicleCode_Citizen" outlined placeholder='請輸入統一編號' style="padding:10px" />
-              <q-input v-model="VehicleCode_Citizen" outlined placeholder='請輸入公司名稱' style="padding:10px" />
+              <q-input v-model="VehicleCode_Citizen2" outlined placeholder='請輸入公司名稱' style="padding:10px" />
             </div>
             <div class="Remarks">
               <p class="text_Red">*開立發票後，下載並列印電子發票證明聯(報帳用)，節省發票郵寄時間。</p>
@@ -131,6 +131,8 @@ export default {
         { label: '發票捐贈', value: 'inv_Donate' }
       ],
       PersonalInvoiceType: ref(''),
+      VehicleCode_Citizen: ref(''),
+      VehicleCode_Citizen2: ref(''),
       identifyCode: "", //密碼登入圖形驗證碼
       identifyCodes: "23456789abcdefghjkmnpqrstuvwxyz", //生成圖形驗證碼依據
       verify: ""

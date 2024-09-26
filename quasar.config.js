@@ -64,8 +64,9 @@ module.exports = configure(function (/* ctx */) {
       publicPath: "/m/",
       // analyze: true,
       env: {
-        //API_BASE: 'https://localhost:7084',
 
+
+        //API_BASE_DEV: 'https://localhost:7084',
         API_BASE_DEV: 'https://mp.1qr.tw/ap-management',
         API_BASE_PROD: 'https://mp.digiflowtech.com/ap-management',
 

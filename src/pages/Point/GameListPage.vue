@@ -124,7 +124,7 @@ export default {
           //console.log(response.data)
           if (response.data.param.ReturnCode == "000000") {
             merchantItem.value = response.data.param.content.Item
-            console.log(merchantItem.value[0])
+            //console.log(merchantItem.value[0])
             merchantItem.value.forEach(merchant => {
               if (merchant.Rating == 1) {
                 merchant.gameRating = "G"

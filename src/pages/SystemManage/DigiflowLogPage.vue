@@ -5,11 +5,11 @@
         <div class="BlockContent">
           <h5 class="mainTitle">系統API紀錄查詢</h5>
           <div class="filterBlock q-gutter-md">
-            <q-input v-model="RequestDate" mask="date" class="DateInput" label="日期" color="warning" outlined rounded>
+            <q-input v-model="requestDate" mask="date" class="DateInput" label="日期" color="warning" outlined rounded>
               <template v-slot:append>
                 <q-icon name="event" class="cursor-pointer">
                   <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                    <q-date v-model="RequestDate">
+                    <q-date v-model="requestDate">
                       <div class="row items-center justify-end">
                         <q-btn v-close-popup label="Close" color="warning" flat />
                       </div>
@@ -18,9 +18,9 @@
                 </q-icon>
               </template>
             </q-input>
-            <q-select color="warning" size="lg" v-model="ApiNameValue" :options="ApiNameList" label="API名稱" rounded
+            <q-select color="warning" size="lg" v-model="apiNameValue" :options="apiNameList" label="API名稱" rounded
               outlined />
-            <q-select color="warning" size="lg" v-model="BusinessResultValue" :options="BusinessResultList" label="執行結果"
+            <q-select color="warning" size="lg" v-model="businessResultValue" :options="businessResultList" label="執行結果"
               rounded outlined />
             <q-btn class="btn" color="grey-4" label="清除條件" rounded unelevated @click="clearFilter" size="1rem" />
             <q-btn class="btn" color="warning" label="搜尋" rounded @click="loadOrders" size="1rem" />
@@ -52,12 +52,10 @@
                   <div class="text-h6">API詳細資料</div>
                 </q-card-section>
                 <q-card-section class="q-pt-none">
-                  <!-- <div v-html="generateTable(selected_row)"></div> -->
-                  <!-- {{ generateTable(selected_row) }} -->
                   <!-- 這邊顯示詳細資料 -->
                   <q-list separator>
                     <q-item v-for="(item, key) in selected_row" :key="item.value">
-                      <q-item-section><q-item-label>{{ ApiLogColumn[key] }}</q-item-label></q-item-section>
+                      <q-item-section><q-item-label>{{ apiLogColumn[key] }}</q-item-label></q-item-section>
                       <q-item-section side><q-item-label> {{ item }}</q-item-label></q-item-section>
                     </q-item>
                   </q-list>
@@ -82,13 +80,13 @@ import { toThousands, getMerchantName } from 'src/utils/index.js'
 import { useUserStore, useMerchantStore } from "../../stores";
 import { api } from 'boot/axios'
 import { exportFile, useQuasar } from 'quasar'
-const ApiNameList = [
+const apiNameList = [
   { label: '虛擬帳號取號', value: 'DigiflowVA' },
   { label: '商戶資訊查詢', value: 'DigiflowQuery' },
   { label: '發票開立', value: 'InvoiceCreate' },
   { label: '發票折讓', value: 'InvoiceAllowance' }
 ]
-const BusinessResultList = [
+const businessResultList = [
   { label: '成功', value: 'Y' },
   { label: '失敗', value: 'N' },
   { label: '全選', value: '' }
@@ -103,7 +101,7 @@ const columns = [
   { name: "ErrorCode", label: "錯誤代碼", field: "ErrorCode", align: 'left', sortable: true },
   { name: "ErrorMessage", label: "錯誤訊息", field: "ErrorMessage", align: 'left', sortable: false }
 ];
-const ApiLogColumn = {
+const apiLogColumn = {
   RowId: '紀錄序號',
   RequestDate: '請求日期',
   ApServer: '伺服器ID',
@@ -128,10 +126,10 @@ const ApiLogColumn = {
   Key3: '相關主鍵3',
   BusinessResult: '業務執行結果'
 }
-const MerchantValue = ref(null);
-const ApiNameValue = ref(null);
-const BusinessResultValue = ref(null);
-const RequestDate = ref('');
+const merchantValue = ref(null);
+const apiNameValue = ref(null);
+const businessResultValue = ref(null);
+const requestDate = ref('');
 const pagination = ref({
   sortBy: 'desc',
   descending: true,
@@ -139,7 +137,7 @@ const pagination = ref({
   rowsPerPage: 10,
   rowsNumber: 10
 })
-const MerchantList = ref([])
+const merchantList = ref([])
 const actualMerchant = ref([])
 export default {
   name: "ApiLogPage",
@@ -153,16 +151,16 @@ export default {
     const isLoading = ref(false);
     const merchantStore = useMerchantStore()
     merchantStore.getMerchantMap().then(res => {
-      MerchantList.value = res
-      actualMerchant.value = MerchantList
+      merchantList.value = res
+      actualMerchant.value = merchantList
     }).catch(function (err) {
       console.log(err)
     })
     function clearFilter() {
-      MerchantValue.value = null;
-      ApiNameValue.value = null;
-      BusinessResultValue.value = '';
-      RequestDate.value = '';
+      merchantValue.value = null;
+      apiNameValue.value = null;
+      businessResultValue.value = '';
+      requestDate.value = '';
     }
     function loadOrders(props) {
 
@@ -173,19 +171,19 @@ export default {
         //MerchantId: 142864983000001
         AuthToken: loginUser.token
       }
-      if (MerchantValue.value) {
-        query.MerchantId = MerchantValue.value.value;
+      if (merchantValue.value) {
+        query.MerchantId = merchantValue.value.value;
       }
-      if (ApiNameValue.value) {
-        query.ApiName = ApiNameValue.value.value;
+      if (apiNameValue.value) {
+        query.ApiName = apiNameValue.value.value;
       }
-      if (BusinessResultValue.value) {
-        if (BusinessResultValue.value != "") {
-          query.BusinessResult = BusinessResultValue.value.value;
+      if (businessResultValue.value) {
+        if (businessResultValue.value != "") {
+          query.BusinessResult = businessResultValue.value.value;
         }
       }
-      if (RequestDate.value != "") {
-        query.RequestDate = RequestDate.value.replaceAll('/', '');
+      if (requestDate.value != "") {
+        query.RequestDate = requestDate.value.replaceAll('/', '');
       }
       if (sortBy) {
         query.SortField = sortBy;
@@ -244,17 +242,6 @@ export default {
       this.selected_row = row;
       this.showDetail = true;
     }
-    function generateTable(obj) {
-      // 不安全，待改
-      var htmlcode = "<table><tr>";
-      Object.keys(obj).forEach(function (k) {
-        //console.log(k + ' - ' + obj[k]);
-        htmlcode = htmlcode + "<th>" + k + "</th><th>" + obj[k] + "</th>";
-        htmlcode = htmlcode + "</tr><tr>";
-      });
-      htmlcode = htmlcode + "</tr></table>"
-      return htmlcode;
-    }
     loadOrders({
       sortBy: 'desc',
       descending: true,
@@ -266,19 +253,18 @@ export default {
     return {
       loadOrders,
       checkDetail,
-      //generateTable,
       clearFilter,
       showDetail: ref(false),
-      ApiLogColumn,
-      MerchantValue,
-      ApiNameValue,
-      BusinessResultValue,
-      ApiNameList,
-      BusinessResultList,
+      apiLogColumn,
+      merchantValue,
+      apiNameValue,
+      businessResultValue,
+      apiNameList,
+      businessResultList,
       model: ref(null),
       dateGroup: ref(null),
-      RequestDate,
-      MerchantList,
+      requestDate,
+      merchantList,
       columns,
       rows,
       isLoading,

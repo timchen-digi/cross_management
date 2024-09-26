@@ -61,11 +61,11 @@
                 </div>
               </div>
             </q-btn-dropdown>
-            <q-select class="col" color="warning" v-model="MerchantValue" use-input :options="actualMerchant"
+            <q-select class="col" color="warning" v-model="merchantValue" use-input :options="actualMerchant"
               v-show="showMerchantSelect" @filter="filterFn" label="商戶" rounded outlined />
-            <q-select class="col" color="warning" v-model="OrderTypeValue" :options="orderType" label="類型" rounded
+            <q-select class="col" color="warning" v-model="orderTypeValue" :options="orderType" label="類型" rounded
               outlined />
-            <q-select class="col" color="warning" v-model="OrderStateValue" :options="orderStatus" label="狀態" rounded
+            <q-select class="col" color="warning" v-model="orderStateValue" :options="orderStatus" label="狀態" rounded
               outlined />
             <q-btn class="btn" color="grey-4" label="清除條件" rounded unelevated @click="clearFilter" size="1rem" />
             <q-btn class="btn" color="warning" label="搜尋" rounded @click="loadOrders" size="1rem" />
@@ -103,7 +103,7 @@
                 <q-card-section class="q-pt-none">
                   <q-list separator>
                     <q-item v-for="(item, key) in rowHandler(selected_row)" :key="item.value">
-                      <q-item-section><q-item-label>{{ OrderColumn[key] }}</q-item-label></q-item-section>
+                      <q-item-section><q-item-label>{{ orderColumn[key] }}</q-item-label></q-item-section>
                       <q-item-section side><q-item-label> {{ item }}</q-item-label></q-item-section>
                     </q-item>
                   </q-list>
@@ -170,7 +170,7 @@ const columns = [
     format: (val) => (val.replace('T', ' ')), sortable: true
   },
 ];
-const OrderColumn = {
+const orderColumn = {
   Id: '交易ID',
   TxId: '原始交易ID',
   MerchantId: '特店編號',
@@ -223,9 +223,9 @@ const OrderColumn = {
   CreateTime: '建立時間',
 }
 
-const OrderStateValue = ref(null);
-const OrderTypeValue = ref(null);
-const MerchantValue = ref(null);
+const orderStateValue = ref(null);
+const orderTypeValue = ref(null);
+const merchantValue = ref(null);
 const dateStart = ref('');
 const dateEnd = ref('');
 const customId = ref('');
@@ -236,7 +236,7 @@ const pagination = ref({
   rowsPerPage: 10,
   rowsNumber: 10
 })
-const MerchantList = ref([])
+const merchantList = ref([])
 const actualMerchant = ref([])
 export default {
   name: "HistoryPage",
@@ -251,16 +251,16 @@ export default {
     const isLoading = ref(false);
     const merchantStore = useMerchantStore();
     merchantStore.getMerchantMap().then(res => {
-      MerchantList.value = res
-      actualMerchant.value = MerchantList
+      merchantList.value = res
+      actualMerchant.value = merchantList
       console.log(actualMerchant.value)
     }).catch(function (err) {
       console.log(err)
     })
     function clearFilter() {
-      OrderStateValue.value = null;
-      OrderTypeValue.value = null;
-      MerchantValue.value = null;
+      orderStateValue.value = null;
+      orderTypeValue.value = null;
+      merchantValue.value = null;
       dateStart.value = '';
       dateEnd.value = '';
       customId.value = '';
@@ -274,17 +274,17 @@ export default {
         // 測試區不做驗證
         AuthToken: loginUser.token
       }
-      if (OrderStateValue.value) {
-        query.Status = orderStatus.indexOf(OrderStateValue.value) - 3;
+      if (orderStateValue.value) {
+        query.Status = orderStatus.indexOf(orderStateValue.value) - 3;
       }
-      if (OrderTypeValue.value) {
-        query.Type = orderType.indexOf(OrderTypeValue.value);
+      if (orderTypeValue.value) {
+        query.Type = orderType.indexOf(orderTypeValue.value);
       }
       if (customId.value != "") {
         query.CustomId = customId.value;
       }
-      if (MerchantValue.value) {
-        query.MerchantId = MerchantValue.value.value;
+      if (merchantValue.value) {
+        query.MerchantId = merchantValue.value.value;
       }
       if (loginUser.merchantId != "") {
         query.MerchantId = loginUser.merchantId;
@@ -477,16 +477,16 @@ export default {
     function filterFn(val, update) {
       if (val === '') {
         update(() => {
-          actualMerchant.value = MerchantList.value
+          actualMerchant.value = merchantList.value
         })
         return
       }
       update(() => {
         const needle = val.toLowerCase()
-        console.log(MerchantList.value);
+        console.log(merchantList.value);
         //actualMerchant.value = MerchantList.value.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
         // 用商戶名或商戶編號過濾
-        actualMerchant.value = MerchantList.value.filter(v => { return (v.label.toLowerCase().indexOf(needle) > -1 || v.value.indexOf(needle) > -1) })
+        actualMerchant.value = merchantList.value.filter(v => { return (v.label.toLowerCase().indexOf(needle) > -1 || v.value.indexOf(needle) > -1) })
       })
     }
     //console.log(loginUser);
@@ -511,19 +511,18 @@ export default {
       clearFilter,
       filterFn,
       rowHandler,
-      OrderColumn,
+      orderColumn,
       showDetail: ref(false),
       customId,
       model: ref(null),
-      OrderStateValue,
-      OrderTypeValue,
+      orderStateValue,
+      orderTypeValue,
       dateGroup: ref(null),
       dateStart,
       dateEnd,
       orderType,
       orderStatus,
-      MerchantValue,
-      //MerchantList,
+      merchantValue,
       actualMerchant,
       showMerchantSelect,
       dateOptions: [

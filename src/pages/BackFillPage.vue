@@ -81,7 +81,7 @@ const columns = [
     format: (v) => (orderStatus[v + 3]), sortable: true
   }
 ];
-const OrderColumn = {
+const orderColumn = {
   Id: '交易ID',
   TxId: '原始交易ID',
   MerchantId: '特店編號',
@@ -97,9 +97,9 @@ const OrderColumn = {
 }
 
 
-const OrderStateValue = ref(null);
-const OrderTypeValue = ref(null);
-const MerchantValue = ref(null);
+const orderStateValue = ref(null);
+const orderTypeValue = ref(null);
+const merchantValue = ref(null);
 const customId = ref('');
 const pagination = ref({
   sortBy: 'desc',
@@ -108,7 +108,7 @@ const pagination = ref({
   rowsPerPage: 10,
   rowsNumber: 10
 })
-const MerchantList = ref([])
+const merchantList = ref([])
 const actualMerchant = ref([])
 export default {
   name: "HistoryPage",
@@ -123,8 +123,8 @@ export default {
     const loginUser = useUserStore();
     const merchantStore = useMerchantStore()
     merchantStore.getMerchantMap().then(res => {
-      MerchantList.value = res
-      actualMerchant.value = MerchantList
+      merchantList.value = res
+      actualMerchant.value = merchantList
     }).catch(function (err) {
       console.log(err)
     })
@@ -164,8 +164,8 @@ export default {
         AuthToken: loginUser.token,
         CustomId: CustomId
       }
-      if (MerchantValue.value) {
-        query.MerchantId = MerchantValue.value.value;
+      if (merchantValue.value) {
+        query.MerchantId = merchantValue.value.value;
       }
       if (loginUser.merchantId != "") {
         query.MerchantId = loginUser.merchantId;
@@ -254,14 +254,14 @@ export default {
       uploadFn,
       check_if_document_upload,
       selected_file,
-      OrderColumn,
+      orderColumn,
       showUpload: ref(false),
       customId,
-      OrderStateValue,
-      OrderTypeValue,
+      orderStateValue,
+      orderTypeValue,
       orderType,
       orderStatus,
-      MerchantValue,
+      merchantValue,
       //MerchantList,
       actualMerchant,
       columns,

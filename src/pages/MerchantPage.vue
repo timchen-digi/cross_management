@@ -10,7 +10,7 @@
           </div>
 
           <div class="filterBlock q-gutter-md">
-            <q-select color="warning" size="lg" v-model="StatusValue" :options="StatusList" label="商戶狀態" rounded
+            <q-select color="warning" size="lg" v-model="statusValue" :options="statusList" label="商戶狀態" rounded
               outlined />
             <q-btn class="q-py-md" color="grey-4" label="清除條件" rounded unelevated @click="clearFilter" size="1rem" />
             <q-btn class="q-py-md" color="warning" label="搜尋" rounded @click="loadOrders" size="1rem" />
@@ -45,7 +45,7 @@
                 <q-card-section class="q-pt-none">
                   <q-list separator>
                     <q-item v-for="(item, key) in rowHandler(selected_row)" :key="item.value">
-                      <q-item-section><q-item-label>{{ MerchantColumn[key] }}</q-item-label></q-item-section>
+                      <q-item-section><q-item-label>{{ merchantColumn[key] }}</q-item-label></q-item-section>
                       <q-item-section side><q-item-label> {{ item }}</q-item-label></q-item-section>
                     </q-item>
                   </q-list>
@@ -55,8 +55,8 @@
                 </q-card-section>
                 <q-card-section class="q-pt-none">
                   <q-list separator>
-                    <q-item v-for="(item, key) in MerchantAccount" :key="item.value">
-                      <q-item-section><q-item-label>{{ MerchantColumn[key] }}</q-item-label></q-item-section>
+                    <q-item v-for="(item, key) in merchantAccount" :key="item.value">
+                      <q-item-section><q-item-label>{{ merchantColumn[key] }}</q-item-label></q-item-section>
                       <q-item-section side><q-item-label> {{ item }}</q-item-label></q-item-section>
                     </q-item>
                   </q-list>
@@ -82,7 +82,7 @@
         </q-card-section>
         <q-card-section class="q-pt">
           <q-input v-for="(item, key) in newMerchant" :key="key" v-model="newMerchant[key]"
-            :label="MerchantColumn[key]"></q-input>
+            :label="merchantColumn[key]"></q-input>
         </q-card-section>
         <q-card-actions align="right" class="text-primary">
           <q-btn flat label="取消" v-close-popup></q-btn>
@@ -101,7 +101,7 @@ import dataTable from 'src/components/DataTable.vue';
 import { useUserStore } from "../stores";
 import { api } from 'boot/axios'
 import { exportFile, useQuasar } from 'quasar'
-const StatusList = [
+const statusList = [
   { label: '銷戶', value: '-4' },
   { label: '退件', value: '-3' },
   { label: '停權', value: '-2' },
@@ -115,9 +115,9 @@ const columns = [
   { name: "UBN", label: "統編", field: "UBN", align: 'left', sortable: true },
   { name: "RegistName", label: "註冊名稱", field: "RegistName", align: 'left', sortable: true },
   { name: "BusinessName", label: "營業名稱", field: "BusinessName", align: 'left', sortable: true },
-  { name: "Status", label: "狀態", field: "Status", align: 'left', sortable: true, format: (v) => (StatusList[v + 4].label) }
+  { name: "Status", label: "狀態", field: "Status", align: 'left', sortable: true, format: (v) => (statusList[v + 4].label) }
 ];
-const StatusValue = ref(null);
+const statusValue = ref(null);
 const pagination = ref({
   sortBy: 'desc',
   descending: true,
@@ -125,7 +125,7 @@ const pagination = ref({
   rowsPerPage: 10,
   rowsNumber: 10
 })
-const MerchantColumn = {
+const merchantColumn = {
   MerchantId: '商戶ID',
   UBN: '統編/身分證號',
   Type: '註冊類型',
@@ -155,7 +155,7 @@ const MerchantColumn = {
   monthlyLimit: '月交易限額',
   refundQuota: '退款額度'
 }
-const MerchantAccount = ref({
+const merchantAccount = ref({
   AnnualFee: 0,
   dailyLimit: -1,
   monthlyLimit: -1,
@@ -234,11 +234,11 @@ export default {
         })
     }
     function getAccountInfo(obj) {
-      MerchantAccount.value.AnnualFee = 0
-      MerchantAccount.value.dailyLimit = -1
-      MerchantAccount.value.monthlyLimit = -1
-      MerchantAccount.value.tranLimit = -1
-      MerchantAccount.value.refundQuota = -1
+      merchantAccount.value.AnnualFee = 0
+      merchantAccount.value.dailyLimit = -1
+      merchantAccount.value.monthlyLimit = -1
+      merchantAccount.value.tranLimit = -1
+      merchantAccount.value.refundQuota = -1
       var query = {
         MerchantId: obj['MerchantId']
       }
@@ -248,12 +248,12 @@ export default {
         .then((response) => {
           var record = response.data
           if (record != undefined) {
-            MerchantAccount.value.dailyLimit = record.dailyLimit
-            MerchantAccount.value.monthlyLimit = record.monthlyLimit
-            MerchantAccount.value.tranLimit = record.tranLimit
-            MerchantAccount.value.refundQuota = record.refundQuota
+            merchantAccount.value.dailyLimit = record.dailyLimit
+            merchantAccount.value.monthlyLimit = record.monthlyLimit
+            merchantAccount.value.tranLimit = record.tranLimit
+            merchantAccount.value.refundQuota = record.refundQuota
           }
-          console.log(MerchantAccount.value)
+          console.log(merchantAccount.value)
         })
         .catch(function (error) {
           console.log(error);
@@ -321,7 +321,7 @@ export default {
       if (returnRow.Mcc == '5816') {
         returnRow.Mcc = '5816-線上遊戲'
       }
-      returnRow.Status = StatusList[returnRow.Status + 4].label
+      returnRow.Status = statusList[returnRow.Status + 4].label
       if (returnRow.Type == 3) {
         returnRow.Type = '境外'
       } else if (rows.Type == 2) {
@@ -362,8 +362,8 @@ export default {
         PageSize: rowsPerPage,
         AuthToken: loginUser.token
       }
-      if (StatusValue.value) {
-        query.Status = StatusValue.value.value;
+      if (statusValue.value) {
+        query.Status = statusValue.value.value;
       }
       if (sortBy) {
         query.SortField = sortBy;
@@ -438,13 +438,13 @@ export default {
       registMerchant,
       rowHandler,
       getApplyPaymentService,
-      MerchantColumn,
-      MerchantAccount,
+      merchantColumn,
+      merchantAccount,
       showDetail: ref(false),
       merchantWindow: ref(false),
       newMerchant,
-      StatusValue,
-      StatusList,
+      statusValue,
+      statusList,
       model: ref(null),
       dateGroup: ref(null),
       columns,

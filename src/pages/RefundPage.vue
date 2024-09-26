@@ -63,11 +63,11 @@
                 </div>
               </div>
             </q-btn-dropdown>
-            <q-select class="col" color="warning" size="lg" v-model="MerchantValue" use-input :options="actualMerchant"
+            <q-select class="col" color="warning" size="lg" v-model="merchantValue" use-input :options="actualMerchant"
               v-show="showMerchantSelect" @filter="filterFn" label="商戶" rounded outlined />
-            <q-select class="col" color="warning" size="lg" v-model="OrderTypeValue" :options="orderType" label="類型"
+            <q-select class="col" color="warning" size="lg" v-model="orderTypeValue" :options="orderType" label="類型"
               rounded outlined />
-            <q-select class="col" color="warning" size="lg" v-model="OrderStateValue" :options="orderStatus" label="狀態"
+            <q-select class="col" color="warning" size="lg" v-model="orderStateValue" :options="orderStatus" label="狀態"
               rounded outlined />
             <q-btn class="btn" color="grey-4" label="清除條件" rounded unelevated @click="clearFilter" size="1rem" />
             <q-btn class="btn" color="warning" label="搜尋" rounded @click="loadOrders" size="1rem" />
@@ -104,13 +104,13 @@
                 <q-card-section class="q-pt-none">
                   <q-list separator>
                     <q-item v-for="(item, key) in rowHandler(selected_row)" :key="item.value">
-                      <q-item-section><q-item-label>{{ OrderColumn[key] }}</q-item-label></q-item-section>
+                      <q-item-section><q-item-label>{{ orderColumn[key] }}</q-item-label></q-item-section>
                       <q-item-section side><q-item-label> {{ item }}</q-item-label></q-item-section>
                     </q-item>
                   </q-list>
                 </q-card-section>
                 <q-card-actions align="right">
-                  <q-btn flat label="更新銀行退款狀態" color="primary" @click="CheckRefund(selected_row)" />
+                  <q-btn flat label="更新銀行退款狀態" color="primary" @click="checkRefund(selected_row)" />
                   <q-btn flat label="關閉" color="primary" @click="showDetail = false" v-close-popup />
                 </q-card-actions>
               </q-card>
@@ -121,11 +121,11 @@
                   <div class="text-h6">請輸入匯款交易序號</div>
                 </q-card-section>
                 <q-card-section class="q-pt-none">
-                  <q-input dense v-model="RemitTrxId" autofocus />
+                  <q-input dense v-model="remitTrxId" autofocus />
                 </q-card-section>
                 <q-card-actions align="right" class="text-primary">
-                  <q-btn flat label="取消" v-close-popup @click="CancelRefund()" />
-                  <q-btn flat label="送出" v-close-popup @click="DoRefund(selected_row)" />
+                  <q-btn flat label="取消" v-close-popup @click="cancelRefund()" />
+                  <q-btn flat label="送出" v-close-popup @click="doRefund(selected_row)" />
                 </q-card-actions>
               </q-card>
             </q-dialog>
@@ -141,12 +141,11 @@
 
 import { ref } from 'vue'
 import { toThousands, getMerchantName } from 'src/utils/index.js'
-import dataTable from 'src/components/DataTable.vue';
 import { useUserStore, useMerchantStore } from "../stores";
 import { api } from 'boot/axios'
 import { exportFile, useQuasar } from 'quasar'
 const remitPrompt = ref(false)
-const RemitTrxId = ref("")
+const remitTrxId = ref("")
 const orderType = [
   "", "信用卡分期", "信用卡一般", "銀聯卡", "ApplePay", "GooglePay", "SamsungPay", "虛擬帳號", "EACH", "超商繳費", "電信代收", "點數代收"
 ]
@@ -156,7 +155,7 @@ const orderStatus = [
 const columns = [
   {
     name: "MerchantId", label: "商戶", field: "MerchantId", align: 'left', sortable: true,
-    format: (v) => (getMerchantName(v, MerchantList.value))
+    format: (v) => (getMerchantName(v, merchantList.value))
   },
   { name: "TerminalId", label: "終端", field: "TerminalId", align: 'left', sortable: true },
   {
@@ -187,7 +186,7 @@ const columns = [
     align: 'right', sortable: true
   },
 ];
-const OrderColumn = {
+const orderColumn = {
   Id: '交易ID',
   TxId: '原始交易ID',
   MerchantId: '特店編號',
@@ -248,9 +247,9 @@ const OrderColumn = {
   UpdateTime: '更新時間',
   CreateTime: '建立時間',
 }
-const OrderStateValue = ref(null);
-const OrderTypeValue = ref(null);
-const MerchantValue = ref(null);
+const orderStateValue = ref(null);
+const orderTypeValue = ref(null);
+const merchantValue = ref(null);
 const dateStart = ref('');
 const dateEnd = ref('');
 const customId = ref('');
@@ -261,7 +260,7 @@ const pagination = ref({
   rowsPerPage: 10,
   rowsNumber: 10
 })
-const MerchantList = ref([])
+const merchantList = ref([])
 const actualMerchant = ref([])
 export default {
   name: "HistoryPage",
@@ -276,15 +275,15 @@ export default {
     const showMerchantSelect = (loginUser.merchantId == "");
     const merchantStore = useMerchantStore()
     merchantStore.getMerchantMap().then(res => {
-      MerchantList.value = res
-      actualMerchant.value = MerchantList
+      merchantList.value = res
+      actualMerchant.value = merchantList
     }).catch(function (err) {
       console.log(err)
     })
     function clearFilter() {
-      OrderStateValue.value = null;
-      OrderTypeValue.value = null;
-      MerchantValue.value = null;
+      orderStateValue.value = null;
+      orderTypeValue.value = null;
+      merchantValue.value = null;
       dateStart.value = '';
       dateEnd.value = '';
       customId.value = '';
@@ -299,18 +298,18 @@ export default {
         // 測試區不做驗證
         AuthToken: loginUser.token
       }
-      if (OrderStateValue.value) {
+      if (orderStateValue.value) {
         //query.Status = orderStatus.indexOf(OrderStateValue.value) - 3;
-        query.Status = orderStatus.indexOf(OrderStateValue.value);
+        query.Status = orderStatus.indexOf(orderStateValue.value);
       }
-      if (OrderTypeValue.value) {
-        query.Type = orderType.indexOf(OrderTypeValue.value);
+      if (orderTypeValue.value) {
+        query.Type = orderType.indexOf(orderTypeValue.value);
       }
       if (customId.value != "") {
         query.CustomId = customId.value;
       }
-      if (MerchantValue.value) {
-        query.MerchantId = MerchantValue.value.value;
+      if (merchantValue.value) {
+        query.MerchantId = merchantValue.value.value;
       }
       if (dateStart.value) {
         query.sCreateTime = dateStart.value.replaceAll('/', '-');
@@ -458,7 +457,7 @@ export default {
         })
       }
     }
-    function CheckRefund(order) {
+    function checkRefund(order) {
       if (order["Status"] != 0) {
         $q.notify({
           color: 'warning',
@@ -470,7 +469,7 @@ export default {
       }
       remitPrompt.value = true;
     }
-    function DoRefund(order) {
+    function doRefund(order) {
       //console.log(order);
       // console.log(RemitTrxId);
       // console.log(this.RemitTrxId);
@@ -515,13 +514,13 @@ export default {
           });
         })
     }
-    function CancelRefund() {
+    function cancelRefund() {
       this.RemitTrxId.value = "";
     }
     function filterFn(val, update) {
       if (val === '') {
         update(() => {
-          actualMerchant.value = MerchantList.value
+          actualMerchant.value = merchantList.value
         })
         return
       }
@@ -529,7 +528,7 @@ export default {
         const needle = val.toLowerCase()
         //actualMerchant.value = MerchantList.value.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
         // 用商戶名或商戶編號過濾
-        actualMerchant.value = MerchantList.value.filter(v => { return (v.label.toLowerCase().indexOf(needle) > -1 || v.value.indexOf(needle) > -1) })
+        actualMerchant.value = merchantList.value.filter(v => { return (v.label.toLowerCase().indexOf(needle) > -1 || v.value.indexOf(needle) > -1) })
         console.log(actualMerchant.value)
       })
     }
@@ -548,27 +547,27 @@ export default {
       checkDetail,
       rowHandler,
       clearFilter,
-      CheckRefund,
-      DoRefund,
-      CancelRefund,
-      OrderColumn,
+      checkRefund,
+      doRefund,
+      cancelRefund,
+      orderColumn,
       showDetail: ref(false),
       customId,
       model: ref(null),
-      OrderStateValue,
-      OrderTypeValue,
+      orderStateValue,
+      orderTypeValue,
       dateGroup: ref(null),
       dateStart,
       dateEnd,
       orderType,
       orderStatus,
       filterFn,
-      MerchantValue,
-      MerchantList,
+      merchantValue,
+      merchantList,
       actualMerchant,
       showMerchantSelect,
       remitPrompt,
-      RemitTrxId,
+      remitTrxId,
       dateOptions: [
         { label: '本月', value: 'month', color: 'warning' },
         { label: '上個月', value: 'lastMonth', color: 'warning' },

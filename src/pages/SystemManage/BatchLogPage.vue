@@ -5,26 +5,6 @@
         <div class="BlockContent">
           <h5 class="mainTitle">批次作業日誌查詢</h5>
           <div class="filterBlock q-gutter-md">
-            <!-- <q-input v-model="RequestDate" mask="date" class="DateInput" label="日期" color="warning" outlined rounded>
-              <template v-slot:append>
-                <q-icon name="event" class="cursor-pointer">
-                  <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                    <q-date v-model="RequestDate">
-                      <div class="row items-center justify-end">
-                        <q-btn v-close-popup label="Close" color="warning" flat />
-                      </div>
-                    </q-date>
-                  </q-popup-proxy>
-                </q-icon>
-              </template>
-</q-input> -->
-            <!-- <q-select color="warning" size="lg" v-model="ApiNameValue" :options="ApiNameList" label="API名稱" rounded
-              outlined /> -->
-            <!-- <q-select color="warning" size="lg" v-model="BusinessResultValue" :options="BusinessResultList" label="執行結果"
-              rounded outlined /> -->
-            <!-- <q-btn class="btn" color="grey-4" label="清除條件" rounded unelevated @click="clearFilter" size="1rem" />
-            <q-btn class="btn" color="warning" label="搜尋" rounded @click="loadOrders" size="1rem" /> -->
-
           </div>
           <div class="OrderTableBlock q-my-lg">
             <q-table class="OrderTable" :rows="rows" :columns="columns" :row-key="rows.name"
@@ -53,12 +33,10 @@
                   <div class="text-h6">批次作業詳細資料</div>
                 </q-card-section>
                 <q-card-section class="q-pt-none">
-                  <!-- <div v-html="generateTable(selected_row)"></div> -->
-                  <!-- {{ generateTable(selected_row) }} -->
                   <!-- 這邊顯示詳細資料 -->
                   <q-list separator>
                     <q-item v-for="(item, key) in selected_row" :key="item.value">
-                      <q-item-section><q-item-label>{{ ApiLogColumn[key] }}</q-item-label></q-item-section>
+                      <q-item-section><q-item-label>{{ apiLogColumn[key] }}</q-item-label></q-item-section>
                       <q-item-section side><q-item-label> {{ item }}</q-item-label></q-item-section>
                     </q-item>
                   </q-list>
@@ -83,7 +61,7 @@ import { toThousands, GetBatchName } from 'src/utils/index.js'
 import { useUserStore, useMerchantStore } from "../../stores";
 import { api } from 'boot/axios'
 import { exportFile, useQuasar } from 'quasar'
-const ApiNameList = [
+const apiNameList = [
   { label: '建立訂單', value: 'Create' },
   { label: '付款通知', value: 'Notify' },
   { label: '訂單查詢', value: 'Query' },
@@ -91,7 +69,7 @@ const ApiNameList = [
   { label: '退款查詢', value: 'QueryRefund' },
   { label: '日終檔下載', value: 'Reconciliation' }
 ]
-const BusinessResultList = [
+const businessResultList = [
   { label: '成功', value: 'Y' },
   { label: '失敗', value: 'N' },
   { label: '全選', value: '' }
@@ -102,7 +80,7 @@ const columns = [
   { name: "StartTime", label: "開始時間", field: "StartTime", align: 'left', sortable: true, format: (v) => (v.replaceAll('T', ' ').replaceAll('-', '/')) },
   { name: "EndTime", label: "結束時間", field: "EndTime", align: 'left', sortable: true, format: (v) => (v.replaceAll('T', ' ').replaceAll('-', '/')) },
 ];
-const ApiLogColumn = {
+const apiLogColumn = {
   RowId: '紀錄序號',
   BatchId: '批次作業編號',
   ApServer: '伺服器ID',
@@ -111,9 +89,8 @@ const ApiLogColumn = {
   StartTime: '開始時間',
   EndTime: '結束時間',
 }
-const ApiNameValue = ref(null);
-const BusinessResultValue = ref(null);
-const RequestDate = ref('');
+const businessResultValue = ref(null);
+const requestDate = ref('');
 const pagination = ref({
   sortBy: 'desc',
   descending: true,
@@ -121,7 +98,7 @@ const pagination = ref({
   rowsPerPage: 10,
   rowsNumber: 10
 })
-const MerchantList = ref([])
+const merchantList = ref([])
 const actualMerchant = ref([])
 export default {
   name: "BatchLogPage",
@@ -135,19 +112,14 @@ export default {
     const isLoading = ref(false);
     const merchantStore = useMerchantStore()
     merchantStore.getMerchantMap().then(res => {
-      MerchantList.value = res
-      actualMerchant.value = MerchantList
+      merchantList.value = res
+      actualMerchant.value = merchantList
     }).catch(function (err) {
       console.log(err)
     })
     function clearFilter() {
-      // MerchantValue.value = null;
-      // ApiNameValue.value = null;
-      // BusinessResultValue.value = '';
-      // RequestDate.value = '';
     }
     function loadOrders(props) {
-
       const { page, rowsPerPage, sortBy, descending } = props.pagination ? props.pagination : pagination.value
       var query = {
         Start: (page - 1) * pagination.value.rowsPerPage,
@@ -155,20 +127,6 @@ export default {
         //MerchantId: 142864983000001
         AuthToken: loginUser.token
       }
-      // if (MerchantValue.value) {
-      //   query.MerchantId = MerchantValue.value.value;
-      // }
-      // if (ApiNameValue.value) {
-      //   query.ApiName = ApiNameValue.value.value;
-      // }
-      // if (BusinessResultValue.value) {
-      //   if (BusinessResultValue.value != "") {
-      //     query.BusinessResult = BusinessResultValue.value.value;
-      //   }
-      // }
-      // if (RequestDate.value != "") {
-      //   query.RequestDate = RequestDate.value.replaceAll('/', '');
-      // }
       if (sortBy) {
         query.SortField = sortBy;
       }
@@ -241,14 +199,14 @@ export default {
       clearFilter,
       //GetBatchName,
       showDetail: ref(false),
-      ApiLogColumn,
-      BusinessResultValue,
-      ApiNameList,
-      BusinessResultList,
+      apiLogColumn,
+      businessResultValue,
+      apiNameList,
+      businessResultList,
       model: ref(null),
       dateGroup: ref(null),
-      RequestDate,
-      MerchantList,
+      requestDate,
+      merchantList,
       columns,
       rows,
       isLoading,

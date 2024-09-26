@@ -204,4 +204,9 @@ export default {
 .my-menu-link
   color: white
   background: #F2C037
+
+@media screen and (max-width: 576px)
+  .mainLOGO
+    display: none
+
 </style>

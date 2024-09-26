@@ -9,9 +9,9 @@
             <q-btn class="btn q-px-xl" color="warning" label="新增使用者" unelevated rounded @click="userWindow = true" />
           </div>
           <div class="filterBlock q-gutter-md">
-            <q-select color="warning" size="lg" v-model="MerchantValue" :options="MerchantList" label="商戶" rounded
+            <q-select color="warning" size="lg" v-model="merchantValue" :options="merchantList" label="商戶" rounded
               outlined />
-            <q-input class="q-mb-sm" v-model="UserId" label="使用者名稱" size="18px" rounded outlined>
+            <q-input class="q-mb-sm" v-model="userId" label="使用者名稱" size="18px" rounded outlined>
               <template v-slot:prepend><q-icon name="search" /></template>
             </q-input>
             <q-btn class="btn" color="grey-4" label="清除條件" rounded unelevated @click="clearFilter" size="1rem" />
@@ -53,12 +53,12 @@
                       <q-item-section side><q-item-label> {{ item }}</q-item-label></q-item-section>
                     </q-item> -->
                     <q-input v-for="(item, key) in selected_row" :key="item.value" v-model="selected_row[key]"
-                      :label="UserColumn[key]" :readonly="readonly"></q-input>
+                      :label="userColumn[key]" :readonly="readonly"></q-input>
                   </q-list>
                 </q-card-section>
                 <q-card-actions align="right">
-                  <q-btn flat :label="updateButton" color="primary" @click="UpdateUser(selected_row)" />
-                  <q-btn flat label="關閉" color="primary" @click="CancelUpdate()" v-close-popup />
+                  <q-btn flat :label="updateButton" color="primary" @click="updateUser(selected_row)" />
+                  <q-btn flat label="關閉" color="primary" @click="cancelUpdate()" v-close-popup />
                 </q-card-actions>
               </q-card>
             </q-dialog>
@@ -74,7 +74,7 @@
         </q-card-section>
         <q-card-section class="q-pt">
           <q-input v-for="( item, key ) in newUser " :key="key" v-model="newUser[key]"
-            :label="UserColumn[key]"></q-input>
+            :label="userColumn[key]"></q-input>
         </q-card-section>
         <q-card-actions align="right" class="text-primary">
           <q-btn flat label="取消" v-close-popup></q-btn>
@@ -100,7 +100,7 @@ const StatustList = [
 const columns = [
   {
     name: "MerchantId", label: "商戶", field: "MerchantId", align: 'left', sortable: true,
-    format: (v) => (getMerchantName(v, MerchantList.value))
+    format: (v) => (getMerchantName(v, merchantList.value))
   },
   // { name: "TerminalId", label: "終端", field: "TerminalId", align: 'left', sortable: true },
   { name: "UserId", label: "使用者ID", field: "UserId", align: 'left', sortable: true },
@@ -112,7 +112,7 @@ const columns = [
     format: (val) => (val.replace('T', ' ')), sortable: true
   }
 ];
-const UserColumn = {
+const userColumn = {
   MerchantId: '商戶',
   UserId: '使用者ID',
   Name: '姓名',
@@ -127,8 +127,8 @@ const UserColumn = {
 }
 const readonly = ref(true);
 const updateButton = ref("更新");
-const MerchantValue = ref(null);
-const UserId = ref(null);
+const merchantValue = ref(null);
+const userId = ref(null);
 const BusinessResultValue = ref(null);
 //const RequestDate = ref('');
 const pagination = ref({
@@ -146,7 +146,7 @@ const newUser = ref({
   Mobile: '',
   Hash: '',
 })
-const MerchantList = ref([])
+const merchantList = ref([])
 const actualMerchant = ref([])
 export default {
   name: "UserPage",
@@ -160,14 +160,14 @@ export default {
     const isLoading = ref(false);
     const merchantStore = useMerchantStore()
     merchantStore.getMerchantMap().then(res => {
-      MerchantList.value = res
-      actualMerchant.value = MerchantList
+      merchantList.value = res
+      actualMerchant.value = merchantList
     }).catch(function (err) {
       console.log(err)
     })
     function clearFilter() {
-      MerchantValue.value = null;
-      UserId.value = null;
+      merchantValue.value = null;
+      userId.value = null;
       //BusinessResultValue.value = '';
       //RequestDate.value = '';
     }
@@ -178,11 +178,11 @@ export default {
         PageSize: rowsPerPage,
         AuthToken: loginUser.token
       }
-      if (MerchantValue.value) {
-        query.MerchantId = MerchantValue.value.value;
+      if (merchantValue.value) {
+        query.MerchantId = merchantValue.value.value;
       }
-      if (UserId.value) {
-        query.UserId = UserId.value;
+      if (userId.value) {
+        query.UserId = userId.value;
       }
       // if (BusinessResultValue.value) {
       //   if (BusinessResultValue.value != "") {
@@ -246,11 +246,11 @@ export default {
       this.selected_row = row;
       this.showDetail = true;
     }
-    function CancelUpdate() {
+    function cancelUpdate() {
       this.showDetail = false;
       readonly.value = false;
     }
-    function UpdateUser(user) {
+    function updateUser(user) {
       if (updateButton.value == "更新") {
         console.log(user);
         console.log(user.UserId);
@@ -334,8 +334,8 @@ export default {
     return {
       checkDetail,
       clearFilter,
-      UpdateUser,
-      CancelUpdate,
+      updateUser,
+      cancelUpdate,
       registUser,
       loadUser,
       readonly,
@@ -343,12 +343,12 @@ export default {
       showDetail: ref(false),
       userWindow: ref(false),
       newUser,
-      UserColumn,
-      MerchantValue,
-      UserId,
+      userColumn,
+      merchantValue,
+      userId: userId,
       model: ref(null),
       dateGroup: ref(null),
-      MerchantList,
+      merchantList,
       columns,
       rows,
       isLoading,
