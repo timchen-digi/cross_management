@@ -73,7 +73,7 @@
           <div class="text-h6">填寫使用者資料</div>
         </q-card-section>
         <q-card-section class="q-pt">
-          <q-input v-for="( item, key ) in  newUser " :key="key" v-model="newUser[key]"
+          <q-input v-for="( item, key ) in newUser " :key="key" v-model="newUser[key]"
             :label="UserColumn[key]"></q-input>
         </q-card-section>
         <q-card-actions align="right" class="text-primary">
@@ -88,9 +88,8 @@
 <script>
 
 import { ref } from 'vue'
-import { toThousands, GetMerchantName, MerchantList, getSHA256Hash } from 'src/utils/index.js'
-import dataTable from 'src/components/DataTable.vue';
-import { useUserStore } from "../../stores";
+import { toThousands, getMerchantName, getSHA256Hash } from 'src/utils/index.js'
+import { useUserStore, useMerchantStore } from "../../stores";
 import { api } from 'boot/axios'
 import { exportFile, useQuasar } from 'quasar'
 const StatustList = [
@@ -101,7 +100,7 @@ const StatustList = [
 const columns = [
   {
     name: "MerchantId", label: "商戶", field: "MerchantId", align: 'left', sortable: true,
-    format: (v) => (GetMerchantName(v, MerchantList.value))
+    format: (v) => (getMerchantName(v, MerchantList.value))
   },
   // { name: "TerminalId", label: "終端", field: "TerminalId", align: 'left', sortable: true },
   { name: "UserId", label: "使用者ID", field: "UserId", align: 'left', sortable: true },
@@ -147,6 +146,8 @@ const newUser = ref({
   Mobile: '',
   Hash: '',
 })
+const MerchantList = ref([])
+const actualMerchant = ref([])
 export default {
   name: "UserPage",
   components: {
@@ -157,6 +158,13 @@ export default {
     const rows = ref([]);
     const loginUser = useUserStore();
     const isLoading = ref(false);
+    const merchantStore = useMerchantStore()
+    merchantStore.getMerchantMap().then(res => {
+      MerchantList.value = res
+      actualMerchant.value = MerchantList
+    }).catch(function (err) {
+      console.log(err)
+    })
     function clearFilter() {
       MerchantValue.value = null;
       UserId.value = null;

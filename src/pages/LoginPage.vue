@@ -85,13 +85,13 @@ export default {
           Password: hashPwd,
         }).then(response => {
           //console.log(response);
-          const authStore = useUserStore();
+          const userStore = useUserStore();
           if (response.data.completeFlag == true) {
             // 成功登入
             var user = response.data.records[0];
             //console.log(user);
             merchantId = user.MerchantId;
-            authStore.setUserState(user);
+            userStore.setUserState(user)
           }
           else {
             alert("使用者名稱或密碼錯誤");
@@ -103,9 +103,9 @@ export default {
           this.$router.push("/Management/History");
         }).catch(function (error) {
           // handle error
-          //console.log(error);
-          this.refreshIdentifyCode()
-          this.verify = ""
+          console.log(error);
+          //this.refreshIdentifyCode()
+          //this.verify = ""
           alert("使用者名稱或密碼錯誤");
         })
       });

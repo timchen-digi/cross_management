@@ -89,13 +89,10 @@
     </q-dialog>
   </q-page>
 </template>
-
 <script>
 
 import { ref } from 'vue'
-import { MerchantList } from 'src/utils/index.js'
-import dataTable from 'src/components/DataTable.vue';
-import { useUserStore } from "../stores";
+import { useMerchantStore, useUserStore } from "../stores";
 import { api } from 'boot/axios'
 import { exportFile, useQuasar } from 'quasar'
 
@@ -119,7 +116,6 @@ const columns = [
 ];
 const MerchantValue = ref(null);
 const StatusValue = ref(null);
-const actualMerchant = ref(MerchantList.value)
 const pagination = ref({
   sortBy: 'desc',
   descending: true,
@@ -152,14 +148,21 @@ const TerminalPayment = ref({
   InvoiceEnable: '啟用'
 })
 const newTerminal = ref({
-  MerchantId: '',
+  //MerchantId: '',
   TerminalId: '',
   TerminalName: '',
-  VAccountTypeId: '',
-  Status: 0,
-  InvoiceEnable: false,
-  PaymentTypeId: 0
+  OfficialUrl: '',
+  Rating: '',
+  PCUrl: '',
+  iOSUrl: '',
+  AndroidUrl: '',
+  //VAccountTypeId: '',
+  //Status: 0,
+  //InvoiceEnable: false,
+  //PaymentTypeId: 0
 })
+const MerchantList = ref([])
+const actualMerchant = ref([])
 export default {
   name: "TerminalPage",
   components: {
@@ -171,18 +174,27 @@ export default {
     const loginUser = useUserStore();
     const showMerchantSelect = ref(loginUser.merchantId == "");
     const isLoading = ref(false);
-
+    const merchantStore = useMerchantStore();
+    merchantStore.getMerchantMap().then(res => {
+      MerchantList.value = res
+      actualMerchant.value = res
+    }).catch(function (err) {
+      console.log(err)
+    })
     function clearFilter() {
       MerchantValue.value = null;
     }
     function registTerminal(terminal) {
-      // for (var i in newTerminal.value) {
-      //   console.log(i + i.value);
-      // }
+      terminal.MerchantId = loginUser.MerchantId
+      terminal.Status = 1
+      terminal.Rating = 1
+      terminal.PaymentTypeId = 1
+      terminal.InvoiceEnable = false
+      console.log(terminal)
       // 檢查輸入(必填/格式)
       //console.log(terminal.TerminalId);
       api.post('/Terminal/Create', terminal, {
-        headers: {}
+        headers: { AuthToken: loginUser.token }
       })
         .then((response) => {
           //console.log(response.data);

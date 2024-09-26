@@ -140,13 +140,11 @@
 <script>
 
 import { ref } from 'vue'
-import { toThousands, GetMerchantName, MerchantList } from 'src/utils/index.js'
+import { toThousands, getMerchantName } from 'src/utils/index.js'
 import dataTable from 'src/components/DataTable.vue';
 import { useUserStore, useMerchantStore } from "../stores";
 import { api } from 'boot/axios'
 import { exportFile, useQuasar } from 'quasar'
-const MerchantStore = useMerchantStore();
-const MerchantListNew = ref(MerchantStore.MerchantMap);
 const remitPrompt = ref(false)
 const RemitTrxId = ref("")
 const orderType = [
@@ -158,7 +156,7 @@ const orderStatus = [
 const columns = [
   {
     name: "MerchantId", label: "商戶", field: "MerchantId", align: 'left', sortable: true,
-    format: (v) => (GetMerchantName(v, MerchantList.value))
+    format: (v) => (getMerchantName(v, MerchantList.value))
   },
   { name: "TerminalId", label: "終端", field: "TerminalId", align: 'left', sortable: true },
   {
@@ -263,8 +261,8 @@ const pagination = ref({
   rowsPerPage: 10,
   rowsNumber: 10
 })
-
-const actualMerchant = ref(MerchantList.value)
+const MerchantList = ref([])
+const actualMerchant = ref([])
 export default {
   name: "HistoryPage",
   components: {
@@ -276,6 +274,13 @@ export default {
     const isLoading = ref(false);
     const loginUser = useUserStore();
     const showMerchantSelect = (loginUser.merchantId == "");
+    const merchantStore = useMerchantStore()
+    merchantStore.getMerchantMap().then(res => {
+      MerchantList.value = res
+      actualMerchant.value = MerchantList
+    }).catch(function (err) {
+      console.log(err)
+    })
     function clearFilter() {
       OrderStateValue.value = null;
       OrderTypeValue.value = null;
@@ -525,6 +530,7 @@ export default {
         //actualMerchant.value = MerchantList.value.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
         // 用商戶名或商戶編號過濾
         actualMerchant.value = MerchantList.value.filter(v => { return (v.label.toLowerCase().indexOf(needle) > -1 || v.value.indexOf(needle) > -1) })
+        console.log(actualMerchant.value)
       })
     }
     loadOrders({

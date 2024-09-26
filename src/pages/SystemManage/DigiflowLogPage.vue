@@ -78,9 +78,8 @@
 <script>
 
 import { ref } from 'vue'
-import { toThousands, GetMerchantName, MerchantList } from 'src/utils/index.js'
-import dataTable from 'src/components/DataTable.vue';
-import { useUserStore } from "../../stores";
+import { toThousands, getMerchantName } from 'src/utils/index.js'
+import { useUserStore, useMerchantStore } from "../../stores";
 import { api } from 'boot/axios'
 import { exportFile, useQuasar } from 'quasar'
 const ApiNameList = [
@@ -140,6 +139,8 @@ const pagination = ref({
   rowsPerPage: 10,
   rowsNumber: 10
 })
+const MerchantList = ref([])
+const actualMerchant = ref([])
 export default {
   name: "ApiLogPage",
   components: {
@@ -150,6 +151,13 @@ export default {
     const rows = ref([]);
     const loginUser = useUserStore();
     const isLoading = ref(false);
+    const merchantStore = useMerchantStore()
+    merchantStore.getMerchantMap().then(res => {
+      MerchantList.value = res
+      actualMerchant.value = MerchantList
+    }).catch(function (err) {
+      console.log(err)
+    })
     function clearFilter() {
       MerchantValue.value = null;
       ApiNameValue.value = null;

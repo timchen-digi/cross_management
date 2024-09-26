@@ -57,9 +57,9 @@
 <script>
 
 import { ref } from 'vue'
-import { toThousands, GetMerchantName, MerchantList, FixNumrber } from 'src/utils/index.js'
+import { toThousands, getMerchantName, FixNumrber } from 'src/utils/index.js'
 import dataTable from 'src/components/DataTable.vue';
-import { useUserStore } from "../stores";
+import { useUserStore, useMerchantStore } from "../stores";
 import { api } from 'boot/axios'
 import { exportFile, useQuasar } from 'quasar'
 const orderType = [
@@ -76,7 +76,7 @@ const columns = [
   },
   // {
   //   name: "MerchantId", label: "商戶", field: "MerchantId", align: 'left', sortable: true,
-  //   format: (v) => (GetMerchantName(v, MerchantList.value))
+  //   format: (v) => (getMerchantName(v, MerchantList.value))
   // },
   {
     name: "Type", label: "通路", field: "Type", align: 'center',
@@ -146,7 +146,8 @@ const pagination = ref({
   rowsPerPage: 10,
   rowsNumber: 10
 })
-const actualMerchant = ref(MerchantList.value)
+const MerchantList = ref([])
+const actualMerchant = ref([])
 export default {
   name: "WeekSettlePage",
   components: {
@@ -157,6 +158,13 @@ export default {
     const rows = ref([]);
     const sum = ref();
     const loginUser = useUserStore();
+    const merchantStore = useMerchantStore()
+    merchantStore.getMerchantMap().then(res => {
+      MerchantList.value = res
+      actualMerchant.value = MerchantList
+    }).catch(function (err) {
+      console.log(err)
+    })
     const isLoading = ref(false);
     function clearFilter() {
       OrderStateValue.value = null;
@@ -262,7 +270,7 @@ export default {
     }
     function exportTable() {
       // naive encoding to csv format
-      var merchantName = GetMerchantName(loginUser.merchantId, MerchantList.value)
+      var merchantName = getMerchantName(loginUser.merchantId, MerchantList.value)
       if (merchantName == null) {
         merchantName = ""
       }

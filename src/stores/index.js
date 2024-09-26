@@ -50,40 +50,32 @@ export const useUserStore = defineStore({
   },
 });
 
-export const useMerchant = defineStore('merchants', {
+export const useMerchantStore = defineStore({
+  id: 'merchant',
   state: () => ({
-    merchantMap: ref(null),
+    merchantList: []
   }),
   actions: {
-    async getMerchantMap() {
-      let res = await api.get('/Merchant/GetList');
-      console.log(res.data);
-      merchantMap.value = res.data;
+    async setMerchantList() {
+      console.log('Query Merchant List')
+      // 避免重複取
+      var res = await api.get('/Merchant/GetList')
+      // 不處理例外狀況?
+      res.data.forEach(e => {
+        if (!this.merchantList.includes(e)) {
+          this.merchantList.push(e)
+        }
+      })
     },
+    async getMerchantMap() {
+      if (this.merchantList.length == 0) {
+        await this.setMerchantList()
+      } else {
+        console.log('Get Merchant List From Local')
+      }
+      return this.merchantList
+    }
   },
 })
-
-export const useMerchantStore = () => {
-  const innerStore = defineStore({
-    id: "merchant",
-    state: () => ({
-      merchantMap: null,
-    }),
-
-    actions: {
-      asyncList() {
-        //console.info("asyncList");
-        api.get('/Merchant/GetList').then((response) => {
-          this.merchantMap = response.data;
-        })
-      },
-    },
-  });
-  const s = innerStore();
-  if (s.counter == null) {
-    s.asyncList();
-  }
-  return s;
-};
 
 export default pinia;

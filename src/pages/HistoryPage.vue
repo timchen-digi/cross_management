@@ -124,7 +124,7 @@
 <script>
 
 import { ref, onMounted } from 'vue'
-import { toThousands, GetMerchantName, MerchantList } from 'src/utils/index.js'
+import { toThousands, getMerchantName } from 'src/utils/index.js'
 import dataTable from 'src/components/DataTable.vue';
 import { useUserStore, useMerchantStore } from "../stores";
 import { api } from 'boot/axios'
@@ -135,14 +135,11 @@ const orderType = [
 const orderStatus = [
   "訂單退款", "訂單取消", "訂單逾期", "未付款", "已付款", "已付款(金額有誤)"
 ]
-const MerchantStore = useMerchantStore();
-const MerchantListNew = ref(MerchantStore.MerchantMap);
-// console.log("INIT");
-// console.log(MerchantList.value);
+const merchantStore = useMerchantStore();
 const columns = [
   {
     name: "MerchantId", label: "商戶", field: "MerchantId", align: 'left', sortable: true,
-    format: (v) => (GetMerchantName(v, MerchantStore.merchantMap))
+    format: (v) => (getMerchantName(v, merchantStore.merchantMap))
   },
   //{ name: "TerminalId", label: "終端", field: "TerminalId", align: 'left', sortable: true },
   {
@@ -239,10 +236,8 @@ const pagination = ref({
   rowsPerPage: 10,
   rowsNumber: 10
 })
-//const actualMerchant = MerchantList;
-const actualMerchant = ref(MerchantList.value)
-//console.log("商戶ID")
-//console.log(actualMerchant.value)
+const MerchantList = ref([])
+const actualMerchant = ref([])
 export default {
   name: "HistoryPage",
   components: {
@@ -254,6 +249,14 @@ export default {
     const loginUser = useUserStore();
     const showMerchantSelect = (loginUser.merchantId == "");
     const isLoading = ref(false);
+    const merchantStore = useMerchantStore();
+    merchantStore.getMerchantMap().then(res => {
+      MerchantList.value = res
+      actualMerchant.value = MerchantList
+      console.log(actualMerchant.value)
+    }).catch(function (err) {
+      console.log(err)
+    })
     function clearFilter() {
       OrderStateValue.value = null;
       OrderTypeValue.value = null;
@@ -472,12 +475,6 @@ export default {
       }
     }
     function filterFn(val, update) {
-      // actualMerchant.value = MerchantStore.MerchantMap;
-      // MerchantList.value = MerchantStore.MerchantMap;
-      // console.log("actualMerchant")
-      // console.log(actualMerchant.value);
-      // console.log("MerchantList")
-      // console.log(MerchantList.value);
       if (val === '') {
         update(() => {
           actualMerchant.value = MerchantList.value
