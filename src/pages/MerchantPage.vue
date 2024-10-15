@@ -253,7 +253,7 @@ export default {
             merchantAccount.value.tranLimit = record.tranLimit
             merchantAccount.value.refundQuota = record.refundQuota
           }
-          console.log(merchantAccount.value)
+          //console.log(merchantAccount.value)
         })
         .catch(function (error) {
           console.log(error);

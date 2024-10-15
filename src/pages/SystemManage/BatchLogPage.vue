@@ -124,7 +124,6 @@ export default {
       var query = {
         Start: (page - 1) * pagination.value.rowsPerPage,
         PageSize: rowsPerPage,
-        //MerchantId: 142864983000001
         AuthToken: loginUser.token
       }
       if (sortBy) {

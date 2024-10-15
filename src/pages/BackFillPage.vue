@@ -145,7 +145,7 @@ export default {
         }
       })
         .then(response => {
-          console.log(response);
+          //console.log(response);
           if (response.data.completeFlag) {
             alert("檔案已上傳")
             this.showUpload = true

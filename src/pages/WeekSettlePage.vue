@@ -321,6 +321,7 @@ export default {
         actualMerchant.value = MerchantList.value.filter(v => { return (v.label.toLowerCase().indexOf(needle) > -1 || v.value.indexOf(needle) > -1) })
       })
     }
+    loadOrders({});
     return {
       loadOrders,
       exportTable,

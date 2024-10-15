@@ -253,7 +253,7 @@ export default {
     merchantStore.getMerchantMap().then(res => {
       merchantList.value = res
       actualMerchant.value = merchantList
-      console.log(actualMerchant.value)
+      //console.log(actualMerchant.value)
     }).catch(function (err) {
       console.log(err)
     })
@@ -483,7 +483,7 @@ export default {
       }
       update(() => {
         const needle = val.toLowerCase()
-        console.log(merchantList.value);
+        //console.log(merchantList.value);
         //actualMerchant.value = MerchantList.value.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
         // 用商戶名或商戶編號過濾
         actualMerchant.value = merchantList.value.filter(v => { return (v.label.toLowerCase().indexOf(needle) > -1 || v.value.indexOf(needle) > -1) })

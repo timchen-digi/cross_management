@@ -175,7 +175,6 @@ export default {
       var query = {
         Start: (page - 1) * pagination.value.rowsPerPage,
         PageSize: rowsPerPage,
-        //MerchantId: 142864983000001
         AuthToken: loginUser.token
       }
       if (merchantValue.value) {
@@ -249,6 +248,7 @@ export default {
       this.selected_row = row;
       this.showDetail = true;
     }
+    // 初始取一次
     loadOrders({
       sortBy: 'desc',
       descending: true,

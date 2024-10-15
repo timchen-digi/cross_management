@@ -5,8 +5,8 @@
         <div class="BlockContent">
 
           <div class="row justify-between items-center mainTitle">
-            <span class="text-h5 q-my-0">終端管理</span>
-            <q-btn class="btn q-px-xl" color="warning" label="新增終端" unelevated rounded @click="terminalWindow = true" />
+            <span class="text-h5 q-my-0">商品管理</span>
+            <q-btn class="btn q-px-xl" color="warning" label="新增品項" unelevated rounded @click="terminalWindow = true" />
           </div>
 
           <div class="filterBlock q-gutter-md">
@@ -19,7 +19,7 @@
           </div>
 
           <div class="OrderTableBlock q-my-lg">
-            <q-table class="OrderTable" title="終端清單" :rows="rows" :columns="columns" :row-key="rows.name"
+            <q-table class="OrderTable" title="商品清單" :rows="rows" :columns="columns" :row-key="rows.name"
               v-model:pagination="pagination" :rows-per-page-options="[10, 25, 50]"
               no-data-label="I didn't find anything for you" :loading="isLoading" @request="loadOrders" flat>
               <template v-slot:no-data="">
@@ -42,7 +42,7 @@
             <q-dialog v-model="showDetail">
               <q-card>
                 <q-card-section>
-                  <div class="text-h6">終端基本資料</div>
+                  <div class="text-h6">商品基本資料</div>
                 </q-card-section>
                 <q-card-section class="q-pt-none">
                   <q-list separator>
@@ -53,7 +53,7 @@
                   </q-list>
                 </q-card-section>
                 <q-card-section>
-                  <div class="text-h6">終端支付資料</div>
+                  <div class="text-h6">商品支付資料</div>
                 </q-card-section>
                 <q-card-section class="q-pt-none">
                   <q-list separator>
@@ -75,7 +75,7 @@
     <q-dialog v-model="terminalWindow" persistent>
       <q-card style="min-width: 500px">
         <q-card-section>
-          <div class="text-h6">填寫終端基本資料</div>
+          <div class="text-h6">填寫上架品項資料</div>
         </q-card-section>
         <q-card-section class="q-pt">
           <q-input v-for="(item, key) in newTerminal" :key="key" v-model="newTerminal[key]"
@@ -110,8 +110,8 @@ const RatingList = [
 ]
 const columns = [
   { name: "MerchantId", label: "商戶ID", field: "MerchantId", align: 'left', sortable: true },
-  { name: "TerminalId", label: "終端ID", field: "TerminalId", align: 'left', sortable: true },
-  { name: "TerminalName", label: "終端名稱", field: "TerminalName", align: 'left', sortable: true },
+  { name: "TerminalId", label: "品項ID", field: "TerminalId", align: 'left', sortable: true },
+  { name: "TerminalName", label: "顯示名稱", field: "TerminalName", align: 'left', sortable: true },
   { name: "Status", label: "狀態", field: "Status", align: 'left', sortable: true, format: (v) => (StatusList[v].label) }
 ];
 const MerchantValue = ref(null);
@@ -124,9 +124,9 @@ const pagination = ref({
   rowsNumber: 10
 })
 const TerminalColumn = {
-  TerminalId: '終端編號',
+  TerminalId: '品項編號',
   MerchantId: '特店編號',
-  TerminalName: '終端名稱',
+  TerminalName: '顯示名稱',
   OfficialUrl: '官方網址',
   PictureName: '圖片檔名',
   PCUrl: '下載網址-PC',
@@ -201,13 +201,13 @@ export default {
           if (response.data.completeFlag) {
             $q.notify({
               type: 'positive',
-              message: "終端已建立",
+              message: "商品項已建立",
               position: "center",
             })
           } else {
             $q.notify({
               type: 'negative',
-              message: "終端建立失敗",
+              message: "商品項建立失敗",
               position: "center",
             })
           }
@@ -215,7 +215,7 @@ export default {
         .catch(function (error) {
           $q.notify({
             type: 'negative',
-            message: "終端建立失敗" + error,
+            message: "商品項建立失敗" + error,
             position: "center",
           })
         })
