@@ -20,8 +20,8 @@ export function getMerchantName(id, arr) {
   if (!arr) {
     const merchantStore = useMerchantStore();
     arr = merchantStore.merchantList
-    console.log('help function get list:')
-    console.log(arr);
+    // console.log('help function get list:')
+    // console.log(arr);
   }
   for (let i = 0; i < arr.length; i++) {
     if (arr[i].value === id) {

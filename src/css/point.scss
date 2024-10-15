@@ -44,6 +44,7 @@ body {
   width: 100%;
   font-size: 2rem;
   color: #205fa6;
+  font-weight: 600;
 }
 .BannerBlock .mainBanner .BannerTitle .subTitle {
   width: 100%;
@@ -59,6 +60,7 @@ body {
   }
   .BannerBlock .mainBanner .BannerTitle .mainTitle {
       font-size: 1.8rem;
+      font-weight: 600;
   }
 }
 
@@ -88,15 +90,19 @@ body {
 .FormContent .PointBlock .ProdBOX .RadioBTN {
   margin-bottom: 5px;
 }
+.FormContent .PointBlock .ProdBOX .RadioBTN {
+  margin-bottom: 5px;
+}
+
+.mainContent .PointBlock p {
+  font-size: 1rem;
+}
 
 @media screen and (max-width: 991px) {
   .FormContent {
       width: 90%;
       padding: 1.2rem;
       margin: 0 auto 30px auto;
-  }
-  .FormContent .PointBlock .ProdBOX .RadioBTN {
-      margin-bottom: 8px;
   }
 }
 

@@ -14,7 +14,8 @@
       <h3 class="Title">請輸入購買資訊</h3>
       <div class="ProdBOX">
         <p class="BlockTitle">購買數量</p>
-        <q-option-group :options="ProductList" type="radio" v-model="SelectedProduct" inline />
+        <q-option-group :options="ProductList" type="radio" v-model="SelectedProduct" inline
+          @update:model-value="checkSelectedProduct" />
       </div>
       <div class="ProdBOX">
         <p class="BlockTitle">請選擇付款方式</p>
@@ -25,7 +26,7 @@
         <p class="BlockTitle">Email</p>
         <div class="form-group">
           <q-input v-model="UserEmail" filled type="email" :rules="emailRules" placeholder="請輸入您的Email" />
-          <p id="UserEmailHelp" class="form-text text-negative">此為購點綁定帳號，請務必確認輸入正確</p>
+          <p id="UserEmailHelp" class="form-text text-negative">此為購買綁定帳號，請務必確認輸入正確</p>
         </div>
       </div>
       <div class="ProdBOX" v-if="ShowInvoice">
@@ -116,7 +117,6 @@ export default {
       ],
       UserEmail: ref(''),
       UserEmailCode: ref(''),
-      SelectedProduct: ref(''),
       InvoiceDonate: ref('51811'),
       InvoiceDonateOptions: [
         { label: '第一社會福利基金會', value: '51811' },
@@ -156,26 +156,41 @@ export default {
       //   alert("請選購買數量");
       //   return;
       // }
-      // if (this.PaymentMethod == "") {
-      //   alert("請選擇付款方式");
-      //   return;
-      // }
+      console.log(this.PaymentMethod)
+      if (this.PaymentMethod == "") {
+        alert("請選擇付款方式");
+        return;
+      }
       // this.createCookie("User.Email", this.UserEmail, 10);
       // this.createCookie("User.Prodoct", "數位鎏點數 " + this.SelectedProduct + "點", 10);
       // this.createCookie("User.PayAmount", this.SelectedProduct, 10);
       // this.createCookie("User.PaymentMethod", this.PaymentMethod, 10);
       //this.$router.push("/Point/PaymentConfirm");
+      console.log('SelectedProduct')
+      console.log(this.SelectedProduct)
 
       let uri = window.location.hash.split('?')[1]
       let params = new URLSearchParams(uri)
       let order = ref()
+      // Amount : this.Amount
       let query = {
         "param": {
           "Version": "1.0",
           "MID": params.get("MID"),
           "TID": params.get("TID"),
-          "Amount": this.SelectedProduct
+          "Amount": 100,
+          "InvoiceType": 1,
+          "CarrierType": 1,
+          "Email": this.UserEmail
         }
+      }
+      if (query.param.Amount == null) {
+        // 未選擇購買數量
+        alert("未選擇購買數量")
+        return
+      }
+      if (query.param.InvoiceType == null || query.param.CarrierType == null) {
+        // 未選擇發票
       }
       console.log(query);
       pointApi.post('/GenVA', query, {
@@ -187,7 +202,7 @@ export default {
         }
       })
         .then((response) => {
-          //console.log(response.data)
+          console.log(response.data)
           if (response.data.param.ReturnCode == "000000") {
             //console.log(PaymentList.value)
             console.log(response.data.param)
@@ -196,14 +211,16 @@ export default {
             // this.createCookie("User.Prodoct", "數位鎏點數 " + this.SelectedProduct + "點", 10);
             // this.createCookie("User.PayAmount", this.SelectedProduct, 10);
             // this.createCookie("User.PaymentMethod", this.PaymentMethod, 10);
-            //this.$router.push("/Point/PaymentConfirm");
+            // this.$router.push("/Point/PaymentConfirm");
+            this.$router.push("/Pay/Bank?O=" + this.order.OrderNO + "&P=" + this.order.Amount + "&A=" + this.order.VirtualAccount + "&T=" + this.order.ExpiryTime);
           }
           else {
-            // $q.notify({
-            //   type: 'negative',
-            //   message: "交易建立失敗 " + response.data.param.ReturnMsg,
-            //   position: "center",
-            // });
+            alert("交易建立失敗，錯誤代碼" + response.data.param.ReturnCode)
+            $q.notify({
+              type: 'negative',
+              message: "交易建立失敗 " + response.data.param.ReturnMsg,
+              position: "center",
+            });
           }
         })
         .catch(function (error) {
@@ -214,7 +231,6 @@ export default {
           //   position: "center",
           // });
         })
-
       //this.$router.push("/Point/PaymentDone");
     },
     createCookie(name, value, timeout) {
@@ -254,6 +270,7 @@ export default {
     //const MID = "142864983000001"
     //const TID = "F001"
     const ProductList = ref([])
+    const SelectedProduct = ref(ProductList.value[0])
     const PaymentList = ref([])
     const ShowInvoice = ref(false)
     let uri = window.location.hash.split('?')[1]
@@ -262,6 +279,11 @@ export default {
     const MID = params.get("MID")
     const TID = params.get("TID")
     function getQuery(mid, tid) {
+      if (mid == null || tid == null) {
+        alert("請重新選擇商品")
+        this.$router.push("/Point/Index");
+        return
+      }
       var query = {
         "param": {
           "Version": "1.0",
@@ -269,9 +291,7 @@ export default {
           "TID": tid,
         }
       }
-      const url = 'https://mp.1qr.tw/api/Product'
-      //const url = 'https://localhost:9999/api/Product'
-      pointApi.post(url, query, {
+      pointApi.post('/Product', query, {
         headers: {
           "Content-Type": "application/json;charset=utf-8",
           "isCode": 0,
@@ -293,7 +313,14 @@ export default {
               ProductList.value.push({ label: p.Name, value: p.ProductID })
             });
             response.data.param.content.Payment.forEach(p => {
-              PaymentList.value.push({ label: p.PaymentName, value: p.PaymentID, invoice: p.InvoiceEnable })
+              // console.log(p)
+              if (p.Type == 1) {
+                // 若是銀行虛擬帳號，不顯示銀行名稱以免混淆
+                PaymentList.value.push({ label: "虛擬帳號", value: p.PaymentID, invoice: p.InvoiceEnable })
+              }
+              else {
+                PaymentList.value.push({ label: p.PaymentName, value: p.PaymentID, invoice: p.InvoiceEnable })
+              }
             });
             //console.log(PaymentList.value)
           }
@@ -322,12 +349,17 @@ export default {
       //console.log(inv.invoice)
       ShowInvoice.value = inv.invoice
     }
+    function checkSelectedProduct() {
+      console.log(SelectedProduct.value);
+    }
     return {
       ProductList,
+      SelectedProduct,
       PaymentList,
       ShowInvoice,
       checkPaymentMethod,
-      PaymentMethod
+      PaymentMethod,
+      checkSelectedProduct
     };
   }
 }

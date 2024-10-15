@@ -46,7 +46,7 @@ const routes = [
   {
     path: "/Pay",
     component: () => import("layouts/PayLayout.vue"),
-    meta: { title: '數位鎏線上付款平台' },
+    meta: { title: '數位鎏線上付款網站' },
     children: [
       { path: "Index", component: () => import("pages/Pay/NewPayPage.vue") }, // 付款_自選付款方式
       //{ path: "Index", component: () => import("pages/Pay/PayPage.vue") }, // 付款_信用卡
@@ -57,7 +57,7 @@ const routes = [
   {
     path: "/Point",
     component: () => import("layouts/PointLayout.vue"),
-    meta: { title: '數位鎏線上購點平台' },
+    meta: { title: '數位鎏線上付款網站' },
     children: [
       { path: "", component: () => import("pages/Point/IndexPage.vue") },
       { path: "Index", component: () => import("pages/Point/IndexPage.vue") },

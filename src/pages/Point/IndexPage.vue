@@ -86,7 +86,13 @@ export default {
   },
   setup() {
     const $q = useQuasar()
-    const merchantId = 332715810000001
+    let merchantId = 332715810000001
+    let uri = window.location.hash.split('?')[1]
+    let params = new URLSearchParams(uri)
+    const ParamMerchatId = params.get("MID")
+    if (ParamMerchatId != null) {
+      merchantId = ParamMerchatId
+    }
     const defaultKey = "87654321876543218765432187654321"
     const merchantItem = ref([])
     function getQuery(mid) {
@@ -127,6 +133,9 @@ export default {
               }
               if (!merchant.PicName) {
                 merchant.PicName = "product/default.webp"
+              }
+              if (merchant.Name == '') {
+                merchant.id
               }
               else {
                 merchant.PicName = "product/" + merchant.PicName

@@ -36,20 +36,21 @@ export default route(function (/* { store, ssrContext } */) {
   const loginUser = useUserStore();
   var home = process.env.deployPath || '';
   Router.beforeEach((to, from, next) => {
-    console.log("to.fullPath: ", to.fullPath);
-    console.log("to.path: ", to.path);
-    console.log("to.href: ", to.href);
+    // console.log("to.fullPath: ", to.fullPath);
+    // console.log("to.path: ", to.path);
+    // console.log("to.href: ", to.href);
     // 標題
     document.title = to.meta.title || '數位鎏聚合支付管理後台';
     if (to.path.startsWith("/Pay")) {
       next();
     }
     if (to.path.startsWith("/Point")) {
+      console.log('is point')
       next();
     }
     if (!to.path.startsWith("/Login") && !loginUser.username) {
       if (!to.path.includes('/Pay/') && !to.path.includes('/Point/')) {
-        alert("請先登入");
+        //alert("請先登入");
         next("/Login");
       }
     } else {

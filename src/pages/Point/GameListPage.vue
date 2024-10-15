@@ -147,6 +147,17 @@ export default {
               else {
                 merchant.PicName = "product/" + merchant.PicName
               }
+              var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+              //console.log("user agent: " + userAgent)
+              if (/android/i.test(userAgent)) {
+                merchant.AppURL = merchant.AndroidURL
+              }
+              else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                merchant.AppURL = merchant.iOSURL
+              }
+              else {
+                merchant.AppURL = merchant.PcURL
+              }
             });
           }
           else {
