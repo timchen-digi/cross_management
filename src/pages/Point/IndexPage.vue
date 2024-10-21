@@ -94,6 +94,7 @@ export default {
       merchantId = ParamMerchatId
     }
     const defaultKey = "87654321876543218765432187654321"
+    // get merchant key
     const merchantItem = ref([])
     function getQuery(mid) {
       var query = {
@@ -133,9 +134,6 @@ export default {
               }
               if (!merchant.PicName) {
                 merchant.PicName = "product/default.webp"
-              }
-              if (merchant.Name == '') {
-                merchant.id
               }
               else {
                 merchant.PicName = "product/" + merchant.PicName

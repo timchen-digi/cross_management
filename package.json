@@ -1,8 +1,8 @@
 {
   "name": "quasar-project",
   "version": "0.0.1",
-  "description": "數位鎏聚合支付管理後台",
-  "productName": "數位鎏聚合支付管理後台",
+  "description": "數位鎏聚合支付",
+  "productName": "數位鎏聚合支付",
   "author": "Digiflow",
   "private": true,
   "scripts": {

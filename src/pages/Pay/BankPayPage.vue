@@ -29,10 +29,6 @@
     <q-tab-panels class="q-mt-lg" v-model="PayType" animated transition-prev="fade" transition-next="fade">
       <!--銀行帳戶-->
       <q-tab-panel name="Bank" class="PayPanel">
-        <!-- <div class="inputGroup">
-          <p>請選擇合作銀行</p>
-          <q-select v-model="Bank" :options="bankList" option-label="labal" option-value="value" outlined />
-        </div> -->
         <q-tab-panels v-model="Bank.value" class="q-my-md">
           <q-tab-panel :name="bankItem.value" v-for="(bankItem, index) in bankList" :key="index">
             <q-list bordered separator id="info">
@@ -72,7 +68,7 @@
               <q-btn class="text-subtitle1" color="warning" icon="content_copy" label="複製帳號" rounded @click="Copy" />
               <q-btn class="text-subtitle1" color="warning" icon="save_alt" label="保存繳費資訊" rounded @click="Print" />
               <q-btn class="text-subtitle1 float-right" color="secondary" icon="cancel" label="取消付款" rounded
-                @click="Back" />
+                @click="$router.back()" />
             </div>
           </q-tab-panel>
         </q-tab-panels>
@@ -113,62 +109,18 @@ export default {
         (value) => !!value || 'Email欄位必填',
         (value) => /.+@.+\..+/.test(value) || '請輸入正確的Email地址'
       ],
-      OrderList: [
-        {
-          title: "商品名稱",
-          Contact: "MyProduct123"
-        }, {
-          title: "訂單編號",
-          Contact: "240401120954"
-        }, {
-          title: "商品說明",
-          Contact: "商品說明文字商品說明文字商品說明文字"
-        }, {
-          title: "支付金額",
-          Contact: "NT$ 300"
-        }
-      ],
       PayType: ref('Bank'),
-      paymentMethod: [
-        {
-          label: '信用卡',
-          value: 'Credit'
-        }, {
-          label: '銀行帳戶',
-          value: 'Bank'
-        }, {
-          label: '其他付款方式',
-          value: 'Other'
-        }
-      ],
-      Bank: ref({
-        labal: '玉山銀行',
-        value: 'esun'
-      }),
-      bankList: [
-        {
-          labal: '玉山銀行',
-          value: 'esun',
-          code: '808',
-          account: '6153840960096125',
-          amount: '300',
-          deadline: '2024-04-25 23:41:04'
-        }, {
-          labal: '彰化銀行',
-          value: 'chb',
-          code: '009',
-          account: '96013456789101',
-          amount: '300',
-          deadline: '2024-04-02 13:41:04'
-        }, {
-          labal: '台北富邦銀行',
-          value: 'tpfubon',
-          code: '012',
-          account: '1234567890123456',
-          amount: '300',
-          deadline: '2024-04-02 13:41:04'
-        }
-      ]
+
+      // bankList: [
+      //   {
+      //     labal: '玉山銀行',
+      //     value: 'esun',
+      //     code: '808',
+      //     account: '6153840960096125',
+      //     amount: '300',
+      //     deadline: '2024-04-25 23:41:04'
+      //   }
+      // ]
     }
   },
   mounted() {
@@ -177,6 +129,52 @@ export default {
     this.checkIssuer();
   },
   setup() {
+    let uri = window.location.hash.split('?')[1]
+    //console.log(uri)
+    let params = new URLSearchParams(uri)
+
+    const Account = params.get("A")
+    const orderNo = params.get("O")
+    const Amount = params.get("P")
+    const Time = params.get("T")
+    if (Account == null || orderNo == null || Amount == null || Time == null) {
+      alert("付款資訊有誤")
+      this.$router.push("/Pay/")
+      return
+    }
+    // 用API向平台再確認一次訂單資訊
+
+
+    const Exp = Time.substring(0, 4) + "-" + Time.substring(4, 6) + "-" + Time.substring(6, 8) + " " + Time.substring(8, 10) + ":" + Time.substring(10, 12) + ":" + Time.substring(12, 14)
+    const Bank = ref({
+      labal: '台北富邦銀行',
+      value: 'tpfubon'
+    })
+    const bankList = [
+      {
+        labal: '台北富邦銀行',
+        value: 'tpfubon',
+        code: '012',
+        account: Account,
+        amount: Amount,
+        deadline: Exp
+      }
+    ]
+    const OrderList = [
+      {
+        title: "商品名稱",
+        Contact: GetCookieValue("User.Prodoct")
+      }, {
+        title: "訂單編號",
+        Contact: orderNo
+      }, {
+        title: "商品說明",
+        Contact: GetCookieValue("User.Prodoct")
+      }, {
+        title: "支付金額",
+        Contact: "NT$ " + Amount
+      }
+    ]
     const phoneNumber = ref("");
     const phonePrefix = ref("+886");
     const emailAddress = ref("");
@@ -189,38 +187,6 @@ export default {
     const issuerIcon = ref('');
     const issuerState = ref(false);
     const $q = useQuasar()
-    function CheckPay() {
-      // 檢查輸入
-      if (CVC.value.length == 3 && cardNumber.value.length == 16) {
-
-      }
-      // 引入既有的加密
-      loadScript("https://robot.wepay.tw/s/content/jsencrypt.min.js")
-        .then(() => {
-          var tCardInfo = cardNumber.value + ',' + expM.value + ',' + expY.value + ',' + CVC.value;
-          // 加密card Info
-          var encrypt = new JSEncrypt();
-          const publicKey = "-----BEGIN PUBLIC KEY-----\
-                          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvjhCPqzmRkTb10b1uETg/+jQYc++HX3z\
-                          VWE2MBLa1pIoY7SDVKgbZaYOVR0vm/kxJSWSFhO+Px6fN+jj1yBx8MbAqY4//hs8maQ9zo9um2d8\
-                          DpwBYSMxte0bvtVUm+fRjDbsPAcYpDMemaqMeR8g8Gk0iMGquE2HbfkzTel+AoO1jfhvZiIq439Y\
-                          ShFxysCY1pmDoU90wic/XuldlLNnuSUt6XIRidI8GxzB0AynsSi+UEOk3U5asMoWB+7cbfshZRR0\
-                          0Bh/P60u4thjZ+QpxfLOgNIwLvpKIHPiNnIPhtwEOrMVqDhIvDeMGVFCDF0GPjR4GUxSh08wCWCY\
-                          y35SvQIDAQAB\
-                          -----END PUBLIC KEY-----";
-          encrypt.setPublicKey(publicKey);
-          var encrypted = encrypt.encrypt(tCardInfo);
-          console.log(encrypted);
-          $q.notify({
-            type: 'positive',
-            message: "呼叫數位鎏付款API",
-            position: "center",
-          });
-        })
-      var message = cardNumber.value + "|" + issuer.value + "|" + expM.value + "/" + expY.value + "|" + emailAddress.value;
-
-      return;
-    }
     function Clean() {
       phoneNumber.value = "";
       phonePrefix.value = "+886";
@@ -247,11 +213,11 @@ export default {
       }))
     }
     function Back() {
-      $q.notify({
-        type: 'positive',
-        message: "返回上一頁",
-        position: "center",
-      });
+      // $q.notify({
+      //   type: 'positive',
+      //   message: "返回上一頁",
+      //   position: "center",
+      // });
     }
     function CopyPart(a) {
       console.log(a);
@@ -260,6 +226,13 @@ export default {
         message: "已複製",
         position: "center",
       }))
+    }
+    function GetCookieValue(name) {
+      const regex = new RegExp(`(^| )${name}=([^;]+)`)
+      const match = document.cookie.match(regex)
+      if (match) {
+        return match[2]
+      }
     }
     function Print() {
       loadScript("http://html2canvas.hertzen.com/dist/html2canvas.min.js")
@@ -279,12 +252,14 @@ export default {
       });
     }
     return {
-      CheckPay,
       Clean,
       Copy,
       CopyPart,
       Print,
       Back,
+      Bank,
+      bankList,
+      OrderList,
       phoneNumber,
       phonePrefix,
       emailAddress,

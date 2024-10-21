@@ -13,7 +13,7 @@
     <div class="PointBlock">
       <h3 class="Title">請輸入購買資訊</h3>
       <div class="ProdBOX">
-        <p class="BlockTitle">購買數量</p>
+        <p class="BlockTitle">購買項目</p>
         <q-option-group :options="ProductList" type="radio" v-model="SelectedProduct" inline
           @update:model-value="checkSelectedProduct" />
       </div>
@@ -141,34 +141,22 @@ export default {
   methods: {
     goPayment() {
       //const $q = useQuasar()
-      //圖形驗證碼
-      // if (this.identifyCode != this.verify) {
-      //   alert("驗證碼錯誤")
-      //   this.refreshIdentifyCode()
-      //   this.verify = ""
-      //   return;
-      // }
-      // if (this.UserEmail == "") {
-      //   alert("請輸入Email");
-      //   return;
-      // }
-      // if (this.SelectedProduct == "") {
-      //   alert("請選購買數量");
-      //   return;
-      // }
+      // 圖形驗證碼
+      if (this.identifyCode != this.verify) {
+        alert("驗證碼錯誤")
+        this.refreshIdentifyCode()
+        this.verify = ""
+        return;
+      }
+      if (this.UserEmail == "") {
+        alert("請輸入Email");
+        return;
+      }
       console.log(this.PaymentMethod)
       if (this.PaymentMethod == "") {
         alert("請選擇付款方式");
         return;
       }
-      // this.createCookie("User.Email", this.UserEmail, 10);
-      // this.createCookie("User.Prodoct", "數位鎏點數 " + this.SelectedProduct + "點", 10);
-      // this.createCookie("User.PayAmount", this.SelectedProduct, 10);
-      // this.createCookie("User.PaymentMethod", this.PaymentMethod, 10);
-      //this.$router.push("/Point/PaymentConfirm");
-      console.log('SelectedProduct')
-      console.log(this.SelectedProduct)
-
       let uri = window.location.hash.split('?')[1]
       let params = new URLSearchParams(uri)
       let order = ref()
@@ -178,15 +166,15 @@ export default {
           "Version": "1.0",
           "MID": params.get("MID"),
           "TID": params.get("TID"),
-          "Amount": 100,
+          "Amount": this.SelectedProduct,
           "InvoiceType": 1,
           "CarrierType": 1,
           "Email": this.UserEmail
         }
       }
+      let header = { "apiKey": "" }
       if (query.param.Amount == null) {
-        // 未選擇購買數量
-        alert("未選擇購買數量")
+        alert("未選擇購買項目")
         return
       }
       if (query.param.InvoiceType == null || query.param.CarrierType == null) {
@@ -212,6 +200,9 @@ export default {
             // this.createCookie("User.PayAmount", this.SelectedProduct, 10);
             // this.createCookie("User.PaymentMethod", this.PaymentMethod, 10);
             // this.$router.push("/Point/PaymentConfirm");
+            var ProductName = this.ProductList.find((p) => p.value == this.SelectedProduct);
+            // 商品名稱
+            this.createCookie("User.Prodoct", ProductName.label, 10);
             this.$router.push("/Pay/Bank?O=" + this.order.OrderNO + "&P=" + this.order.Amount + "&A=" + this.order.VirtualAccount + "&T=" + this.order.ExpiryTime);
           }
           else {
@@ -310,7 +301,7 @@ export default {
               });
             }
             response.data.param.content.Product.forEach(p => {
-              ProductList.value.push({ label: p.Name, value: p.ProductID })
+              ProductList.value.push({ label: p.Name, value: p.Amount })
             });
             response.data.param.content.Payment.forEach(p => {
               // console.log(p)
@@ -322,6 +313,11 @@ export default {
                 PaymentList.value.push({ label: p.PaymentName, value: p.PaymentID, invoice: p.InvoiceEnable })
               }
             });
+            SelectedProduct.value = ProductList.value[0]
+            console.log(ProductList.value[0])
+            console.log(ProductList.value[1])
+            console.log(ProductList.value[2])
+            console.log("SelectedProduct: " + SelectedProduct.value)
             //console.log(PaymentList.value)
           }
           else {
