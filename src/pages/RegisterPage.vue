@@ -209,8 +209,9 @@ export default {
       };
       console.log(sendObject);
       //return;
-      //打往後端
-      api.post('/Merchant/Create', sendObject, {
+      // 打往後端
+      // 預註冊
+      api.post('/Merchant/Preregister', sendObject, {
         headers: {}
       })
         .then((response) => {

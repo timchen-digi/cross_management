@@ -12,6 +12,7 @@ export const useUserStore = defineStore({
     merchantId: window.localStorage.getItem("merchantId"),
     token: window.localStorage.getItem("token"),
     userId: window.localStorage.getItem("userId"),
+    role: window.localStorage.getItem("role"),
   }),
   actions: {
     setReload(reload) {
@@ -20,18 +21,36 @@ export const useUserStore = defineStore({
     getReload() {
       return this.needReload;
     },
+    getPermission(action) {
+      const permissionList = [];
+      for (let i = 0; i < 10; i++) {
+        permissionList.push((this.role & (1 << i)) !== 0);
+      }
+      // console.log(this.role);
+      // console.log(permissionList);
+      if (action == "Account") return permissionList[0];
+      if (action == "Order") return permissionList[1];
+      if (action == "Merchant") return permissionList[2];
+      if (action == "Refund") return permissionList[3];
+      if (action == "ChangePassword") return permissionList[4];
+      if (action == "System") return permissionList[5];
+      return false;
+    },
     setUserState(user) {
+      //console.log(user)
       this.username = user.UserName;
       this.token = user.Token;
       this.auth = user.isAdmin;
       this.merchantId = user.MerchantId;
-      this.userId = user.UserId
+      this.userId = user.UserId;
+      this.role = user.Role;
       //避免重新整理後登入資料丟失
       window.localStorage.setItem("userName", this.username);
       window.localStorage.setItem("token", this.token);
       window.localStorage.setItem("auth", this.auth);
       window.localStorage.setItem("merchantId", this.merchantId);
       window.localStorage.setItem("userId", this.userId);
+      window.localStorage.setItem("role", this.role);
       // 登入後須重新渲染頁面
       this.needReload = true;
     },
@@ -41,7 +60,8 @@ export const useUserStore = defineStore({
         UserName: "",
         Token: "",
         isAdmin: "",
-        MerchantId: ""
+        MerchantId: "",
+        role: ""
       });
       //Router.push("Login");
       const router = useRouter();
