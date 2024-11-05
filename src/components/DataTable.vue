@@ -42,7 +42,7 @@
       active-color="warning" gutter="md" />
   </div> -->
   <div v-if="label" class="row justify-center q-my-md">
-    <q-btn color="warning" size="18px" class="q-px-xl text-black" :label="label" to="/Management/History" unelevated
+    <q-btn color="warning" size="18px" class="q-px-xl text-black" :label="label" to="/Management/Order" unelevated
       rounded />
   </div>
 </template>

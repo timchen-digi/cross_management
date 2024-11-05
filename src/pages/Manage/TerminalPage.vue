@@ -92,7 +92,7 @@
 <script>
 
 import { ref } from 'vue'
-import { useMerchantStore, useUserStore } from "../stores";
+import { useMerchantStore, useUserStore } from "../../stores";
 import { api } from 'boot/axios'
 import { exportFile, useQuasar } from 'quasar'
 

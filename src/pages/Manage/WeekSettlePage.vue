@@ -59,7 +59,7 @@
 import { ref } from 'vue'
 import { toThousands, getMerchantName, FixNumrber } from 'src/utils/index.js'
 import dataTable from 'src/components/DataTable.vue';
-import { useUserStore, useMerchantStore } from "../stores";
+import { useUserStore, useMerchantStore } from "../../stores";
 import { api } from 'boot/axios'
 import { exportFile, useQuasar } from 'quasar'
 const orderType = [

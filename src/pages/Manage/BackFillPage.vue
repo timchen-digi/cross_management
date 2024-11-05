@@ -50,7 +50,7 @@
 import { ref, onMounted } from 'vue'
 import { toThousands, getMerchantName } from 'src/utils/index.js'
 import dataTable from 'src/components/DataTable.vue';
-import { useUserStore, useMerchantStore } from "../stores";
+import { useUserStore, useMerchantStore } from "../../stores";
 import { api } from 'boot/axios'
 import { exportFile, useQuasar } from 'quasar'
 import { useRoute } from "vue-router";
@@ -111,7 +111,7 @@ const pagination = ref({
 const merchantList = ref([])
 const actualMerchant = ref([])
 export default {
-  name: "HistoryPage",
+  name: "BackFillPage",
   components: {
     //dataTable
   },

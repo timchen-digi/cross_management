@@ -89,7 +89,6 @@ export default {
           if (response.data.completeFlag == true) {
             // 成功登入
             var user = response.data.records[0];
-            //console.log(user);
             merchantId = user.MerchantId;
             userStore.setUserState(user)
           }
@@ -100,7 +99,7 @@ export default {
             return;
           }
           // 登入成功後導航至其他頁面
-          this.$router.push("/Management/History");
+          this.$router.push("/Management/Order");
         }).catch(function (error) {
           // handle error
           console.log(error);
