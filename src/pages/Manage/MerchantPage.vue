@@ -67,7 +67,7 @@
                   <q-btn color="accent" @click="getApplyService(selected_row)" icon="payments">支付渠道資訊</q-btn>
                 </q-card-section>
                 <q-card-actions align="right">
-                  <q-btn flat label="OK" color="primary" @click="showDetail = false" v-close-popup />
+                  <q-btn flat label="關閉" color="primary" @click="showDetail = false" v-close-popup />
                 </q-card-actions>
               </q-card>
             </q-dialog>

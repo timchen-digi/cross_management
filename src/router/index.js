@@ -40,7 +40,7 @@ export default route(function (/* { store, ssrContext } */) {
     // console.log("to.path: ", to.path);
     // console.log("to.href: ", to.href);
     // 標題
-    document.title = to.meta.title || '數位鎏聚合支付管理後台';
+    document.title = to.meta.title || '[測試]數位鎏聚合支付管理後台';
     if (to.path.startsWith("/Pay")) {
       next();
     }

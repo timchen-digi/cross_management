@@ -32,7 +32,7 @@
           <!-- 這邊顯示詳細資料 -->
         </q-card-section>
         <q-card-actions align="right">
-          <q-btn flat label="OK" color="primary" @click="alert = false" v-close-popup />
+          <q-btn flat label="關閉" color="primary" @click="alert = false" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>

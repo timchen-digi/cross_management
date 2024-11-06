@@ -111,7 +111,7 @@
                 <q-card-actions align="right">
                   <q-btn flat label="人工退款" color="secondary" @click="showRefundWindow(selected_row)"
                     v-show="refundPermission" />
-                  <q-btn flat label="OK" color="primary" @click="showDetail = false" v-close-popup />
+                  <q-btn flat label="關閉" color="primary" @click="showDetail = false" v-close-popup />
                 </q-card-actions>
               </q-card>
             </q-dialog>
@@ -299,7 +299,6 @@ export default {
       var query = {
         Start: (page - 1) * pagination.value.rowsPerPage,
         PageSize: rowsPerPage,
-        // 測試區不做驗證
         AuthToken: loginUser.token
       }
       if (orderStateValue.value) {
@@ -567,8 +566,11 @@ export default {
       // send api
       console.log(row);
       const rOrder = {
+        AuthToken: loginUser.token,
+        MID: row.MerchantId,
         CID: rCustomId.value,
         TID: row.TerminalId,
+        TransNO: row.OrderNO,
         UserID: rUserID.value,
         Branch: rBranch.value,
         VAccount: rVAccount.value,
@@ -580,25 +582,33 @@ export default {
       api.post('/Order/ManuallyRefund', rOrder).then((response) => {
         //console.log(response.data);
         if (response.data.completeFlag) {
+          cancelRefund();
           $q.notify({
             message: "退款狀態已更新",
             position: "center",
-            multiLine: true,
-            // actions: [
-            //   { icon: 'close', color: 'white', round: true, handler: () => { /* ... */ } }
-            // ]
+            actions: [
+              { icon: 'close', color: 'white', round: true, handler: () => { /* ... */ } }
+            ]
           });
         }
         else {
+          cancelRefund();
           var errorMessage = response.data.summary;
+          console.log(errorMessage.Message);
+          var msg = "退款失敗。 " + errorMessage.Message
           $q.notify({
             color: 'warning',
-            message: errorMessage,
-            position: "center"
+            message: msg,
+            position: "center",
+            multiLine: true,
+            actions: [
+              { icon: 'close', color: 'white', round: true, handler: () => { /* ... */ } }
+            ]
           });
         }
       })
         .catch(function (error) {
+          cancelRefund();
           console.log(error);
           $q.notify({
             color: 'warning',
@@ -611,9 +621,7 @@ export default {
           });
         })
       // 清除狀態
-      cancelRefund();
     }
-
     //console.log(loginUser);
     if (loginUser.getReload()) {
       loginUser.setReload(false);

@@ -42,7 +42,7 @@
                   </q-list>
                 </q-card-section>
                 <q-card-actions align="right">
-                  <q-btn flat label="OK" color="primary" @click="showDetail = false" v-close-popup />
+                  <q-btn flat label="關閉" color="primary" @click="showDetail = false" v-close-popup />
                 </q-card-actions>
               </q-card>
             </q-dialog>
