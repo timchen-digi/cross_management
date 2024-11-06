@@ -1,7 +1,7 @@
 <template>
   <q-page padding>
     <div class="LoginContent">
-      <h5 class="MainTitle">申請資料更新</h5>
+      <h5 class="MainTitle">商戶資料註冊</h5>
       <div class="text-subtitle1">營業登記類別</div>
       <div class="inputGroup q-mb-lg">
         <q-btn-toggle v-model="taxType" color="grey" toggle-color="warning" :options="tax_option" size="15px" no-caps
@@ -63,6 +63,15 @@
           <div class="text-subtitle1">販售商品說明</div>
           <q-input color="warning" v-model="productDesc" rounded outlined placeholder="簡述販賣商品內容" />
         </div>
+
+
+        <h6>
+          **此處可上傳附件檔案**
+          1. 企業/個人存摺影本
+          2. 公司登記核准文件(僅公司)
+          3. 401表或其他登記文件(僅公司)
+        </h6>
+
       </div>
       <h5 class="MainTitle">企業代表人資料</h5>
       <div class="inputContent">
@@ -92,6 +101,13 @@
           </div>
         </div>
       </div>
+
+      <h6>
+        **此處可上傳附件檔案**
+        負責人身分證影本正面 及 反面
+      </h6>
+
+
       <h5 class="MainTitle">企業聯絡資料</h5>
       <div class="inputContent">
         <div class="inputGroup">
@@ -114,15 +130,12 @@
         </div>
         <div class="inputGroup">
           <div class="text-subtitle1">註冊pin碼</div>
-          <div class="q-gutter-md row items-start">
-            <q-input color="warning" v-model="pinCode" rounded outlined placeholder="更新註冊資料使用，留空將由系統自動產生" />
-          </div>
+          <q-input color="warning" v-model="pinCode" rounded outlined placeholder="更新註冊資料使用，留空將由系統自動產生" />
+
         </div>
         <div class="inputGroup">
           <div class="text-subtitle1">介紹人</div>
-          <div class="q-gutter-md row items-start">
-            <q-input color="warning" v-model="inviter" rounded outlined placeholder="" disabled />
-          </div>
+          <q-input color="warning" v-model="inviter" rounded outlined placeholder="自動帶入" disabled />
         </div>
         <div class="inputGroup VerificationCode">
           <div class="text-subtitle1 Title">驗證碼</div>
@@ -199,7 +212,7 @@ export default {
     const pinCode = ref("");
     const tax_option = [
       { label: '工商登記', value: 0, slot: '公司統編', ext_data: '合約簽訂公司名', ext_data2: '公司登記地址' },
-      { label: '稅籍編號', value: 1, slot: '稅籍編號', ext_data: '營業人名稱', ext_data2: '稅籍登記地址' },
+      { label: '外國營利事業', value: 1, slot: 'Business Administration No.', ext_data: 'Name', ext_data2: 'Address' },
       { label: '個人戶', value: 2, slot: '身分證字號', ext_data: '營業人名稱', ext_data2: '營業地址' }
     ];
     function CheckInput() {
