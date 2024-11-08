@@ -36,13 +36,14 @@ const routes = [
   },
   {
     path: "/Login",
-    component: () => import("layouts/LoginLayout.vue"),
+    component: () => import("layouts/RegisterLayout.vue"),
     meta: { title: '[測試]數位鎏聚合支付管理後台' },
     children: [
       { path: "", component: () => import("pages/LoginPage.vue") },
       { path: "Register", component: () => import("pages/RegisterPage.vue") },
       { path: "PreRegister", component: () => import("pages/register/PreRegisterPage.vue") },
       { path: "CheckRegister", component: () => import("pages/register/CheckRegisterPage.vue") },
+      { path: "RegisterQuery", component: () => import("pages/register/RegisterQueryPage.vue") },
     ],
   },
   {
