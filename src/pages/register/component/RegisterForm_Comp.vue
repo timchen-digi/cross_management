@@ -51,23 +51,23 @@
         <div class="text-subtitle1">營業登記文件：<q-btn label="了解上傳登記文件" color="primary" @click="companyDocLog = true" flat />
         </div>
         <div class="row items-center q-py-md">
-          <div v-for="(companyDocs, index) in companyDocs" :key="index" class="col-lg-2 col-4">
-            <q-file v-model="companyDocs.file" label="" @input="onFileChange(index, $event)" filled
+          <div v-for="(fileField, index) in fileFields.companyDocs" :key="index" class="col-lg-2 col-4">
+            <q-file v-model="fileField.file" label="" @input="onFileChange('companyDocs', index, $event)" filled
               accept="image/*, application/pdf" class="fileField q-gutter-sm">
               <template v-slot:label>
                 <q-icon name="attach_file" size="xl" />
               </template>
               <template v-slot:file>
-                <img v-if="companyDocs.previewUrl" :src="companyDocs.previewUrl" alt="Image Preview"
+                <img v-if="fileField.previewUrl" :src="fileField.previewUrl" alt="Image Preview"
                   style="width: 80px; height: 80px" />
               </template>
               <template v-slot:append v-if="index !== 0">
-                <q-btn class="removeFileField" icon="close" color="negative" size="xs" @click="removeFileField(index)"
-                  v-if="index !== 0" round />
+                <q-btn class="removeFileField" icon="close" color="negative" size="xs"
+                  @click="removeFileField('companyDocs', index)" v-if="index !== 0" round />
               </template>
             </q-file>
           </div>
-          <q-btn class="addBtn col-lg-2 col-4" color="warning" @click="addFileField" icon="add" />
+          <q-btn class="addBtn col-lg-2 col-4" color="warning" @click="addFileField('companyDocs')" icon="add" />
         </div>
 
         <q-dialog v-model="companyDocLog" medium>
@@ -152,23 +152,23 @@
         <div class="text-subtitle1">身分證圖片：<q-btn label="了解身分證圖片上傳" color="primary" @click="IdCardLog = true" flat />
         </div>
         <div class="row items-center q-py-md">
-          <div v-for="(bizBossIdCard, index) in bizBossIdCard" :key="index" class="col-lg-2 col-4">
-            <q-file v-model="bizBossIdCard.file" label="" @input="onFileChange(index, $event)" filled
+          <div v-for="(fileField, index) in fileFields.bizBossIdCard" :key="index" class="col-lg-2 col-4">
+            <q-file v-model="fileField.file" label="" @input="onFileChange('bizBossIdCard', index, $event)" filled
               accept="image/*, application/pdf" class="fileField q-gutter-sm">
               <template v-slot:label>
                 <q-icon name="attach_file" size="xl" />
               </template>
               <template v-slot:file>
-                <img v-if="bizBossIdCard.previewUrl" :src="bizBossIdCard.previewUrl" alt="Image Preview"
+                <img v-if="fileField.previewUrl" :src="fileField.previewUrl" alt="Image Preview"
                   style="width: 80px; height: 80px" />
               </template>
               <template v-slot:append v-if="index !== 0">
-                <q-btn class="removeFileField" icon="close" color="negative" size="xs" @click="removeFileField(index)"
-                  v-if="index !== 0" round />
+                <q-btn class="removeFileField" icon="close" color="negative" size="xs"
+                  @click="removeFileField('bizBossIdCard', index)" v-if="index !== 0" round />
               </template>
             </q-file>
           </div>
-          <q-btn class="addBtn col-lg-2 col-4" color="warning" @click="addFileField" icon="add" />
+          <q-btn class="addBtn col-lg-2 col-4" color="warning" @click="addFileField('bizBossIdCard')" icon="add" />
         </div>
 
         <q-dialog v-model="IdCardLog" medium>
@@ -215,8 +215,8 @@
         <div class="text-subtitle1">健保卡圖片：<q-btn label="了解健保卡圖片上傳" color="primary" @click="HealthCardLog = true" flat />
         </div>
         <div class="row items-center q-py-md">
-          <div v-for="(fileField, index) in bizBossHealthCard" :key="index" class="col-lg-2 col-4">
-            <q-file v-model="fileField.file" label="" @input="onFileChange(index, $event)" filled
+          <div v-for="(fileField, index) in fileFields.bizBossHealthCard" :key="index" class="col-lg-2 col-4">
+            <q-file v-model="fileField.file" label="" @input="onFileChange('bizBossHealthCard', index, $event)" filled
               accept="image/*, application/pdf" class="fileField q-gutter-sm">
               <template v-slot:label>
                 <q-icon name="attach_file" size="xl" />
@@ -224,10 +224,6 @@
               <template v-slot:file>
                 <img v-if="fileField.previewUrl" :src="fileField.previewUrl" alt="Image Preview"
                   style="width: 80px; height: 80px" />
-              </template>
-              <template v-slot:append v-if="index !== 0">
-                <q-btn class="removeFileField" icon="close" color="negative" size="xs" @click="removeFileField(index)"
-                  v-if="index !== 0" round />
               </template>
             </q-file>
           </div>
@@ -329,8 +325,8 @@
           flat />
       </div>
       <div class="row items-center q-py-md">
-        <div v-for="(fileField, index) in bizBossIdCard" :key="index" class="col-lg-2 col-4">
-          <q-file v-model="fileField.file" label="" @input="onFileChange(index, $event)" filled
+        <div v-for="(fileField, index) in fileFields.bizBossIdCard" :key="index" class="col-lg-2 col-4">
+          <q-file v-model="fileField.file" label="" @input="onFileChange('bizBossIdCard', index, $event)" filled
             accept="image/*, application/pdf" class="fileField q-gutter-sm">
             <template v-slot:label>
               <q-icon name="attach_file" size="xl" />
@@ -340,12 +336,12 @@
                 style="width: 80px; height: 80px" />
             </template>
             <template v-slot:append v-if="index !== 0">
-              <q-btn class="removeFileField" icon="close" color="negative" size="xs" @click="removeFileField(index)"
-                v-if="index !== 0" round />
+              <q-btn class="removeFileField" icon="close" color="negative" size="xs"
+                @click="removeFileField('bizBossIdCard', index)" v-if="index !== 0" round />
             </template>
           </q-file>
         </div>
-        <q-btn class="addBtn col-lg-2 col-4" color="warning" @click="addFileField" icon="add" />
+        <q-btn class="addBtn col-lg-2 col-4" color="warning" @click="addFileField('bizBossIdCard')" icon="add" />
       </div>
 
       <q-dialog v-model="companyIdCardLog" medium>
@@ -470,15 +466,17 @@ export default {
     return {
       identifyCode: "", //密碼登入圖形驗證碼
       identifyCodes: "1234567890abcdefghizklmnopqrstuvwxyz", //生成圖形驗證碼依據
-      companyDocs: [
-        { file: null, previewUrl: null } // 初始化一個文件欄位
-      ],
-      bizBossIdCard: [
-        { file: null, previewUrl: null } // 初始化一個文件欄位
-      ],
-      bizBossHealthCard: [
-        { file: null, previewUrl: null } // 初始化一個文件欄位
-      ],
+      fileFields: {
+        companyDocs: [
+          { file: null, previewUrl: null } // 初始化一個文件欄位
+        ],
+        bizBossIdCard: [
+          { file: null, previewUrl: null } // 初始化一個文件欄位
+        ],
+        bizBossHealthCard: [
+          { file: null, previewUrl: null } // 初始化一個文件欄位
+        ]
+      },
       locationOptions: ['北市', '高市', '新北市', '中市', '南市', '桃市',
         '北縣', '宜縣', '桃縣', '竹縣', '苗縣', '中縣', '彰縣', '投縣', '雲縣', '嘉縣', '南縣', '高縣', '屏縣',
         '東縣', '花縣', '澎縣', '基市', '竹市', '嘉市', '連江', '金門'],
@@ -656,34 +654,37 @@ export default {
     randomNum(min, max) {
       return Math.floor(Math.random() * (max - min) + min);
     },
-    addFileField() {
+    addFileField(type) {
       // 添加一個新的文件欄位
-      this.fileFields.push({ previewUrl: null, file: null });
+      this.fileFields[type].push({ previewUrl: null, file: null, fileName: null });
     },
-    removeFileField(index) {
+    removeFileField(type, index) {
+      if (index === 0) {
+        return;
+      }
       // 移除指定的文件欄位
-      this.fileFields.splice(index, 1);
+      this.fileFields[type].splice(index, 1);
     },
-    onFileChange(index, event) {
+    onFileChange(type, index, event) {
       if (event && event.target && event.target.files && event.target.files.length > 0) {
         const file = event.target.files[0];
-        this.fileFields[index].file = file;
+        this.fileFields[type][index].file = file;
 
         // 判斷文件格式
         if (file.type.startsWith("image/")) {
           // 是圖片則生成預覽 URL
-          this.fileFields[index].isImage = true;
-          this.fileFields[index].previewUrl = URL.createObjectURL(file);
-          this.fileFields[index].fileName = null;
+          this.fileFields[type][index].isImage = true;
+          this.fileFields[type][index].previewUrl = URL.createObjectURL(file);
+          this.fileFields[type][index].fileName = null;
         } else if (file.type === "application/pdf") {
           // 是 PDF 則顯示文件名稱
-          this.fileFields[index].isImage = false;
-          this.fileFields[index].previewUrl = null;
-          this.fileFields[index].fileName = file.name;
+          this.fileFields[type][index].isImage = false;
+          this.fileFields[type][index].previewUrl = null;
+          this.fileFields[type][index].fileName = file.name;
         } else {
           // 清除欄位（不是圖片也不是 PDF）
-          this.fileFields[index].previewUrl = null;
-          this.fileFields[index].fileName = null;
+          this.fileFields[type][index].previewUrl = null;
+          this.fileFields[type][index].fileName = null;
         }
       } else {
         console.error("未找到文件，請檢查 QFile 的事件綁定");
