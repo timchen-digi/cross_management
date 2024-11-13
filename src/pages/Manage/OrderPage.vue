@@ -346,7 +346,14 @@ export default {
               if (response.data.records[i]) {
                 // 閘道交易編號 = 數位鎏帳單編號處理
                 // 從前端作比較快
-                response.data.records[i].OrderNO = 'V' + response.data.records[i].CreateTime.replaceAll('-', '').substring(0, 8) + response.data.records[i].Id.padStart(11, '0')
+                if (response.data.records[i].Type == 7) {
+                  // V2024111300000022499
+                  response.data.records[i].OrderNO = 'V' + response.data.records[i].CreateTime.replaceAll('-', '').substring(0, 8) + response.data.records[i].TxId.padStart(11, '0')
+                }
+                if (response.data.records[i].Type == 9) {
+                  // DIG20241112000000012
+                  response.data.records[i].OrderNO = 'DIG' + response.data.records[i].CreateTime.replaceAll('-', '').substring(0, 8) + response.data.records[i].TxId.padStart(9, '0')
+                }
               }
             }
             rows.value = response.data.records
