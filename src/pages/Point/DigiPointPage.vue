@@ -13,6 +13,14 @@
     <div class="PointBlock">
       <h3 class="Title">請輸入購買資訊</h3>
       <div class="ProdBOX">
+        <p class="BlockTitle">請選擇遊戲伺服器</p>
+        <div class="form-group">
+          <q-select v-model="myServer" :options="ServerOptions" outlined rounded disabled />
+          <!-- <q-input v-model="myMail" filled placeholder="綁定帳號後自動填入" /> -->
+          <p id="UserEmailHelp" class="form-text text-negative">購買商品將發送至您選擇的伺服器</p>
+        </div>
+      </div>
+      <div class="ProdBOX">
         <p class="BlockTitle">購買項目</p>
         <q-option-group :options="ProductList" type="radio" v-model="SelectedProduct" inline
           @update:model-value="checkSelectedProduct" />
@@ -22,13 +30,7 @@
         <q-option-group :options="PaymentList" type="radio" v-model="PaymentMethod" inline
           @update:model-value="checkPaymentMethod" />
       </div>
-      <div class="ProdBOX">
-        <p class="BlockTitle">Email</p>
-        <div class="form-group">
-          <q-input v-model="UserEmail" filled type="email" :rules="emailRules" placeholder="請輸入您的Email" />
-          <p id="UserEmailHelp" class="form-text text-negative">此為購買綁定帳號，請務必確認輸入正確</p>
-        </div>
-      </div>
+
       <div class="ProdBOX" v-if="ShowInvoice">
         <p class="BlockTitle">發票資訊</p>
         <div class="SelectBOX mb-3">
@@ -69,6 +71,13 @@
           </q-tab-panel>
         </q-tab-panels>
       </div>
+      <div class="ProdBOX">
+        <p class="BlockTitle">Email</p>
+        <div class="form-group">
+          <q-input v-model="UserEmail" filled type="email" :rules="emailRules" placeholder="請輸入您的Email" />
+          <p id="UserEmailHelp" class="form-text text-negative">此為購買綁定帳號，請務必確認輸入正確</p>
+        </div>
+      </div>
     </div>
     <!-- 這邊加一個驗證碼 -->
     <div class="inputGroup VerificationCode">
@@ -98,6 +107,24 @@
       </ul>
     </div>
   </div>
+  <q-dialog v-model="needAuth" persistent>
+    <q-card style="min-width: 350px">
+      <q-card-section>
+        <div class="text-h6">➤請先登入</div>
+        <p class="BlockTitle">請選擇欲綁定帳號</p>
+        <div class="BTNGroup" style="margin: 0%">
+          <button type="submit" class="BTN_sure submit" @click="facebookLogin" style="width:90%; margin: 2%"><q-icon
+              name="facebook" />&nbsp;
+            使用Facebook帳號登入</button>
+          <button class="BTN_cancel submit" onclick="alert('Google帳號登入功能開發中')" style="width:90%; margin: 2%">
+            使用Google帳號登入</button>
+          <br>
+          <button class="BTN_cancel submit" onclick="alert('LINE帳號登入功能開發中')" style="width:90%; margin: 2%">
+            使用LINE帳號登入</button>
+        </div>
+      </q-card-section>
+    </q-card>
+  </q-dialog>
 </template>
 <script>
 import { ref } from "vue";
@@ -108,6 +135,9 @@ export default {
   name: 'DigiPointComponent',
   components: {
     Sidentify
+  },
+  created() {
+
   },
   data() {
     return {
@@ -134,6 +164,7 @@ export default {
       VehicleCode_Citizen: ref(''),
       VehicleCode_Citizen2: ref(''),
       identifyCode: "", //密碼登入圖形驗證碼
+      //myMail: "mail",
       identifyCodes: "23456789abcdefghjkmnpqrstuvwxyz", //生成圖形驗證碼依據
       verify: ""
     }
@@ -249,10 +280,14 @@ export default {
     randomNum(min, max) {
       return Math.floor(Math.random() * (max - min) + min);
     },
+
   },
   mounted() {
     this.identifyCode = "";
+    //this.myMail = "";
     this.makeIdentifyCode(4);
+    //console.log("渲染完成後檢查FB登入")
+    //this.facebookLogin();
   },
   setup() {
     const $q = useQuasar()
@@ -264,6 +299,33 @@ export default {
     const SelectedProduct = ref(ProductList.value[0])
     const PaymentList = ref([])
     const ShowInvoice = ref(false)
+    const needAuth = ref(true)
+    // 防止重複載入
+    if (!window.FB) {
+      window.fbAsyncInit = function () {
+        FB.init({
+          appId: '1090788265529869',
+          cookie: true,
+          xfbml: true,
+          version: 'v21.0'
+        });
+
+        //do something after init
+        // console.log("渲染完成後檢查FB登入")
+        // facebookLogin();
+      };
+      (function (d, s, id) {
+        var js,
+          fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {
+          return;
+        }
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "https://connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+      })(document, "script", "facebook-jssdk");
+    }
     let uri = window.location.hash.split('?')[1]
     //console.log(uri)
     let params = new URLSearchParams(uri)
@@ -314,10 +376,6 @@ export default {
               }
             });
             SelectedProduct.value = ProductList.value[0]
-            console.log(ProductList.value[0])
-            console.log(ProductList.value[1])
-            console.log(ProductList.value[2])
-            console.log("SelectedProduct: " + SelectedProduct.value)
             //console.log(PaymentList.value)
           }
           else {
@@ -348,6 +406,52 @@ export default {
     function checkSelectedProduct() {
       console.log(SelectedProduct.value);
     }
+    const myServer = ref("綁定帳號後自動填入");
+    const ServerOptions = ref([
+      { label: '綁定帳號後自動填入', value: '' }
+    ])
+    function facebookLogin() {
+      // 檢查登入狀態
+      FB.getLoginStatus(function (response) {
+        if (response.status === "connected") {
+          console.log("已登入")
+          getProfile();
+          needAuth.value = false;
+        } else {
+          console.log("未登入")
+          FB.login(
+            function (res) {
+              console.log("呼叫登入");
+              getProfile();
+            },
+            { scope: "public_profile,email" }
+          );
+        }
+      });
+    }
+    function getProfile() {
+      console.log("getProfile");
+      const myId = ref("");
+      FB.api("/me?fields=name,id,email", function (res) {
+        // do something
+        console.log(res);
+        if (res.id == null || res.id == undefined) {
+          alert("登入失敗")
+          needAuth.value = true;
+        }
+        else {
+          //alert("[開發]已連結FB帳號，uid:" + res.id)
+          console.log(res.email)
+          myId.value = res.id
+          needAuth.value = false;
+          //this.myMail = res.email;
+        }
+        //alert(myId.value);
+        myServer.value = "伺服器-" + myId.value;
+        ServerOptions.value = [{ label: myServer.value, value: myServer.value }]
+        //alert(myMail)
+      });
+    }
     return {
       ProductList,
       SelectedProduct,
@@ -355,7 +459,11 @@ export default {
       ShowInvoice,
       checkPaymentMethod,
       PaymentMethod,
-      checkSelectedProduct
+      checkSelectedProduct,
+      facebookLogin,
+      myServer,
+      needAuth,
+      ServerOptions
     };
   }
 }
