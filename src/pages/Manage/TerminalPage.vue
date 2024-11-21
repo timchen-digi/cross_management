@@ -53,15 +53,20 @@
                   </q-list>
                 </q-card-section>
                 <q-card-section>
-                  <div class="text-h6">商品支付資料</div>
+                  <div class="text-h6">商品支付方式</div>
                 </q-card-section>
                 <q-card-section class="q-pt-none">
-                  <q-list separator>
-                    <q-item v-for="(item, key) in TerminalPayment" :key="item.value">
-                      <q-item-section><q-item-label>{{ TerminalColumn[key] }}</q-item-label></q-item-section>
-                      <q-item-section side><q-item-label> {{ item }}</q-item-label></q-item-section>
-                    </q-item>
-                  </q-list>
+                  <div v-if="TerminalPaymentList.length == 0">未設定</div>
+                  <q-template v-for="(tp) in TerminalPaymentList" :key="tp.value">
+                    <q-list separator>
+                      <q-item v-for="(item, key) in tp" :key="item.value">
+                        <q-item-section><q-item-label>{{ TerminalColumn[key] }}</q-item-label></q-item-section>
+                        <q-item-section side><q-item-label> {{ item }}</q-item-label></q-item-section>
+                      </q-item>
+                    </q-list>
+                    <hr v-if="TerminalPaymentList.length > 0" />
+                  </q-template>
+                  <q-btn label="新增支付方式" v-close-popup @click="addPaymentType(selected_row)" color="primary"></q-btn>
                 </q-card-section>
                 <q-card-actions align="right">
                   <q-btn flat label="關閉" color="primary" @click="showDetail = false" v-close-popup />
@@ -78,12 +83,36 @@
           <div class="text-h6">填寫上架品項資料</div>
         </q-card-section>
         <q-card-section class="q-pt">
-          <q-input v-for="(item, key) in newTerminal" :key="key" v-model="newTerminal[key]"
-            :label="TerminalColumn[key]"></q-input>
+          <q-select class="col" color="warning" v-model="newTerminal.MerchantId" use-input :options="actualMerchant"
+            label="商戶" />
+          <temeplate v-for="(item, key) in newTerminal" :key="key">
+            <q-input v-if="key != 'MerchantId' && key != 'Rating'" v-model="newTerminal[key]"
+              :label="TerminalColumn[key]"></q-input>
+          </temeplate>
+          <q-select class="col" color="warning" v-model="newTerminal.Rating" :options="RatingList" label="遊戲分級" />
         </q-card-section>
         <q-card-actions align="right" class="text-primary">
           <q-btn flat label="取消" v-close-popup></q-btn>
           <q-btn flat label="新增" v-close-popup @click="registTerminal(newTerminal)"></q-btn>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+    <q-dialog v-model="showAddPaymentType" persistent>
+      <q-card style="min-width: 500px">
+        <q-card-section>
+          <div class="text-h6">新增支付方式</div>
+        </q-card-section>
+        <q-card-section class="q-pt">
+          <q-select class="col" color="warning" v-model="newPaymentType.PaymentTypeId" :options="PaymentTypeList"
+            label="支付方式" />
+          <q-toggle v-model="newPaymentType.InvoiceEnable" label="是否開立發票" checked-icon="check" unchecked-icon="clear"
+            size="lg" left-label />
+          <q-toggle v-model="newPaymentType.Status" label="啟用" checked-icon="check" unchecked-icon="clear" size="lg"
+            left-label />
+        </q-card-section>
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat label="取消" v-close-popup></q-btn>
+          <q-btn flat label="新增" v-close-popup @click="registNewPaymentType()"></q-btn>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -107,6 +136,12 @@ const RatingList = [
   { label: '輔導12', value: '3' },
   { label: '輔導15', value: '4' },
   { label: '限制級', value: '5' }
+]
+const PaymentTypeList = [
+  { label: '台北富邦銀行虛擬帳號', value: '1' },
+  { label: '玉山商業銀行虛擬帳號', value: '2' },
+  { label: '萊爾富便利商店', value: '3' },
+  { label: '信用卡一次付清', value: '4' },
 ]
 const columns = [
   { name: "MerchantId", label: "商戶ID", field: "MerchantId", align: 'left', sortable: true },
@@ -137,18 +172,12 @@ const TerminalColumn = {
   Rating: '分級',
   UpdateTime: '更新時間',
   CreateTime: '建立時間',
-  InvoiceEnable: '開立發票',
-  PaymentTypeId: '支付方式編號'
+  InvoiceEnable: '是否開立發票',
+  PaymentTypeId: '支付方式'
 }
-const TerminalPayment = ref({
-  // MerchantId: 0,
-  // TerminalId: 0,
-  PaymentTypeId: 1,
-  Status: '啟用',
-  InvoiceEnable: '啟用'
-})
+const TerminalPaymentList = ref([])
 const newTerminal = ref({
-  //MerchantId: '',
+  MerchantId: '',
   TerminalId: '',
   TerminalName: '',
   OfficialUrl: '',
@@ -173,6 +202,7 @@ export default {
     const rows = ref([]);
     const loginUser = useUserStore();
     const showMerchantSelect = ref(loginUser.merchantId == "");
+    //newTerminal.value.TerminalId = loginUser.merchantId;
     const isLoading = ref(false);
     const merchantStore = useMerchantStore();
     merchantStore.getMerchantMap().then(res => {
@@ -185,15 +215,17 @@ export default {
       MerchantValue.value = null;
     }
     function registTerminal(terminal) {
-      terminal.MerchantId = loginUser.MerchantId
-      terminal.Status = 1
-      terminal.Rating = 1
-      terminal.PaymentTypeId = 1
-      terminal.InvoiceEnable = false
-      console.log(terminal)
+      let sendTerminal = { ...terminal }
+      //sendTerminal.MerchantId = loginUser.MerchantId
+      sendTerminal.MerchantId = terminal.MerchantId.value
+      sendTerminal.Status = 1
+      sendTerminal.Rating = terminal.Rating.value
+      sendTerminal.PaymentTypeId = 1
+      sendTerminal.InvoiceEnable = false
+      //console.log(sendTerminal)
       // 檢查輸入(必填/格式)
       //console.log(terminal.TerminalId);
-      api.post('/Terminal/Create', terminal, {
+      api.post('/Terminal/Create', sendTerminal, {
         headers: { AuthToken: loginUser.token }
       })
         .then((response) => {
@@ -219,37 +251,61 @@ export default {
             position: "center",
           })
         })
+      newTerminal.value = {
+        MerchantId: '',
+        TerminalId: '',
+        TerminalName: '',
+        OfficialUrl: '',
+        Rating: '',
+        PCUrl: '',
+        iOSUrl: '',
+        AndroidUrl: ''
+      }
     }
     function getTerminalPaymentInfo(obj) {
+      //console.log(obj)
       var query = {
         TerminalId: obj['TerminalId'],
-        MerchantId: loginUser.merchantId
-        //MerchantId: obj['TerminalId']
+        MerchantId: obj['MerchantId']
       }
-      // api.post('/Terminal/GetPaymentType', query, {
-      //   headers: {}
-      // })
-      //   .then((response) => {
-      //     var record = response.data
-      //     if (record != undefined) {
-      //       TerminalPayment.value.MerchantId = record.MerchantId
-      //       TerminalPayment.value.TerminalId = record.TerminalId
-      //       TerminalPayment.value.PaymentTypeId = record.PaymentTypeId
-      //       TerminalPayment.value.Status = record.Status
-      //       TerminalPayment.value.InvoiceEnable = record.InvoiceEnable
-      //     }
-      //     console.log(TerminalPayment.value)
-      //   })
-      //   .catch(function (error) {
-      //     console.log(error);
-      //   })
+      api.post('/Terminal/GetPaymentType', query, {
+        headers: {}
+      })
+        .then((response) => {
+          var record = response.data
+          if (record != undefined) {
+            var pt = record.records
+            console.log(pt)
+            TerminalPaymentList.value = []
+            pt.forEach(p => {
+              if (p != undefined) {
+                console.log(p)
+                TerminalPaymentList.value.push(
+                  {
+                    PaymentTypeId: PaymentTypeList[p.PaymentTypeId - 1].label,
+                    Status: p.Status,
+                    InvoiceEnable: p.InvoiceEnable
+                  }
+                )
+              }
+            });
+            console.log(TerminalPaymentList.value)
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        })
     }
     function rowHandler(rows) {
       let returnRow = { ...rows }
       returnRow.CreateTime = returnRow.CreateTime.replace('T', ' ')
       returnRow.UpdateTime = returnRow.UpdateTime.replace('T', ' ')
       returnRow.Status = StatusList[returnRow.Status].label
-      returnRow.Rating = RatingList[returnRow.Rating - 1].label
+      if (returnRow.Rating > 0) {
+        returnRow.Rating = RatingList[returnRow.Rating - 1].label
+      } else {
+        returnRow.Rating = "未設定"
+      }
       return returnRow
     }
     function loadTerminals(props) {
@@ -317,6 +373,66 @@ export default {
           });
         })
     }
+    const showAddPaymentType = ref(false);
+    const newPaymentType = ref({
+      MerchantId: '',
+      TerminalId: '',
+      PaymentTypeId: '',
+      InvoiceEnable: false,
+      Status: true
+    })
+    function addPaymentType(row) {
+      newPaymentType.value.MerchantId = row.MerchantId
+      newPaymentType.value.TerminalId = row.TerminalId
+      newPaymentType.value.PaymentTypeId = '台北富邦銀行虛擬帳號'
+      newPaymentType.value.InvoiceEnable = false
+      newPaymentType.value.Status = true
+      showAddPaymentType.value = true
+    }
+    function registNewPaymentType() {
+      // console.log("新增支付方式")
+      if (newPaymentType.value.PaymentTypeId.value <= 0) {
+        $q.notify({
+          type: 'negative',
+          message: "支付方式有誤",
+          position: "center",
+        })
+        return
+      }
+      api.post('/Terminal/AddPaymentType', {
+        MerchantId: newPaymentType.value.MerchantId,
+        TerminalId: newPaymentType.value.TerminalId,
+        PaymentTypeId: newPaymentType.value.PaymentTypeId.value,
+        InvoiceEnable: newPaymentType.value.InvoiceEnable,
+        Status: newPaymentType.value.Status
+      }, {
+        headers: { AuthToken: loginUser.token }
+      })
+        .then((response) => {
+          //console.log(response.data);
+          if (response.data.completeFlag) {
+            $q.notify({
+              type: 'positive',
+              message: "已新增支付方式",
+              position: "center",
+            })
+          } else {
+            $q.notify({
+              type: 'negative',
+              message: "支付方式新增失敗",
+              position: "center",
+            })
+          }
+        })
+        .catch(function (error) {
+          $q.notify({
+            type: 'negative',
+            message: "支付方式新增失敗" + error,
+            position: "center",
+          })
+        })
+      newPaymentType.value = {}
+    }
     function checkDetail(row) {
       this.selected_row = row
       this.showDetail = true
@@ -355,21 +471,25 @@ export default {
       loadOrders: loadTerminals,
       checkDetail,
       clearFilter,
-      //getApiInfo,
       registTerminal,
       rowHandler,
-      //getApplyPaymentService,
       TerminalColumn,
-      TerminalPayment,
+      TerminalPaymentList,
+      PaymentTypeList,
       filterFn,
       MerchantValue,
       actualMerchant,
+      addPaymentType,
+      showAddPaymentType,
+      registNewPaymentType,
+      newPaymentType,
       showMerchantSelect,
       showDetail: ref(false),
       terminalWindow: ref(false),
       newTerminal,
       StatusValue,
       StatusList,
+      RatingList,
       model: ref(null),
       dateGroup: ref(null),
       columns,
