@@ -6,7 +6,8 @@
 
           <div class="row justify-between items-center mainTitle">
             <span class="text-h5 q-my-0">商品管理</span>
-            <q-btn class="btn q-px-xl" color="warning" label="新增品項" unelevated rounded @click="terminalWindow = true" />
+            <q-btn class="btn q-px-xl" color="warning" label="新增品項" unelevated rounded @click="terminalWindow = true"
+              v-show="hasEditPermission" />
           </div>
 
           <div class="filterBlock q-gutter-md">
@@ -14,8 +15,10 @@
               outlined /> -->
             <q-select class="col" color="warning" v-model="MerchantValue" use-input :options="actualMerchant"
               v-show="showMerchantSelect" @filter="filterFn" label="商戶" rounded outlined />
-            <q-btn class="q-py-md" color="grey-4" label="清除條件" rounded unelevated @click="clearFilter" size="1rem" />
-            <q-btn class="q-py-md" color="warning" label="搜尋" rounded @click="loadOrders" size="1rem" />
+            <q-btn class="q-py-md" color="grey-4" label="清除條件" rounded unelevated @click="clearFilter" size="1rem"
+              v-show="hasEditPermission" />
+            <q-btn class="q-py-md" color="warning" label="搜尋" rounded @click="loadOrders" size="1rem"
+              v-show="hasEditPermission" />
           </div>
 
           <div class="OrderTableBlock q-my-lg">
@@ -64,9 +67,23 @@
                         <q-item-section side><q-item-label> {{ item }}</q-item-label></q-item-section>
                       </q-item>
                     </q-list>
-                    <hr v-if="TerminalPaymentList.length > 0" />
+                    <q-card-actions v-show="hasEditPermission">
+                      <q-btn v-if="tp['InvoiceEnable']" label="不開立發票"
+                        @click="updatePaymentType(selected_row, tp['PaymentTypeId'], null, false)" color="black" />
+                      <q-btn v-if="!tp['InvoiceEnable']" label="需開立發票"
+                        @click="updatePaymentType(selected_row, tp['PaymentTypeId'], null, true)" color="black" />
+                      <hr v-if="TerminalPaymentList.length > 0" />
+                      <q-btn v-if="tp['Status'] == '待開通'" label="啟用此支付方式"
+                        @click="updatePaymentType(selected_row, tp['PaymentTypeId'], 1, null)" color="green" />
+                      <q-btn v-if="tp['Status'] == '停用'" label="啟用此支付方式"
+                        @click="updatePaymentType(selected_row, tp['PaymentTypeId'], 1, null)" color="green" />
+                      <q-btn v-if="tp['Status'] == '已開通'" label="停用此支付方式"
+                        @click="updatePaymentType(selected_row, tp['PaymentTypeId'], 2, null)" color="red" />
+                      <hr v-if="TerminalPaymentList.length > 0" />
+                    </q-card-actions>
                   </q-template>
-                  <q-btn label="新增支付方式" v-close-popup @click="addPaymentType(selected_row)" color="primary"></q-btn>
+                  <q-btn label="新增支付方式" @click="addPaymentType(selected_row)" color="primary" v-show="hasEditPermission"
+                    class="full-width"></q-btn>
                 </q-card-section>
                 <q-card-actions align="right">
                   <q-btn flat label="關閉" color="primary" @click="showDetail = false" v-close-popup />
@@ -107,8 +124,6 @@
             label="支付方式" />
           <q-toggle v-model="newPaymentType.InvoiceEnable" label="是否開立發票" checked-icon="check" unchecked-icon="clear"
             size="lg" left-label />
-          <q-toggle v-model="newPaymentType.Status" label="啟用" checked-icon="check" unchecked-icon="clear" size="lg"
-            left-label />
         </q-card-section>
         <q-card-actions align="right" class="text-primary">
           <q-btn flat label="取消" v-close-popup></q-btn>
@@ -203,6 +218,8 @@ export default {
     const loginUser = useUserStore();
     const showMerchantSelect = ref(loginUser.merchantId == "");
     //newTerminal.value.TerminalId = loginUser.merchantId;
+    //const editPermission = loginUser.getPermission("EditTerminal");
+    const hasEditPermission = ref(loginUser.merchantId == "");
     const isLoading = ref(false);
     const merchantStore = useMerchantStore();
     merchantStore.getMerchantMap().then(res => {
@@ -275,11 +292,9 @@ export default {
           var record = response.data
           if (record != undefined) {
             var pt = record.records
-            console.log(pt)
             TerminalPaymentList.value = []
             pt.forEach(p => {
               if (p != undefined) {
-                console.log(p)
                 TerminalPaymentList.value.push(
                   {
                     PaymentTypeId: PaymentTypeList[p.PaymentTypeId - 1].label,
@@ -289,7 +304,6 @@ export default {
                 )
               }
             });
-            console.log(TerminalPaymentList.value)
           }
         })
         .catch(function (error) {
@@ -384,19 +398,19 @@ export default {
     function addPaymentType(row) {
       newPaymentType.value.MerchantId = row.MerchantId
       newPaymentType.value.TerminalId = row.TerminalId
-      newPaymentType.value.PaymentTypeId = '台北富邦銀行虛擬帳號'
+      newPaymentType.value.PaymentTypeId = ''
       newPaymentType.value.InvoiceEnable = false
-      newPaymentType.value.Status = true
+      newPaymentType.value.Status = false
       showAddPaymentType.value = true
     }
     function registNewPaymentType() {
-      // console.log("新增支付方式")
-      if (newPaymentType.value.PaymentTypeId.value <= 0) {
+      if (newPaymentType.value.PaymentTypeId.value == undefined || newPaymentType.value.PaymentTypeId.value <= 0) {
         $q.notify({
           type: 'negative',
-          message: "支付方式有誤",
+          message: "未選擇支付方式",
           position: "center",
         })
+        newPaymentType.value = {}
         return
       }
       api.post('/Terminal/AddPaymentType', {
@@ -423,6 +437,11 @@ export default {
               position: "center",
             })
           }
+          getTerminalPaymentInfo({
+            MerchantId: newPaymentType.value.MerchantId,
+            TerminalId: newPaymentType.value.TerminalId,
+          });
+          newPaymentType.value = {}
         })
         .catch(function (error) {
           $q.notify({
@@ -430,8 +449,51 @@ export default {
             message: "支付方式新增失敗" + error,
             position: "center",
           })
+          newPaymentType.value = {}
         })
-      newPaymentType.value = {}
+    }
+    function updatePaymentType(row, tp, tStatus, tInvoiceEnable) {
+      //console.log(tp);
+      var sendBody = {
+        MerchantId: row.MerchantId,
+        TerminalId: row.TerminalId,
+        PaymentTypeId: PaymentTypeList.find(item => item.label == tp).value,
+      }
+      if (tStatus != null) {
+        sendBody.Status = tStatus
+      }
+      if (tInvoiceEnable != null) {
+        sendBody.InvoiceEnable = tInvoiceEnable
+      }
+      api.post('/Terminal/UpdatePaymentType', sendBody, {
+        headers: { AuthToken: loginUser.token }
+      })
+        .then((response) => {
+          if (response.data.completeFlag) {
+            $q.notify({
+              type: 'positive',
+              message: "已更新支付方式",
+              position: "center",
+            })
+          } else {
+            $q.notify({
+              type: 'negative',
+              message: "更新失敗",
+              position: "center",
+            })
+          }
+          getTerminalPaymentInfo({
+            MerchantId: row.MerchantId,
+            TerminalId: row.TerminalId
+          });
+        })
+        .catch(function (error) {
+          $q.notify({
+            type: 'negative',
+            message: "更新失敗" + error,
+            position: "center",
+          })
+        })
     }
     function checkDetail(row) {
       this.selected_row = row
@@ -453,7 +515,7 @@ export default {
       }
       update(() => {
         const needle = val.toLowerCase()
-        console.log(MerchantList.value);
+        // console.log(MerchantList.value);
         //actualMerchant.value = MerchantList.value.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
         // 用商戶名或商戶編號過濾
         actualMerchant.value = MerchantList.value.filter(v => { return (v.label.toLowerCase().indexOf(needle) > -1 || v.value.indexOf(needle) > -1) })
@@ -483,7 +545,9 @@ export default {
       showAddPaymentType,
       registNewPaymentType,
       newPaymentType,
+      updatePaymentType,
       showMerchantSelect,
+      hasEditPermission,
       showDetail: ref(false),
       terminalWindow: ref(false),
       newTerminal,
