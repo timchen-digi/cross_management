@@ -60,8 +60,7 @@ export default {
       var query = {
         "param": {
           "Version": "1.0",
-          "Merchant": [mid],
-          "Status": 1
+          "Merchant": [mid]
         }
       }
       pointApi.post('/QueryPage', query, {

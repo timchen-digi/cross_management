@@ -549,9 +549,14 @@ export default {
     function showRefundWindow(order) {
       console.log(order.Status);
       console.log(orderStatus[order.Status + 3])
-      if (orderStatus[order.Status + 3] == "已付款" || orderStatus[order.Status + 3] == "已付款(金額有誤)") {
+      if (orderStatus[order.Status + 3] == "已付款") {
         rCustomId.value = order.CustomId;
         rAmount.value = 0;
+        refundPrompt.value = true;
+      }
+      else if (orderStatus[order.Status + 3] == "已付款(金額有誤)") {
+        rCustomId.value = order.CustomId;
+        rAmount.value = order.PayAmount;
         refundPrompt.value = true;
       }
       else {
