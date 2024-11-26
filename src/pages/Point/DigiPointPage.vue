@@ -75,7 +75,7 @@
         <p class="BlockTitle">Email</p>
         <div class="form-group">
           <q-input v-model="UserEmail" filled type="email" :rules="emailRules" placeholder="請輸入您的Email" />
-          <p id="UserEmailHelp" class="form-text text-negative">此為購買綁定帳號，請務必確認輸入正確</p>
+          <!-- <p id="UserEmailHelp" class="form-text text-negative">此為購買綁定帳號，請務必確認輸入正確</p> -->
         </div>
       </div>
     </div>
@@ -121,6 +121,8 @@
           <br>
           <button class="BTN_cancel submit" onclick="alert('LINE帳號登入功能開發中')" style="width:90%; margin: 2%">
             使用LINE帳號登入</button>
+          <button class="BTN_cancel submit" @click="skipAuth" style="width:90%; margin: 2%">
+            *[測試]跳過登入步驟*</button>
         </div>
       </q-card-section>
     </q-card>
@@ -183,6 +185,7 @@ export default {
         alert("請輸入Email");
         return;
       }
+      console.log("支付方式")
       console.log(this.PaymentMethod)
       if (this.PaymentMethod == "") {
         alert("請選擇付款方式");
@@ -212,47 +215,66 @@ export default {
         // 未選擇發票
       }
       console.log(query);
-      pointApi.post('/GenVA', query, {
-        headers: {
-          "Content-Type": "application/json;charset=utf-8",
-          "isCode": 0,
-          "apiKey": "87654321876543218765432187654321",
-          "type": 0
-        }
-      })
-        .then((response) => {
-          console.log(response.data)
-          if (response.data.param.ReturnCode == "000000") {
-            //console.log(PaymentList.value)
-            console.log(response.data.param)
-            this.order = response.data.param.content
-            // this.createCookie("User.Email", this.UserEmail, 10);
-            // this.createCookie("User.Prodoct", "數位鎏點數 " + this.SelectedProduct + "點", 10);
-            // this.createCookie("User.PayAmount", this.SelectedProduct, 10);
-            // this.createCookie("User.PaymentMethod", this.PaymentMethod, 10);
-            // this.$router.push("/Point/PaymentConfirm");
-            var ProductName = this.ProductList.find((p) => p.value == this.SelectedProduct);
-            // 商品名稱
-            this.createCookie("User.Prodoct", ProductName.label, 10);
-            this.$router.push("/Pay/Bank?O=" + this.order.OrderNO + "&P=" + this.order.Amount + "&A=" + this.order.VirtualAccount + "&T=" + this.order.ExpiryTime);
-          }
-          else {
-            alert("交易建立失敗，錯誤代碼" + response.data.param.ReturnCode)
-            $q.notify({
-              type: 'negative',
-              message: "交易建立失敗 " + response.data.param.ReturnMsg,
-              position: "center",
-            });
+      // 虛擬帳號
+      if (this.PaymentMethod == 1) {
+        pointApi.post('/GenVA', query, {
+          headers: {
+            "Content-Type": "application/json;charset=utf-8",
+            "isCode": 0,
+            "apiKey": "87654321876543218765432187654321",
+            "type": 0
           }
         })
-        .catch(function (error) {
-          // handle error
-          // $q.notify({
-          //   type: 'negative',
-          //   message: "交易建立失敗 " + error,
-          //   position: "center",
-          // });
-        })
+          .then((response) => {
+            console.log(response.data)
+            if (response.data.param.ReturnCode == "000000") {
+              //console.log(PaymentList.value)
+              console.log(response.data.param)
+              this.order = response.data.param.content
+              // this.createCookie("User.Email", this.UserEmail, 10);
+              // this.createCookie("User.Prodoct", "數位鎏點數 " + this.SelectedProduct + "點", 10);
+              // this.createCookie("User.PayAmount", this.SelectedProduct, 10);
+              // this.createCookie("User.PaymentMethod", this.PaymentMethod, 10);
+              // this.$router.push("/Point/PaymentConfirm");
+              var ProductName = this.ProductList.find((p) => p.value == this.SelectedProduct);
+              // 商品名稱
+              this.createCookie("User.Prodoct", ProductName.label, 10);
+              this.$router.push("/Pay/Bank?O=" + this.order.OrderNO + "&P=" + this.order.Amount + "&A=" + this.order.VirtualAccount + "&T=" + this.order.ExpiryTime);
+            }
+            else {
+              alert("交易建立失敗，錯誤代碼" + response.data.param.ReturnCode)
+              $q.notify({
+                type: 'negative',
+                message: "交易建立失敗 " + response.data.param.ReturnMsg,
+                position: "center",
+              });
+            }
+          })
+          .catch(function (error) {
+            // handle error
+            // $q.notify({
+            //   type: 'negative',
+            //   message: "交易建立失敗 " + error,
+            //   position: "center",
+            // });
+          })
+      }
+      else if (this.PaymentMethod == 4) {
+        // 開發中
+        //alert("暫不支援")
+        //return
+        // 導向信用卡頁面
+        var ProductName = this.ProductList.find((p) => p.value == this.SelectedProduct);
+        // 商品名稱
+        this.createCookie("User.Prodoct", ProductName.label, 10);
+        this.createCookie("User.Email", this.UserEmail, 10);
+        this.$router.push("/Pay/Creditcard?&P=" + this.SelectedProduct + "&M=" + params.get("MID") + "&E=" + params.get("TID"));
+      } else {
+        // 開發中
+        alert("暫不支援")
+        return
+      }
+
       //this.$router.push("/Point/PaymentDone");
     },
     createCookie(name, value, timeout) {
@@ -300,6 +322,9 @@ export default {
     const PaymentList = ref([])
     const ShowInvoice = ref(false)
     const needAuth = ref(true)
+    // 測試期間略過登入
+    //needAuth.value = false
+
     // 防止重複載入
     if (!window.FB) {
       window.fbAsyncInit = function () {
@@ -367,7 +392,7 @@ export default {
             });
             response.data.param.content.Payment.forEach(p => {
               // console.log(p)
-              if (p.Type == 1) {
+              if (p.PaymentID == 1) {
                 // 若是銀行虛擬帳號，不顯示銀行名稱以免混淆
                 PaymentList.value.push({ label: "虛擬帳號", value: p.PaymentID, invoice: p.InvoiceEnable })
               }
@@ -463,7 +488,13 @@ export default {
       facebookLogin,
       myServer,
       needAuth,
-      ServerOptions
+      ServerOptions,
+      skipAuth: function () {
+        // Under dev mode
+        needAuth.value = false
+        myServer.value = "伺服器-test01"
+        ServerOptions.value = [{ label: myServer.value, value: myServer.value }]
+      }
     };
   }
 }

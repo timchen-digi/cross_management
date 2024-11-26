@@ -18,6 +18,7 @@
     "crypto-js": "^4.2.0",
     "pinia": "^2.1.7",
     "quasar": "^2.8.0",
+    "sweetalert2": "^11.14.5",
     "v-credit-card": "^1.2.4",
     "vue": "^3.2.29",
     "vue-ccard": "^1.0.7",

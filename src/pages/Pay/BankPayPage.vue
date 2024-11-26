@@ -100,7 +100,7 @@ import { ref } from "vue";
 import { useQuasar } from 'quasar'
 import { loadScript } from "vue-plugin-load-script";
 export default {
-  name: 'PayComponent',
+  name: 'BankPayComponent',
   data() {
     return {
       monthArray: [],

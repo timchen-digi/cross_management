@@ -54,7 +54,8 @@ const routes = [
       { path: "Index", component: () => import("pages/Pay/NewPayPage.vue") }, // 付款_自選付款方式
       //{ path: "Index", component: () => import("pages/Pay/PayPage.vue") }, // 付款_信用卡
       { path: "Bank", component: () => import("pages/Pay/BankPayPage.vue") }, // 付款_虛擬帳號
-      { path: "Result", component: () => import("pages/Pay/ResultPage.vue") }, // 商戶後台
+      { path: "Creditcard", component: () => import("pages/Pay/CreditcardPayPage.vue") }, // 付款_信用卡
+      { path: "Result", component: () => import("pages/Pay/ResultPage.vue") }, // 付款結果頁
     ],
   },
   {
@@ -72,7 +73,8 @@ const routes = [
       { path: "DigiPoint", component: () => import("pages/Point/DigiPointPage.vue") },
       { path: "GameList", component: () => import("pages/Point/GameListPage.vue") }, //合作遊戲
       { path: "PaymentConfirm", component: () => import("pages/Point/PaymentConfirmPage.vue") },
-      { path: "PaymentDone", component: () => import("pages/Point/PaymentDonePage.vue") }
+      { path: "PaymentDone", component: () => import("pages/Point/PaymentDonePage.vue") },
+      { path: "Auth", component: () => import("pages/Point/AuthPage.vue") } //OAuth後重導向
     ],
   },
   // Always leave this as last one,
