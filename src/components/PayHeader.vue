@@ -1,7 +1,8 @@
 <template>
   <q-header class="header">
     <q-toolbar class="Toolbar q-pa-md">
-      <img src="~assets/logos/Airwallex-logo.svg" class="mainLOGO" />
+      <!-- <img src="~assets/logos/Airwallex-logo.svg" class="mainLOGO" /> -->
+      <img src="~assets/logos/DigiFlow_logo.svg" class="mainLOGO" />
     </q-toolbar>
   </q-header>
 </template>
