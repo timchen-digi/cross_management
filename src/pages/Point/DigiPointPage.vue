@@ -41,11 +41,11 @@
         <q-tab-panels class="q-mt-lg" v-model="InvoiceMethod" animated transition-prev="fade" transition-next="fade">
           <q-tab-panel name="inv_personal" class="PayPanel">
             <div id="inv_personal_Content" class="InputBOX invTypeBox inv_personal">
-              <q-radio v-model="PersonalInvoiceType" val="手機條碼載具" label="手機條碼載具" />
-              <q-radio v-model="PersonalInvoiceType" val="自然人憑證載具" label="自然人憑證載具" />
-              <q-radio v-model="PersonalInvoiceType" val="數位鎏會員載具" label="數位鎏會員載具" />
+              <q-radio v-model="CarrierType" val="手機條碼載具" label="手機條碼載具" />
+              <q-radio v-model="CarrierType" val="自然人憑證載具" label="自然人憑證載具" />
+              <q-radio v-model="CarrierType" val="數位鎏會員載具" label="數位鎏會員載具" />
               <div class="input-group" style="padding:10px">
-                <q-input v-model="UserEmailCode" outlined :label=PersonalInvoiceType />
+                <q-input v-model="CarrierNO" outlined :label=CarrierType />
               </div>
               <div class="Remarks">
                 <p>※依法規定，發票一經開立，不得更改或該開其他統一編號發票。<a href="https://www.einvoice.nat.gov.tw/"
@@ -55,8 +55,8 @@
           </q-tab-panel>
           <q-tab-panel name="inv_Triple_Online" class="PayPanel">
             <div class="InputBOX invTypeBox inv_Paper">
-              <q-input v-model="VehicleCode_Citizen" outlined placeholder='請輸入統一編號' style="padding:10px" />
-              <q-input v-model="VehicleCode_Citizen2" outlined placeholder='請輸入公司名稱' style="padding:10px" />
+              <q-input v-model="BuyerID" outlined placeholder='請輸入統一編號' style="padding:10px" />
+              <q-input v-model="BuyerName" outlined placeholder='請輸入公司名稱' style="padding:10px" />
             </div>
             <div class="Remarks">
               <p class="text_Red">*開立發票後，下載並列印電子發票證明聯(報帳用)，節省發票郵寄時間。</p>
@@ -66,7 +66,7 @@
           </q-tab-panel>
           <q-tab-panel name="inv_Donate" class="PayPanel">
             <div class="q-pa-md InputBOX invTypeBox inv_Donate">
-              <q-option-group :options="InvoiceDonateOptions" type="radio" v-model="InvoiceDonate" />
+              <q-option-group :options="InvoiceDonateOptions" type="radio" v-model="LoveCode" />
             </div>
           </q-tab-panel>
         </q-tab-panels>
@@ -148,8 +148,8 @@ export default {
         (value) => /.+@.+\..+/.test(value) || '請輸入正確的Email地址'
       ],
       UserEmail: ref(''),
-      UserEmailCode: ref(''),
-      InvoiceDonate: ref('51811'),
+      CarrierNO: ref(''),
+      LoveCode: ref('51811'),
       InvoiceDonateOptions: [
         { label: '第一社會福利基金會', value: '51811' },
         { label: '董氏基金會', value: '531' },
@@ -162,9 +162,9 @@ export default {
         { label: '公司發票', value: 'inv_Triple_Online' },
         { label: '發票捐贈', value: 'inv_Donate' }
       ],
-      PersonalInvoiceType: ref(''),
-      VehicleCode_Citizen: ref(''),
-      VehicleCode_Citizen2: ref(''),
+      CarrierType: ref('手機條碼載具'),
+      BuyerID: ref(''),
+      BuyerName: ref(''),
       identifyCode: "", //密碼登入圖形驗證碼
       //myMail: "mail",
       identifyCodes: "23456789abcdefghjkmnpqrstuvwxyz", //生成圖形驗證碼依據
@@ -185,28 +185,67 @@ export default {
         alert("請輸入Email");
         return;
       }
-      console.log("支付方式")
-      console.log(this.PaymentMethod)
       if (this.PaymentMethod == "") {
         alert("請選擇付款方式");
+        return;
+      }
+      if (typeof (this.SelectedProduct) != typeof (1)) {
+        alert("請選擇購買品項");
         return;
       }
       let uri = window.location.hash.split('?')[1]
       let params = new URLSearchParams(uri)
       let order = ref()
+      let terminalName = ""
+      if (params.get("TID") == "Game02") {
+        terminalName = "Mobile Legend"
+      }
+      if (params.get("TID") == "Game09") {
+        terminalName = "長安養成記"
+      }
       // Amount : this.Amount
       let query = {
         "param": {
           "Version": "1.0",
           "MID": params.get("MID"),
           "TID": params.get("TID"),
+          "InvoiceType": 0,
           "Amount": this.SelectedProduct,
-          "InvoiceType": 1,
-          "CarrierType": 1,
           "Email": this.UserEmail
         }
       }
-      let header = { "apiKey": "" }
+      // 發票資訊
+      let CarrierInfo = {}
+      if (this.ShowInvoice) {
+        if (this.InvoiceMethod == "inv_personal") {
+          // 個人發票載具
+          CarrierInfo.InvoiceType = 1
+          if (this.CarrierType == "手機條碼載具") {
+            CarrierInfo.CarrierType = 1
+          }
+          if (this.CarrierType == "自然人憑證載具") {
+            CarrierInfo.CarrierType = 2
+          }
+          if (this.CarrierType == "數位鎏會員載具") {
+            CarrierInfo.CarrierType = 3
+          }
+          CarrierInfo.CarrierNO = this.CarrierNO
+        } else if (this.InvoiceMethod == "inv_Triple_Online") {
+          // 公司發票
+          CarrierInfo.InvoiceType = 3
+          CarrierInfo.BuyerID = this.BuyerID
+          CarrierInfo.BuyerName = this.BuyerName
+        } else if (this.InvoiceMethod == "inv_Donate") {
+          // 發票捐贈
+          CarrierInfo.InvoiceType = 2
+          CarrierInfo.LoveCode = this.LoveCode
+        } else {
+          // 未選擇發票類型
+        }
+        Object.keys(CarrierInfo).forEach(function (item) {
+          query.param[item] = CarrierInfo[item];
+        });
+      }
       if (query.param.Amount == null) {
         alert("未選擇購買項目")
         return
@@ -228,17 +267,13 @@ export default {
           .then((response) => {
             console.log(response.data)
             if (response.data.param.ReturnCode == "000000") {
-              //console.log(PaymentList.value)
-              console.log(response.data.param)
+              //console.log(response.data.param)
               this.order = response.data.param.content
-              // this.createCookie("User.Email", this.UserEmail, 10);
-              // this.createCookie("User.Prodoct", "數位鎏點數 " + this.SelectedProduct + "點", 10);
-              // this.createCookie("User.PayAmount", this.SelectedProduct, 10);
-              // this.createCookie("User.PaymentMethod", this.PaymentMethod, 10);
-              // this.$router.push("/Point/PaymentConfirm");
               var ProductName = this.ProductList.find((p) => p.value == this.SelectedProduct);
               // 商品名稱
-              this.createCookie("User.Prodoct", ProductName.label, 10);
+              this.createCookie("User.Prodoct", ProductName.label.split(' ')[0], 10);
+              // 遊戲名稱
+              this.createCookie("User.Terminal", terminalName, 10);
               this.$router.push("/Pay/Bank?O=" + this.order.OrderNO + "&P=" + this.order.Amount + "&A=" + this.order.VirtualAccount + "&T=" + this.order.ExpiryTime);
             }
             else {
@@ -259,22 +294,27 @@ export default {
             // });
           })
       }
+      //信用卡
       else if (this.PaymentMethod == 4) {
-        // 開發中
-        //alert("暫不支援")
-        //return
         // 導向信用卡頁面
         var ProductName = this.ProductList.find((p) => p.value == this.SelectedProduct);
         // 商品名稱
-        this.createCookie("User.Prodoct", ProductName.label, 10);
+        if (this.ShowInvoice) {
+          console.log("需開立發票")
+          this.createCookie("Carrier", true, 10);
+          this.createCookie("Carrier.Info", JSON.stringify(CarrierInfo), 10);
+        }
+        this.createCookie("User.Prodoct", ProductName.label.split(' ')[0], 10);
         this.createCookie("User.Email", this.UserEmail, 10);
+        // 待改，帶入遊戲名稱
+        console.log(terminalName)
+        this.createCookie("User.Terminal", terminalName, 10);
         this.$router.push("/Pay/Creditcard?&P=" + this.SelectedProduct + "&M=" + params.get("MID") + "&E=" + params.get("TID"));
       } else {
         // 開發中
-        alert("暫不支援")
+        alert("佔不支援此支付方式")
         return
       }
-
       //this.$router.push("/Point/PaymentDone");
     },
     createCookie(name, value, timeout) {
@@ -388,7 +428,7 @@ export default {
               });
             }
             response.data.param.content.Product.forEach(p => {
-              ProductList.value.push({ label: p.Name, value: p.Amount })
+              ProductList.value.push({ label: p.Name + " NT$" + p.Amount, value: p.Amount })
             });
             response.data.param.content.Payment.forEach(p => {
               // console.log(p)
@@ -398,6 +438,9 @@ export default {
               }
               else {
                 PaymentList.value.push({ label: p.PaymentName, value: p.PaymentID, invoice: p.InvoiceEnable })
+              }
+              if (p.InvoiceEnable == true) {
+
               }
             });
             SelectedProduct.value = ProductList.value[0]
@@ -429,7 +472,7 @@ export default {
       ShowInvoice.value = inv.invoice
     }
     function checkSelectedProduct() {
-      console.log(SelectedProduct.value);
+      //console.log(SelectedProduct.value);
     }
     const myServer = ref("綁定帳號後自動填入");
     const ServerOptions = ref([

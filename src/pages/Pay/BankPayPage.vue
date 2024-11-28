@@ -162,11 +162,12 @@ export default {
     ]
     const OrderList = [
       {
-        title: "商品名稱",
-        Contact: GetCookieValue("User.Prodoct")
-      }, {
         title: "訂單編號",
         Contact: orderNo
+      },
+      {
+        title: "遊戲名稱",
+        Contact: GetCookieValue("User.Terminal")
       }, {
         title: "商品說明",
         Contact: GetCookieValue("User.Prodoct")

@@ -20,78 +20,8 @@
 
     </div>
   </q-card>
-
-  <q-card class="my-card q-ma-md q-pa-md" bordered v-show="false">
-    <h5 class="mainTitle">發票資訊填寫</h5>
-    <div class="ProdBOX">
-    </div>
-    <div class="inputGroup q-mb-lg">
-      <q-btn-toggle v-model="InvoiceType" color="grey" toggle-color="warning" :options="InvoiceMethod" size="15px"
-        no-caps unelevated rounded />
-    </div>
-    <q-tab-panels class="q-mt-lg" v-model="InvoiceType" animated transition-prev="fade" transition-next="fade">
-      <q-tab-panel name="inv_personal" class="PayPanel">
-        <div id="inv_personal_Content" class="InputBOX invTypeBox inv_personal">
-          <div class="input-group" style="max-width: 50% ;padding:10px">
-            <q-input v-model="MailCode" outlined readonly label="電子郵件載具" />
-          </div>
-          <div class="Remarks">
-            <p>※依法規定，發票一經開立，不得更改或該開其他統一編號發票。<a href="https://www.einvoice.nat.gov.tw/" target="_blank">財政部電子發票整合服務平台</a>
-            </p>
-          </div>
-        </div>
-      </q-tab-panel>
-      <q-tab-panel name="inv_Triple_Online" class="PayPanel">
-        <div class="InputBOX invTypeBox inv_Paper" style="max-width: 50%;">
-          <q-input v-model="VehicleCode_Citizen" outlined placeholder='請輸入統一編號' />
-          <q-input v-model="VehicleCode_Citizen" outlined placeholder='請輸入公司名稱' />
-        </div>
-        <div class="Remarks">
-          <p class="text_Red">*開立發票後，下載並列印電子發票證明聯(報帳用)，節省發票郵寄時間。</p>
-          <p>※依法規定，發票一經開立，不得更改或該開其他統一編號發票。<a href="https://www.einvoice.nat.gov.tw/" target="_blank">財政部電子發票整合服務平台</a>
-          </p>
-        </div>
-      </q-tab-panel>
-      <q-tab-panel name="inv_Donate" class="PayPanel">
-        <div class="q-pa-md InputBOX invTypeBox inv_Donate">
-          <q-option-group :options="InvoiceDonateOptions" type="radio" v-model="InvoiceDonate" />
-        </div>
-      </q-tab-panel>
-      <q-tab-panel name="inv_Paper" class="PayPanel">
-        <div class="InputBOX invTypeBox inv_Paper" style="max-width: 50%">
-          <q-input v-model="VehicleCode_Citizen" outlined placeholder='請輸入姓名' />
-          <q-input v-model="VehicleCode_Citizen" outlined placeholder='發票寄送地址' />
-        </div>
-        <div class="Remarks">
-          <p>發票於到貨後猶豫期+5個工作天以平信寄出。</p>
-          <p>※依法規定，發票一經開立，不得更改或該開其他統一編號發票。<a href="https://www.einvoice.nat.gov.tw/" target="_blank">財政部電子發票整合服務平台</a>
-          </p>
-        </div>
-      </q-tab-panel>
-      <q-tab-panel name="inv_Triple" class="PayPanel">
-        <div class="InputBOX invTypeBox inv_Paper" style="max-width: 50%">
-          <q-input v-model="VehicleCode_Citizen" outlined placeholder='請輸入統一編號' />
-          <q-input v-model="VehicleCode_Citizen2" outlined placeholder='請輸入公司名稱' />
-          <q-input v-model="VehicleCode_Citizen3" outlined placeholder='發票寄送地址' />
-        </div>
-        <div class="Remarks">
-          <p>發票於到貨後猶豫期+5個工作天以平信寄出。</p>
-          <p>※依法規定，發票一經開立，不得更改或該開其他統一編號發票。<a href="https://www.einvoice.nat.gov.tw/" target="_blank">財政部電子發票整合服務平台</a>
-          </p>
-        </div>
-      </q-tab-panel>
-    </q-tab-panels>
-  </q-card>
-
   <q-card class="my-card q-ma-md q-pa-md" bordered>
-    <!-- <h5 class="mainTitle">請選擇付款方式</h5>
-    <div class="inputGroup q-mb-lg">
-      <q-btn-toggle v-model="PayType" color="grey" toggle-color="warning" :options="paymentMethod" size="15px" no-caps
-        unelevated rounded />
-    </div> -->
-
     <q-tab-panels class="q-mt-lg" v-model="PayType" animated transition-prev="fade" transition-next="fade">
-
       <!--信用卡-->
       <q-tab-panel name="Credit" class="PayPanel">
         <div class="inputGroup">
@@ -186,20 +116,6 @@ export default {
       ],
       MailCode: ref('customermail@mail.com'),
       PayType: ref('Credit'),
-      InvoiceDonate: ref('51811'),
-      InvoiceDonateOptions: [
-        { label: '第一社會福利基金會', value: '51811' },
-        { label: '董氏基金會', value: '531' },
-        { label: '中華民國脊髓損傷者聯合會', value: '2628' },
-        { label: '關懷台灣文教基金會', value: '9271' }
-      ],
-      InvoiceType: ref('inv_personal'),
-      InvoiceMethod: [{ label: '個人雲端發票', value: 'inv_personal' },
-      { label: '公司發票', value: 'inv_Triple_Online' },
-      { label: '發票捐贈', value: 'inv_Donate' },
-        // { label: '個人紙本發票', value: 'inv_Paper' },
-        // { label: '公司用(郵寄)', value: 'inv_Triple' }
-      ],
       CV: ref(''),
     }
   },
@@ -210,7 +126,6 @@ export default {
   },
   setup() {
     let uri = window.location.hash.split('?')[1]
-    //console.log(uri)
     let params = new URLSearchParams(uri)
     //const Account = params.get("A")
     const TID = params.get("E")
@@ -223,8 +138,8 @@ export default {
     }
     const OrderList = [
       {
-        title: "商品名稱",
-        Contact: GetCookieValue("User.Prodoct")
+        title: "遊戲名稱",
+        Contact: GetCookieValue("User.Terminal")
       }, {
         title: "商品說明",
         Contact: GetCookieValue("User.Prodoct")
@@ -248,6 +163,11 @@ export default {
     const issuerIcon = ref('');
     const issuerState = ref(false);
     const $q = useQuasar()
+    const paymentDone = ref(false)
+    let CarrierInfo = {}
+    if (GetCookieValue("Carrier")) {
+      CarrierInfo = JSON.parse(GetCookieValue("Carrier.Info"))
+    }
     function CheckPay() {
       // 檢查輸入
       if (CVC.value.length == 3 && cardNumber.value.length == 16) {
@@ -260,7 +180,7 @@ export default {
           var tCardInfo = cardNumber.value + ',' + expM.value + expY.value + ',' + CVC.value
           //tCardInfo = tCardInfo + ',' + emailAddress.value;
           // 加密card Info
-          console.log(tCardInfo)
+          //console.log(tCardInfo)
           var encrypt = new JSEncrypt();
           const publicKey = "-----BEGIN PUBLIC KEY-----\
                               MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqluZxy3BkrP92hX38FMxCWuFpzC6UOso\
@@ -272,7 +192,7 @@ export default {
                               -----END PUBLIC KEY-----";
           encrypt.setPublicKey(publicKey);
           var encrypted = encrypt.encrypt(tCardInfo);
-          console.log(encrypted);
+          //console.log(encrypted);
           let uri = window.location.hash.split('?')[1]
           // test
           let query = {
@@ -282,15 +202,16 @@ export default {
               "TID": TID,
               "PaymentID": "4",
               "Amount": Amount,
-              // "InvoiceType": 1,
               "InvoiceType": 0,
-              // "CarrierType": 1,
               "Email": emailAddress.value,
               "PaymentType": "1",
               "Amount": Amount * 100,
               "EncryptCardInfo": encrypted
             }
           }
+          Object.keys(CarrierInfo).forEach(function (item) {
+            query.param[item] = CarrierInfo[item];
+          });
           console.log("送出內容")
           console.log(query)
           pointApi.post('/Credit', query, {
@@ -339,8 +260,6 @@ export default {
               });
             })
         })
-      var message = cardNumber.value + "|" + issuer.value + "|" + expM.value + "/" + expY.value + "|" + emailAddress.value;
-
       return;
     }
     function GetCookieValue(name) {
